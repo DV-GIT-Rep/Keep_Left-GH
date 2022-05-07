@@ -5,6 +5,9 @@
 //  Created by Bill Drayton on 13/1/22.
 //
 
+//NOTE: - For both the Straight Track View and the Figure 8 View, the Straight Track will be included
+// in the view at a lower Z level. This allows vehicles to operate at all times.
+
 import SwiftUI
 import SpriteKit
 
@@ -22,6 +25,7 @@ struct ContentView: View {
         
         //NOTE: Loading f8Metre1 into 'scale' here DOESN'T WORK as it's never recomputed!!!
         var scale: CGFloat = 1.875 - 0.25
+        
         
         ZStack {
             SpriteView(scene: straightScene)
