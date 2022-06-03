@@ -1,0 +1,72 @@
+[
+    {
+    "name": "Figure 8 Track",
+    "image": "fig8Icon",
+    "view": 1,
+    "features": [
+        "Two lane \"Keep Left\" track",
+        "Two lane \"Other\" track",
+        "Selectable speed limits",
+        "Able to select number of vehicles",
+        "Track length approximately 1km"
+        ]
+    },
+    {
+    "name": "Straight Track",
+    "image": "straightTrackIcon",
+    "view": 2,
+    "features": [
+        "Two lane \"Keep Left\" track",
+        "Two lane \"Other\" track",
+        "Selectable speed limits",
+        "Able to select number of vehicles",
+        "Full track length approximately 1km",
+        "Able to zoom track length/width"
+        ]
+    },
+    {
+    "name": "Game Track",
+    "image": "gameTrackIcon",
+    "view": 3,
+    "features": [
+        "Two lane \"Keep Left\" track",
+        "Selectable speed limits",
+        "Able to select number of vehicles",
+        "Full track length approximately 1km",
+        "Able to zoom track length/width",
+        "User vehicle must maintain minimum distance from other vehicles",
+        "User vehicle must not exceed speed limit"
+        ]
+    },
+    {
+    "name": "Screen Shots",
+    "image": "fig8Icon",
+    "view": 4,
+    "features": [
+        "View existing screen shots",
+        "Enable auto screen shots",
+        "Set auto screen shot time/date and/or distance"
+        ]
+    },
+    {
+    "name": "User Guide",
+    "image": "userGuideIcon",
+    "view": 5,
+    "features": [
+        "View existing screen shots",
+        "Enable auto screen shots",
+        "Set auto screen shot time/date and/or distance"
+        ]
+    },
+    {
+    "name": "Settings",
+    "image": "settingsIcon",
+    "view": 10,
+    "features": [
+        "Set default number of vehicles",
+        "Set speed limit",
+        "Set magnifier display as standard on figure 8 track",
+        "Set magnifier on figure 8 track to hover over vehicle"
+        ]
+    }
+]

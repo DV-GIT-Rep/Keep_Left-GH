@@ -12,9 +12,16 @@ import SwiftUI
 
 @main
 struct Keep_Left: App {
+    init () {
+        Fig8TrackView()
+        StraightTrackView()
+        GameTrackView()
+        ScreenShotView()
+        SettingsView()
+    }
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainMenuView()
         }
     }
 }

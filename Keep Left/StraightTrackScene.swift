@@ -16,10 +16,12 @@ var vBody: SKSpriteNode!
 
 var sprite: SKSpriteNode!   //Temporary to stop XCode errors!
 
+var dONTrEPEAT = false
+
 //Track scene may be temporary. Functions below MUST be called from within a scene!
 class StraightTrackScene: SKScene {
     
-    var toggleSpeed: Int = 2
+    var toggleSpeed: Int = 1
 //    var toggleSpeed: Int = 1
 
 //    let self.view?.showsNodeCount = true
@@ -64,7 +66,7 @@ class StraightTrackScene: SKScene {
     //            }
     //        }
     //
-
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else {return}   //Exit if not first touch!
         var kph: CGFloat = 110
@@ -97,7 +99,7 @@ class StraightTrackScene: SKScene {
                 childNode(withName: "s1Vehicle_\(i)")?.physicsBody?.velocity.dy = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
                 childNode(withName: "s2Vehicle_\(i)")?.physicsBody?.velocity.dy = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
             }
-            toggleSpeed = toggleSpeed + 2
+//            toggleSpeed = toggleSpeed + 2
         case 3:
             for i in 1...numVehicles {
                 childNode(withName: "s1Vehicle_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
@@ -112,17 +114,17 @@ class StraightTrackScene: SKScene {
 //            toggleSpeed = -1
 //        print("Vehicle 1 Node = \(childNode(withName: "s1Vehicle_1")!)")
 
-        if toggleSpeed == 5 {
+        if toggleSpeed == 4 {
 //            toggleSpeed = -1
-            toggleSpeed = 0
-//            var scene = Fig8Scene(fileNamed: "Fig8Scene")!
-            var scene = Fig8Scene()
-//            var transition: SKTransition = SKTransition.moveIn(with: .right, duration: 2)
-            var transition: SKTransition = SKTransition.fade(withDuration: 2)
-            self.view?.presentScene(scene, transition: transition)
+            toggleSpeed = 0 // WAS toggleSpeed = 0 when Fig8Scene accessed from here!!!
+            ////            var scene = Fig8Scene(fileNamed: "Fig8Scene")!
+            //            var scene = Fig8Scene()
+            ////            var transition: SKTransition = SKTransition.moveIn(with: .right, duration: 2)
+            //            var transition: SKTransition = SKTransition.fade(withDuration: 2)
+            //            self.view?.presentScene(scene, transition: transition)
 ////            print("toggleSpeed = \(toggleSpeed)")
         } else if toggleSpeed == 6 {
-//            toggleSpeed = 0
+            toggleSpeed = 0
 //            var transition: SKTransition = SKTransition.fade(withDuration: 2)
 //            var scene = StraightTrackScene()
 //            self.view?.presentScene(scene)
@@ -176,7 +178,10 @@ class StraightTrackScene: SKScene {
 /*        var veh = putVehicle()
         placeVehicle(s1Vehicle: veh)
 */
+        if dONTrEPEAT == false {
         let veh = makeVehicle()
+            dONTrEPEAT = true
+        }
         
     }
     

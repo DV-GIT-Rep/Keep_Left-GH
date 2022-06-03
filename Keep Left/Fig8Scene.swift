@@ -18,7 +18,7 @@ import SwiftUI
 //Track scene may be temporary. Functions below MUST be called from within a scene!
 class Fig8Scene: SKScene {
     
-    var toggleSpeed: Int = 0
+//    var toggleSpeed: Int = 0 ZZZ
     
 //    let self.view?.showsNodeCount = true
     
@@ -70,13 +70,13 @@ class Fig8Scene: SKScene {
     //        }
     //
 
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        guard let touch = touches.first else {return}   //Exit if not first touch!
-        toggleSpeed = 2
-        var transition: SKTransition = SKTransition.fade(withDuration: 2)
-        var scene = StraightTrackScene()
-        self.view?.presentScene(scene, transition: transition)
-    }
+//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+////        guard let touch = touches.first else {return}   //Exit if not first touch!
+////        toggleSpeed = 2 ZZZ
+//        var transition: SKTransition = SKTransition.fade(withDuration: 2)
+//        var scene = StraightTrackScene()
+//        self.view?.presentScene(scene, transition: transition)
+//    }
 /*
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
