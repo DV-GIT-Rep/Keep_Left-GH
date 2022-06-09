@@ -40,7 +40,7 @@
     },
     {
     "name": "Screen Shots",
-    "image": "fig8Icon",
+    "image": "screenShotIcon",
     "view": 4,
     "features": [
         "View existing screen shots",

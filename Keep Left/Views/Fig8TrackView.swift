@@ -34,7 +34,8 @@ struct Fig8TrackView: View {
                     .scaleEffect(scale)
                 Spacer(minLength: UIScreen.main.bounds.height / 5.5)
             }
-            
+            .foregroundColor(Color(red: 0.2, green: 0.2, blue: 0.2))
+
         }
         .statusBar(hidden: true)
 

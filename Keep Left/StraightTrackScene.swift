@@ -21,7 +21,7 @@ var dONTrEPEAT = false
 //Track scene may be temporary. Functions below MUST be called from within a scene!
 class StraightTrackScene: SKScene {
     
-    var toggleSpeed: Int = 1
+    var toggleSpeed: Int = 2
 //    var toggleSpeed: Int = 1
 
 //    let self.view?.showsNodeCount = true

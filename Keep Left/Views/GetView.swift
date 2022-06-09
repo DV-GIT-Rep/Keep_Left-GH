@@ -1,3 +1,4 @@
+/*  //View NOT used!!!
 //
 //  GetView.swift
 //  Keep Left
@@ -48,3 +49,5 @@ struct GetView: View {
 //        GetView(viewName: \.self)
 //    }
 //}
+
+*/
