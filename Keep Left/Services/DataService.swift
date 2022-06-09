@@ -9,12 +9,12 @@ import Foundation
 
 class DataService: ObservableObject {
     
-    static func getLocalData() -> [Menu] {
+    static func getLocalData(fileName: String, fileType: String = "json") -> [Menu] {
         
         //Parse local JSON file
         
         //Get the URL path to the JSON file
-        let pathString = Bundle.main.path(forResource: "menus", ofType: "json")
+        let pathString = Bundle.main.path(forResource: fileName, ofType: fileType)
 
         //Verify pathString is not equal to nil, else return an empty recipe
         guard pathString != nil else {
@@ -46,12 +46,12 @@ class DataService: ObservableObject {
                 
             } catch {
                 //Error parsing JSON
-                print("Error parsing JSON data: \(error)")
+                print("Error parsing JSON data for \(fileName).\(fileType):\n   \(error)")
             }
             
         } catch {
             //Error retrieving data
-            print("Error retrieving Data: \(error)")
+            print("Error retrieving Data from \(fileName).\(fileType):\n   \(error)")
         }
         
         //Only gets here if there is an error! Return empty recipe array!
