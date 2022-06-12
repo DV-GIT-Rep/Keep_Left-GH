@@ -9,7 +9,7 @@ import Foundation
 
 class DataService: ObservableObject {
     
-    static func getLocalData(fileName: String, fileType: String = "json") -> [Menu] {
+    static func getLocalMenuData(fileName: String, fileType: String = "json") -> [Menu] {
         
         //Parse local JSON file
         

@@ -14,8 +14,8 @@ class MenuModel: ObservableObject {
     
     init() {
         
-        //Retrieve the local data using the getLocalData function in the DataService class
-        self.mainMenu = DataService.getLocalData(fileName: "menus", fileType: "json")
+        //Retrieve the local data using the getLocalMenuData function in the DataService class
+        self.mainMenu = DataService.getLocalMenuData(fileName: "menus", fileType: "json")
         
     }
 }
