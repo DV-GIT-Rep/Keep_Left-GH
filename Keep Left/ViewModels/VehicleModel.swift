@@ -9,8 +9,9 @@ import Foundation
 
 class VehicleModel: ObservableObject {
     
-    @Published var vehicle = [Vehicle]()
-    
+    @Published var t1Vehicle = [Vehicle]()
+    @Published var t2Vehicle = [Vehicle]()
+
     init() {
         
 //        //Retrieve the local data using the getLocalMenuData function in the DataService class
