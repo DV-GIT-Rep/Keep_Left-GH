@@ -9,13 +9,13 @@ import Foundation
 
 class VehicleModel: ObservableObject {
     
-    @Published var t1Vehicle = [Vehicle]()
-    @Published var t2Vehicle = [Vehicle]()
+    @Published var txVehicle = [Vehicle]()
+//    @Published var t2Vehicle = [Vehicle]()
 
     init() {
         
 //        //Retrieve the local data using the getLocalMenuData function in the DataService class
-//        self.vehicle = DataService.getLocalVehicleData(fileName: "vehicles", fileType: "json")
+//        self.txVehicle = DataService.getLocalVehicleData(fileName: "vehicles", fileType: "json")
         
     }
 }

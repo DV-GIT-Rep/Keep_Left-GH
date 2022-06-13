@@ -7,8 +7,10 @@
 
 import SpriteKit
 
-class Vehicle: SKSpriteNode {
+class Vehicle: SKSpriteNode, ObservableObject {
     
+    @Published var txVehicle = [Vehicle]()
+
     //MARK: - Init
     init(imageName: String) {
         let texture = SKTexture(imageNamed: imageName)
