@@ -30,8 +30,23 @@ class StraightTrackScene: SKScene {
 //    override func sceneDidLoad() {
         
         //MARK: - Create background colour (width: screenwidth, height: 1km). Define sMetre1 = multiplier for metres to points
-        calcScale()
+//        calcScale()
+        var result = SceneModel().calcStraightScene(height: view.bounds.size.height, width: view.bounds.size.width)
+        portrait = result.portrait
+        sMetre1 = result.metre1
+        sSceneWidth = result.width
+        sSceneHeight = result.height
+        scene?.size.width = sSceneWidth
+        scene?.size.height = sSceneHeight
         
+        scene?.backgroundColor = UIColor(red: 0.19, green: 0.38, blue: 0.16, alpha: 1)
+//        scene?.zPosition = -55
+        scene?.scaleMode = .aspectFill
+        physicsWorld.gravity = .zero
+        
+//        if
+//        scene?.zRotation = .pi * 3
+
         //MARK: - Add 2x straight roads to StraightTrackScene
         addRoads()
         
@@ -132,35 +147,35 @@ class StraightTrackScene: SKScene {
         toggleSpeed = toggleSpeed + 1
     } // //ZZZ
     
-    //Calculate scale of the display and return display orientation
-    func calcScale() -> (km1: CGFloat, sTrackPortrait: Bool) {
-        //blah! blah! blah!
-        if (view!.bounds.size.width < view!.bounds.size.height) {
-            portrait = true
-//            scene?.anchorPoint = CGPoint(x: 0.5, y: 0.0)
-            sMetre1 = view!.bounds.size.width/sTrackWidth
-            scene?.size.width = view!.bounds.size.width
-            sSceneWidth = scene!.size.width
-            scene?.size.height = 1000 * sMetre1  //Set screen height = 1,000 metres
-            sSceneHeight = scene!.size.height
-//            scene?.position = CGPoint(x: view!.bounds.size.width/2, y: 0)
-        } else {
-            portrait = false
-            sMetre1 = view!.bounds.size.height/sTrackWidth
-            scene?.size.width = 1000 * sMetre1  //Set screen width = 1,000 metres
-            sSceneWidth = scene!.size.width
-            scene?.size.height = view!.bounds.size.height
-            sSceneHeight = scene!.size.height
-//            scene?.position = CGPoint(x: view!.bounds.size.width/2, y: 0)
-        }
-        
-        scene?.backgroundColor = UIColor(red: 0.19, green: 0.38, blue: 0.16, alpha: 1)
-//        scene?.zPosition = -55
-        scene?.scaleMode = .aspectFill
-        physicsWorld.gravity = .zero
-        
-        return (km1, sTrackPortrait)
-    }
+//    //Calculate scale of the display and return display orientation
+//    func calcScale() -> (km1: CGFloat, sTrackPortrait: Bool) {
+//        //blah! blah! blah!
+//        if (view!.bounds.size.width < view!.bounds.size.height) {
+//            portrait = true
+////            scene?.anchorPoint = CGPoint(x: 0.5, y: 0.0)
+//            sMetre1 = view!.bounds.size.width/sTrackWidth
+//            scene?.size.width = view!.bounds.size.width
+//            sSceneWidth = scene!.size.width
+//            scene?.size.height = 1000 * sMetre1  //Set screen height = 1,000 metres
+//            sSceneHeight = scene!.size.height
+////            scene?.position = CGPoint(x: view!.bounds.size.width/2, y: 0)
+//        } else {
+//            portrait = false
+//            sMetre1 = view!.bounds.size.height/sTrackWidth
+//            scene?.size.width = 1000 * sMetre1  //Set screen width = 1,000 metres
+//            sSceneWidth = scene!.size.width
+//            scene?.size.height = view!.bounds.size.height
+//            sSceneHeight = scene!.size.height
+////            scene?.position = CGPoint(x: view!.bounds.size.width/2, y: 0)
+//        }
+//        
+//        scene?.backgroundColor = UIColor(red: 0.19, green: 0.38, blue: 0.16, alpha: 1)
+////        scene?.zPosition = -55
+//        scene?.scaleMode = .aspectFill
+//        physicsWorld.gravity = .zero
+//        
+//        return (km1, sTrackPortrait)
+//    }
 
     //Create a straight dual carriageway, dual lane 1km long track and orient accordingly
     func createStraightTrack() {
@@ -193,7 +208,7 @@ class StraightTrackScene: SKScene {
     var yOffset: CGFloat = 0.0  //metres
     var zPos: CGFloat = -54
 //    createLine(xOffset: xOffset, yOffset: yOffset, lWidth: roadWidth, lLength: roadLength, colour: SKColor(red: 42/256, green: 41/256, blue: 34/256, alpha: 1), zPos: zPos)   //Lay down bitumen
-        createLine(xOffset: xOffset, yOffset: yOffset, lWidth: roadWidth, lLength: roadLength, colour: SKColor(red: 42/256, green: 41/256, blue: 34/256, alpha: 1), zPos: zPos)   //Lay down bitumen
+    createLine(xOffset: xOffset, yOffset: yOffset, lWidth: roadWidth, lLength: roadLength, colour: SKColor(red: 42/256, green: 41/256, blue: 34/256, alpha: 1), zPos: zPos)   //Lay down bitumen
     }
 
     func createCentreLines() {
@@ -218,7 +233,7 @@ class StraightTrackScene: SKScene {
 //        let roadLength = 1000.0
 //        let lWidth = lineWidth    //Default = lineWidth
 //        zPos = -53                 //Default = -53
-    createLine(xOffset: xOffset, yOffset: yOffset, lWidth: shoulderLineWidth, lLength: roadLength)
+        createLine(xOffset: xOffset, yOffset: yOffset, lWidth: shoulderLineWidth, lLength: roadLength)
     }
 
     func createOutsideLines() {
@@ -229,6 +244,8 @@ class StraightTrackScene: SKScene {
 //        let lWidth = lineWidth  //Default = lineWidth
 //        zPos = -53    //createLine defaults to -53 & colour defaults to white
         createLine(xOffset: xOffset, yOffset: yOffset, lWidth: shoulderLineWidth, lLength: roadLength)
+//        Line().createLine(xOffset: xOffset, yOffset: yOffset, lWidth: shoulderLineWidth, lLength: roadLength, lineParent: self)
+//        print("size.width = \(size.width)")
     }
     
     func createLine(xOffset: CGFloat, yOffset: CGFloat, lWidth: CGFloat = lineWidth, lLength: CGFloat, colour: SKColor = .white, zPos: CGFloat = -53, multiLine: Bool = true) {

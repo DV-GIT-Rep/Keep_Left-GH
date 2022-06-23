@@ -36,9 +36,13 @@ struct OtherSummaryDescriptionView: View {
     var body: some View {
         VStack(alignment: .trailing) {
             Text("Avg Speed")
+                .bold()
+                .foregroundColor(.black)
             Text("Max Speed")
             Text("Min Speed")
             Text("Avg Miles")
+                .bold()
+                .foregroundColor(.black)
             Text("Max Miles")
             Text("Min Miles")
         }
@@ -48,12 +52,16 @@ struct OtherSummaryDescriptionView: View {
 struct OtherSummaryResultsView: View {
     var body: some View {
         VStack (alignment: .leading) {
-            Text("87 kph")
+            Text("84 kph")
+                .bold()
+                .foregroundColor(.black)
             Text("110 kph")
-            Text("36 kph")
-            Text("325,248")
-            Text("478,414")
-            Text("233,823")
+            Text("31 kph")
+            Text("318,624")
+                .bold()
+                .foregroundColor(.black)
+            Text("473,379")
+            Text("231,593")
         }
     }
 }

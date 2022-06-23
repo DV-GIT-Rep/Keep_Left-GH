@@ -120,6 +120,7 @@ class Fig8Scene: SKScene {
     func calcF8Size() -> () {
         if (view!.bounds.size.width < view!.bounds.size.height) {
             portrait = true
+            scene?.zRotation = .pi * 3
 //            scene?.anchorPoint = CGPoint(x: 0.5, y: 0.0)
             scene?.size.width = view!.bounds.size.width
             scene?.size.height = view!.bounds.size.height
@@ -132,6 +133,7 @@ class Fig8Scene: SKScene {
 //            scene?.position = CGPoint(x: view!.bounds.size.width/2, y: 0)
         } else {
             portrait = false
+            scene?.zRotation = .pi * -3
 //            f8Metre1 = view!.bounds.size.height/f8ScreenWidth
 //            scene?.size.width = 1000 * f8Metre1  //Set screen width = 1,000 metres
 //            scene?.size.height = view!.bounds.size.height

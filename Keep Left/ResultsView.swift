@@ -36,9 +36,13 @@ struct SummaryDescriptionView: View {
     var body: some View {
         VStack(alignment: .trailing) {
             Text("Avg Speed")
+                .bold()
+                .foregroundColor(.black)
             Text("Max Speed")
             Text("Min Speed")
             Text("Avg Miles")
+                .bold()
+                .foregroundColor(.black)
             Text("Max Miles")
             Text("Min Miles")
         }
@@ -49,9 +53,13 @@ struct SummaryResultsView: View {
     var body: some View {
         VStack (alignment: .leading) {
             Text("87 kph")
+                .bold()
+                .foregroundColor(.black)
             Text("110 kph")
             Text("36 kph")
             Text("325,248")
+                .bold()
+                .foregroundColor(.black)
             Text("478,414")
             Text("233,823")
         }

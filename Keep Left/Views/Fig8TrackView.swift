@@ -45,5 +45,6 @@ struct Fig8TrackView: View {
 struct Fig8TrackView_Previews: PreviewProvider {
     static var previews: some View {
         Fig8TrackView()
+            .previewInterfaceOrientation(.portraitUpsideDown)
     }
 }
