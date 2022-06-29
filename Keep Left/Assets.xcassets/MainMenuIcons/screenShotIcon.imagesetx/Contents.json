@@ -1,11 +1,11 @@
 {
   "images" : [
     {
+      "filename" : "Car 6.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "camera.circle@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

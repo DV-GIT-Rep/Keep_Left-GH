@@ -14,6 +14,7 @@
 		9D383457285712470061D6C0 /* Roads.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D383456285712470061D6C0 /* Roads.swift */; };
 		9D38345B285AD48C0061D6C0 /* SceneModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D38345A285AD48C0061D6C0 /* SceneModel.swift */; };
 		9D38345D286196BF0061D6C0 /* TempView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D38345C286196BF0061D6C0 /* TempView.swift */; };
+		9D38345F286C04D60061D6C0 /* OldSceneModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D38345E286C04D50061D6C0 /* OldSceneModel.swift */; };
 		9D45447C27E1706000D105F9 /* Vehicle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D45447B27E1706000D105F9 /* Vehicle.swift */; };
 		9D6CF27828470291001CD66C /* MainMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D6CF27728470290001CD66C /* MainMenuView.swift */; };
 		9D6CF27C28473B67001CD66C /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D6CF27B28473B67001CD66C /* Menu.swift */; };
@@ -49,6 +50,7 @@
 		9D383456285712470061D6C0 /* Roads.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Roads.swift; sourceTree = "<group>"; };
 		9D38345A285AD48C0061D6C0 /* SceneModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneModel.swift; sourceTree = "<group>"; };
 		9D38345C286196BF0061D6C0 /* TempView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempView.swift; sourceTree = "<group>"; };
+		9D38345E286C04D50061D6C0 /* OldSceneModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OldSceneModel.swift; sourceTree = "<group>"; };
 		9D45447B27E1706000D105F9 /* Vehicle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vehicle.swift; sourceTree = "<group>"; };
 		9D6CF27728470290001CD66C /* MainMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuView.swift; sourceTree = "<group>"; };
 		9D6CF27B28473B67001CD66C /* Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 				9D38345A285AD48C0061D6C0 /* SceneModel.swift */,
 				9D6CF27D28473C3A001CD66C /* MenuModel.swift */,
 				9D38344F28559F300061D6C0 /* VehicleModel.swift */,
+				9D38345E286C04D50061D6C0 /* OldSceneModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -288,6 +291,7 @@
 				9DD199D927901F8500866318 /* KeepLeftApp.swift in Sources */,
 				9D89A5CA284ABE26009D41D0 /* UserGuideView.swift in Sources */,
 				9D6CF2922849CFF1001CD66C /* OtherResultsView.swift in Sources */,
+				9D38345F286C04D60061D6C0 /* OldSceneModel.swift in Sources */,
 				9D174FC2281507FC00DF0996 /* ResultsView.swift in Sources */,
 				9DD199E727901FE900866318 /* ObsoleteStraightTrackScene.swift in Sources */,
 				9D70F43327C8A1BF006F2A14 /* Fig8Scene.swift in Sources */,

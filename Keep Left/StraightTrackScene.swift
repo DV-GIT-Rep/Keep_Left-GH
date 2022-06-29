@@ -21,6 +21,7 @@ var dONTrEPEAT = false
 //Track scene may be temporary. Functions below MUST be called from within a scene!
 class StraightTrackScene: SKScene {
     
+    var straightScene = SceneModel()
     var toggleSpeed: Int = 2
 //    var toggleSpeed: Int = 1
 
@@ -31,11 +32,12 @@ class StraightTrackScene: SKScene {
         
         //MARK: - Create background colour (width: screenwidth, height: 1km). Define sMetre1 = multiplier for metres to points
 //        calcScale()
-        var result = SceneModel().calcStraightScene(height: view.bounds.size.height, width: view.bounds.size.width)
-        portrait = result.portrait
-        sMetre1 = result.metre1
-        sSceneWidth = result.width
-        sSceneHeight = result.height
+
+        straightScene.calcStraightScene(size: view.bounds.size)
+        portrait = straightScene.portrait
+        sMetre1 = straightScene.metre1
+        sSceneWidth = straightScene.width
+        sSceneHeight = straightScene.height
         scene?.size.width = sSceneWidth
         scene?.size.height = sSceneHeight
         

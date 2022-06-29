@@ -10,97 +10,82 @@ import SwiftUI
 
 class SceneModel: ObservableObject {
     
-    @Published var f8Metre1: CGFloat
-    @Published var f8Height: CGFloat
-    @Published var f8Width: CGFloat
-    @Published var f8Portrait: Bool
+    @Published var metre1: CGFloat
+    @Published var height: CGFloat
+    @Published var width: CGFloat
+    @Published var portrait: Bool
+    @Published var size: CGSize
 
-    @Published var sMetre1: CGFloat
-    @Published var sHeight: CGFloat
-    @Published var sWidth: CGFloat
-    @Published var sPortrait: Bool
-    
     init() {
-        f8Metre1 = 1.0
-        f8Height = 1.0
-        f8Width = 1.0
-        f8Portrait = true
-
-        sMetre1 = 1.0
-        sHeight = 1.0
-        sWidth = 1.0
-        sPortrait = true
+        metre1 = 1.0
+        height = 1.0
+        width = 1.0
+        portrait = true
+        size = CGSize(width: 1.0, height: 1.0)
     }
     
-    func calcF8Scene(height: CGFloat = UIScreen.main.bounds.size.height,
-                   width: CGFloat = UIScreen.main.bounds.size.width) -> (height: CGFloat,
-                                         width: CGFloat,
-                                         metre1: CGFloat,
-                                         portrait: Bool) {
-        
-        let f8Height = height
-        let f8Width = width
+    /*
+    init(size: CGSize) {
+        self.size = size
+    }
+    */
+
+    func calcF8Scene(size: CGSize = UIScreen.main.bounds.size) {
+
+        height = size.height
+        width = size.width
         
         if (width < height) {
             
-            f8Portrait = true
+            portrait = true
             
             //MARK: - Use width to calculate scale factor for very tall screens Fig 8 Track only!
-            if ((f8Height > (2 * f8Width))) {
-                f8Metre1 = f8Width / f8ScreenWidth
+            if ((height > (2 * width))) {
+                metre1 = width / f8ScreenWidth
             } else {
-                f8Metre1 = f8Height / f8ScreenHeight
+                metre1 = height / f8ScreenHeight
             }
             
         } else {
             
-            f8Portrait = false
+            portrait = false
             
             //MARK: - Use height to calculate scale factor for very wide screens Fig 8 Track only!
-            if (f8Width > (2 * f8Height)) {
-                f8Metre1 = f8Height / f8ScreenHeight
+            if (width > (2 * height)) {
+                metre1 = height / f8ScreenHeight
             } else {
-                f8Metre1 = f8Width / f8ScreenWidth
+                metre1 = width / f8ScreenWidth
             }
             
         }
-        
-        return (f8Height, f8Width, f8Metre1, f8Portrait)
     }
     
-    func calcStraightScene(height: CGFloat = UIScreen.main.bounds.size.height,
-                   width: CGFloat = UIScreen.main.bounds.size.width) -> (height: CGFloat,
-                                         width: CGFloat,
-                                         metre1: CGFloat,
-                                         portrait: Bool) {
+    func calcStraightScene(size: CGSize = UIScreen.main.bounds.size) {
+
+        height = size.height
+        width = size.width
         
-        let sHeight = height
-        let sWidth = width
-        
-        if (sWidth < sHeight) {
+        if (width < height) {
             
-            sPortrait = true
+            portrait = true
             
             //MARK: - Use width to calculate scale factor. sTrackWidth can vary to set scale.
-                sMetre1 = sWidth / sTrackWidth
+            metre1 = width / sTrackWidth
 
-            sSceneWidth = sWidth
-            sSceneHeight = 1000 * sMetre1
+            sSceneWidth = width
+            sSceneHeight = 1000 * metre1
 
         } else {
             
-            sPortrait = false
+            portrait = false
             
             //MARK: - Use width to calculate scale factor. sTrackWidth can vary to set scale.
-            sMetre1 = sHeight / sTrackWidth
+            metre1 = height / sTrackWidth
 
-            sSceneWidth = 1000 * sMetre1
-            sSceneHeight = sHeight
+            sSceneWidth = 1000 * metre1
+            sSceneHeight = height
 
         }
-        
-        return (sSceneHeight, sSceneWidth, sMetre1, sPortrait)
     }
-    
 
 }

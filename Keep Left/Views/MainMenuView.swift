@@ -9,8 +9,9 @@ import SwiftUI
 
 struct MainMenuView: View {
     
-    //Reference the View Model
-    @ObservedObject var model = MenuModel()
+    //Reference the Scene and View Models
+    @StateObject var scene = SceneModel()
+    @StateObject var model = MenuModel()
     
     var body: some View {
         
@@ -51,6 +52,8 @@ struct MainMenuView: View {
             }
             .navigationTitle("Select")
         }
+        .environmentObject(scene)   //Anything inside NavigationView to access SceneModel class
+        .environmentObject(model)   //Anything inside NavigationView to access MenuModel class
     }
 }
 
@@ -83,5 +86,6 @@ func getView(viewNo: Int) -> AnyView {
 struct MainMenuView_Previews: PreviewProvider {
     static var previews: some View {
         MainMenuView()
+            .previewInterfaceOrientation(.portrait)
     }
 }

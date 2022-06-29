@@ -18,7 +18,9 @@ import SwiftUI
 //Track scene may be temporary. Functions below MUST be called from within a scene!
 class Fig8Scene: SKScene {
     
-//    var toggleSpeed: Int = 0 ZZZ
+    var f8Scene = SceneModel()
+
+    //    var toggleSpeed: Int = 0 ZZZ
     
 //    let self.view?.showsNodeCount = true
     
@@ -31,7 +33,16 @@ class Fig8Scene: SKScene {
         
         
         //MARK: - Create background colour width: screenwidth height: 1km. Define sMetre1 = multiplier for metres to points
-        calcF8Size()
+//        calcF8Size()
+        
+        f8Scene.calcF8Scene(size: view.bounds.size)
+        portrait = f8Scene.portrait
+        f8Metre1 = f8Scene.metre1
+        f8SceneWidth = f8Scene.width
+        f8SceneHeight = f8Scene.height
+        scene?.size.width = f8SceneWidth
+        scene?.size.height = f8SceneHeight
+
         
         //MARK: - Add 2x figure 8 roads to StraightTrackScene
         addF8Roads()
@@ -115,40 +126,40 @@ class Fig8Scene: SKScene {
         toggleSpeed = toggleSpeed + 1
     }   */
     
-    //Calculate scale of the display and return display orientation
-//    func calcF8Size() -> (f8km1: CGFloat, f8TrackPortrait: Bool) {
-    func calcF8Size() -> () {
-        if (view!.bounds.size.width < view!.bounds.size.height) {
-            portrait = true
-            scene?.zRotation = .pi * 3
-//            scene?.anchorPoint = CGPoint(x: 0.5, y: 0.0)
-            scene?.size.width = view!.bounds.size.width
-            scene?.size.height = view!.bounds.size.height
-            if (scene?.size.height)! > (2 * (scene?.size.width)!) {
-                f8Metre1 = (scene?.size.width)! / f8ScreenWidth
-            } else {
-                f8Metre1 = (scene?.size.height)! / f8ScreenHeight
-            }
-            print("f8Metre1: \(f8Metre1)\nHeight: \(scene?.size.height)!    Width: \(scene?.size.width)!\nf8ScrnHgt: \(f8ScreenHeight)    f8ScrnWdth: \(f8ScreenWidth)")
-//            scene?.position = CGPoint(x: view!.bounds.size.width/2, y: 0)
-        } else {
-            portrait = false
-            scene?.zRotation = .pi * -3
-//            f8Metre1 = view!.bounds.size.height/f8ScreenWidth
-//            scene?.size.width = 1000 * f8Metre1  //Set screen width = 1,000 metres
+//    //Calculate scale of the display and return display orientation
+////    func calcF8Size() -> (f8km1: CGFloat, f8TrackPortrait: Bool) {
+//    func calcF8Size() -> () {
+//        if (view!.bounds.size.width < view!.bounds.size.height) {
+//            portrait = true
+//            scene?.zRotation = .pi * 3
+////            scene?.anchorPoint = CGPoint(x: 0.5, y: 0.0)
+//            scene?.size.width = view!.bounds.size.width
 //            scene?.size.height = view!.bounds.size.height
-//            scene?.position = CGPoint(x: view!.bounds.size.width/2, y: 0)
-        }
-        
-        scene?.backgroundColor = UIColor(red: 0.657, green: 0.657, blue: 0.657, alpha: 1)    //Equivalent colour to image background
-//        scene?.backgroundColor = UIColor(red: 0.19, green: 0.38, blue: 0.16, alpha: 1)
-//        scene?.zPosition = -5
-        scene?.scaleMode = .aspectFill
-        physicsWorld.gravity = .zero
-        
-//        return (km1, sTrackPortrait)
-        return ()
-    }
+//            if (scene?.size.height)! > (2 * (scene?.size.width)!) {
+//                f8Metre1 = (scene?.size.width)! / f8ScreenWidth
+//            } else {
+//                f8Metre1 = (scene?.size.height)! / f8ScreenHeight
+//            }
+//            print("f8Metre1: \(f8Metre1)\nHeight: \(scene?.size.height)!    Width: \(scene?.size.width)!\nf8ScrnHgt: \(f8ScreenHeight)    f8ScrnWdth: \(f8ScreenWidth)")
+////            scene?.position = CGPoint(x: view!.bounds.size.width/2, y: 0)
+//        } else {
+//            portrait = false
+//            scene?.zRotation = .pi * -3
+////            f8Metre1 = view!.bounds.size.height/f8ScreenWidth
+////            scene?.size.width = 1000 * f8Metre1  //Set screen width = 1,000 metres
+////            scene?.size.height = view!.bounds.size.height
+////            scene?.position = CGPoint(x: view!.bounds.size.width/2, y: 0)
+//        }
+//        
+//        scene?.backgroundColor = UIColor(red: 0.657, green: 0.657, blue: 0.657, alpha: 1)    //Equivalent colour to image background
+////        scene?.backgroundColor = UIColor(red: 0.19, green: 0.38, blue: 0.16, alpha: 1)
+////        scene?.zPosition = -5
+//        scene?.scaleMode = .aspectFill
+//        physicsWorld.gravity = .zero
+//        
+////        return (km1, sTrackPortrait)
+//        return ()
+//    }
 
     //Create a straight dual carriageway, dual lane 1km long track and orient accordingly
     func createStraightTrack() {
