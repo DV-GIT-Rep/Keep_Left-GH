@@ -10,7 +10,7 @@ import SpriteKit
 
 struct StraightTrackView: View {
     
-    var straightScene = StraightTrackScene()
+    @State private var straightScene = StraightTrackScene()
 
     var body: some View {
 
@@ -40,6 +40,11 @@ struct StraightTrackView: View {
 
         }
         .statusBar(hidden: true)
+        .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+            let isLandscape = UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight
+            let rotation = isLandscape ? CGFloat.pi/2 : 0
+            straightScene.set(sContainerZRotation:rotation)
+        }
 
     }
 }

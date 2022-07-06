@@ -1,5 +1,5 @@
 //
-//  VehicleFunctions.swift
+//  StraightTrackScene.swift
 //  Keep Left
 //
 //  Created by Bill Drayton on 3/2/2022.
@@ -21,6 +21,13 @@ var dONTrEPEAT = false
 //Track scene may be temporary. Functions below MUST be called from within a scene!
 class StraightTrackScene: SKScene {
     
+    //property and function for handling rotation
+    var sOneTime = false    //Only allows container to be created once
+    let sContainer = SKNode()
+    func set(sContainerZRotation:CGFloat) {
+        sContainer.zRotation = sContainerZRotation
+    }
+    
     var straightScene = SceneModel()
     var toggleSpeed: Int = 2
 //    var toggleSpeed: Int = 1
@@ -28,7 +35,13 @@ class StraightTrackScene: SKScene {
 //    let self.view?.showsNodeCount = true
     
     override func didMove(to view: SKView) {
-//    override func sceneDidLoad() {
+        if sOneTime == false {
+            self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            self.addChild(sContainer) //add sContainer
+            sOneTime = true
+        }
+
+        //    override func sceneDidLoad() {
         
         //MARK: - Create background colour (width: screenwidth, height: 1km). Define sMetre1 = multiplier for metres to points
 //        calcScale()
@@ -206,8 +219,10 @@ class StraightTrackScene: SKScene {
     //Create road surfaces
 //    var roadLength: CGFloat = 1000.0
 //    var roadWidth: CGFloat = 8.0
-    var xOffset: CGFloat = (roadWidth / 2) + (centreStrip / 2)     //metres
-    var yOffset: CGFloat = 0.0  //metres
+//    var xOffset: CGFloat = (roadWidth / 2) + (centreStrip / 2)     //metres
+//    var yOffset: CGFloat = 0.0  //metres
+    var xOffset: CGFloat = -sTrackWidth / 2     //metres
+    var yOffset: CGFloat = -500.0  //metres = road length / 2
     var zPos: CGFloat = -54
 //    createLine(xOffset: xOffset, yOffset: yOffset, lWidth: roadWidth, lLength: roadLength, colour: SKColor(red: 42/256, green: 41/256, blue: 34/256, alpha: 1), zPos: zPos)   //Lay down bitumen
     createLine(xOffset: xOffset, yOffset: yOffset, lWidth: roadWidth, lLength: roadLength, colour: SKColor(red: 42/256, green: 41/256, blue: 34/256, alpha: 1), zPos: zPos)   //Lay down bitumen
@@ -262,7 +277,7 @@ class StraightTrackScene: SKScene {
         line1.position.y = (yOffset * sMetre1)
         line1.position.x = (size.width / 2) - (xOffset * sMetre1)
         line1.zPosition = zPos
-        self.addChild(line1)
+        sContainer.addChild(line1)
         
         if multiLine {
 //        var line2 = SKSpriteNode(color: colour, size: CGSize(width: (lWidth * sMetre1), height: (lLength * sMetre1)))
@@ -273,7 +288,7 @@ class StraightTrackScene: SKScene {
             line2.position.y = (yOffset * sMetre1)
             line2.position.x = (size.width / 2) + (xOffset * sMetre1)
             line2.zPosition = zPos
-            self.addChild(line2)
+            sContainer.addChild(line2)
         }
         
         return
@@ -293,7 +308,7 @@ class StraightTrackScene: SKScene {
         veh.physicsBody?.linearDamping = 0
         veh.physicsBody?.angularDamping = 0
         veh.physicsBody?.allowsRotation = false
-//        addChild(veh)
+//        sContainer.addChild(veh)
         
         return veh
     }
@@ -342,7 +357,7 @@ class StraightTrackScene: SKScene {
 //            print("s1Vehicle Dimensions = \(Int(s1Vehicle.size.width)) wide x \(Int(s1Vehicle.size.height)) long")
 //            s1Vehicle.physicsBody?.isDynamic = false   //Prevents reaction to other physics bodies!
             
-            addChild(s1Vehicle)
+            sContainer.addChild(s1Vehicle)
 
 //            s2Vehicle = SKSpriteNode(imageNamed: vehImage + String(fName))
             
@@ -366,7 +381,7 @@ class StraightTrackScene: SKScene {
 //            print("s1Vehicle Dimensions = \(Int(s1Vehicle.size.width)) wide x \(Int(s1Vehicle.size.height)) long")
 //            s1Vehicle.physicsBody?.isDynamic = false   //Prevents reaction to other physics bodies!
             
-            addChild(s2Vehicle)
+            sContainer.addChild(s2Vehicle)
 
             s1Vehicle = placeVehicle(s1Vehicle: s1Vehicle, s2Vehicle: s2Vehicle)
 
@@ -385,33 +400,33 @@ class StraightTrackScene: SKScene {
 //        var tmpSprite = SKSpriteNode(color: UIColor(red: 0.8, green: 0.8, blue: 0.1, alpha: 0.4), size: CGSize(width: size.width * (1/3), height: size.height * (1/3)))
 //        tmpSprite.position = CGPoint(x: size.width / 2, y: size.height / 2)
 //        tmpSprite.zPosition = 2
-//        addChild(tmpSprite)
+//        sContainer.addChild(tmpSprite)
 
 //        //Place red square centre screen surrounded by 4x cyan squares 9m apart for screen check
 //        var tmpSprite2 = SKSpriteNode(color: UIColor(red: 1.0, green: 0, blue: 0.1, alpha: 0.6), size: CGSize(width: sMetre1, height: sMetre1))
 //        tmpSprite2.position = CGPoint(x: size.width / 2, y: size.height / 2)
 //        tmpSprite2.zPosition = 3
-//        addChild(tmpSprite2)
+//        sContainer.addChild(tmpSprite2)
 //
 //        var tmpSprite3 = SKSpriteNode(color: UIColor(red: 0.0, green: 1, blue: 1, alpha: 0.6), size: CGSize(width: sMetre1, height: sMetre1))
 //        tmpSprite3.position = CGPoint(x: (size.width / 2) - (4.5 * sMetre1), y: (size.height / 2) + (4.5 * sMetre1))
 //        tmpSprite3.zPosition = 3
-//        addChild(tmpSprite3)
+//        sContainer.addChild(tmpSprite3)
 //
 //        var tmpSprite4 = SKSpriteNode(color: UIColor(red: 0.0, green: 1, blue: 1, alpha: 0.6), size: CGSize(width: sMetre1, height: sMetre1))
 //        tmpSprite4.position = CGPoint(x: (size.width / 2) + (4.5 * sMetre1), y: (size.height / 2) + (4.5 * sMetre1))
 //        tmpSprite4.zPosition = 3
-//        addChild(tmpSprite4)
+//        sContainer.addChild(tmpSprite4)
 //
 //        var tmpSprite5 = SKSpriteNode(color: UIColor(red: 0.0, green: 1, blue: 1, alpha: 0.6), size: CGSize(width: sMetre1, height: sMetre1))
 //        tmpSprite5.position = CGPoint(x: (size.width / 2) - (4.5 * sMetre1), y: (size.height / 2) - (4.5 * sMetre1))
 //        tmpSprite5.zPosition = 3
-//        addChild(tmpSprite5)
+//        sContainer.addChild(tmpSprite5)
 //
 //        var tmpSprite6 = SKSpriteNode(color: UIColor(red: 0.0, green: 1, blue: 1, alpha: 0.6), size: CGSize(width: sMetre1, height: sMetre1))
 //        tmpSprite6.position = CGPoint(x: (size.width / 2) + (4.5 * sMetre1), y: (size.height / 2) - (4.5 * sMetre1))
 //        tmpSprite6.zPosition = 3
-//        addChild(tmpSprite6)
+//        sContainer.addChild(tmpSprite6)
 
         //Change size of last vehicle created and place it centre screen
 //        s1Vehicle.size = CGSize(width: 150 * sMetre1, height: 300 * sMetre1)
@@ -437,8 +452,8 @@ func createVehicle() -> SKSpriteNode {
     vBody = addVehicleBody()
 ///    fBuff = addFrontBuffer()
 //    rBuff = addRearBuffer()
-    self.addChild(vBody)
-    self.addChild(fBuff)
+    sContainer.addChild(vBody)
+    sContainer.addChild(fBuff)
 
     //Set front join to force field
     let fAnchor = CGPoint(x: 0.5, y: 0.5)   //ANCHOR POSITION YET TO BE SET!!!
@@ -446,7 +461,7 @@ func createVehicle() -> SKSpriteNode {
     physicsWorld.add(fJoint)
     
 //    //Set rear join to force field
-//    self.addChild(rBuff)
+//    sContainer.addChild(rBuff)
 //    let rAnchor = CGPoint(x: 0, y: 0)   //ANCHOR POSITION YET TO BE SET!!!
 //    let rJoint = SKPhysicsJointFixed.joint(withBodyA: vBody.physicsBody!, bodyB: rBuff.physicsBody!, anchor: rAnchor)
 //    physicsWorld.add(rJoint)

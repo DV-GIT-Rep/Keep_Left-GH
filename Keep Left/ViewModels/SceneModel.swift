@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import SpriteKit
 
 class SceneModel: ObservableObject {
     
@@ -82,8 +83,11 @@ class SceneModel: ObservableObject {
             //MARK: - Use width to calculate scale factor. sTrackWidth can vary to set scale.
             metre1 = height / sTrackWidth
 
-            sSceneWidth = 1000 * metre1
-            sSceneHeight = height
+            sSceneWidth = width
+            sSceneHeight = 1000 * metre1
+
+//            sSceneWidth = 1000 * metre1
+//            sSceneHeight = height
 
         }
     }
