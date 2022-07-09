@@ -38,6 +38,13 @@ class StraightTrackScene: SKScene {
         if sOneTime == false {
             self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
             self.addChild(sContainer) //add sContainer
+
+//            let isLandscape = UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight
+            let isLandscape = view.bounds.size.width > view.bounds.size.height  //NOTE: Doesn't recognise UIDevice rotation here!!!
+            let rotation = isLandscape ? CGFloat.pi/2 : 0
+            print("Rotation = \(rotation) : isLandscape = \(isLandscape)\nsContainer.frame.width = \(view.bounds.size.width)\nsContainer.frame.height = \(view.bounds.size.height)")
+            sContainer.zRotation = rotation
+
             sOneTime = true
         }
 
@@ -46,7 +53,7 @@ class StraightTrackScene: SKScene {
         //MARK: - Create background colour (width: screenwidth, height: 1km). Define sMetre1 = multiplier for metres to points
 //        calcScale()
 
-        straightScene.calcStraightScene(size: view.bounds.size)
+        straightScene.calcStraightScene(sSize: view.bounds.size)
         portrait = straightScene.portrait
         sMetre1 = straightScene.metre1
         sSceneWidth = straightScene.width
@@ -230,14 +237,14 @@ class StraightTrackScene: SKScene {
 
     func createCentreLines() {
     //Create centre lines
-        var yOffset = 0.0
+        var yOffset = -500.0
         let xOffset = (roadWidth / 2) + (centreStrip / 2)     //metres (no change from road surfaces)
 //        let numLines: CGFloat = trunc(roadLength / linePeriod)
         let lineSpacing: CGFloat = 1000/83  //where 1000 = track length & 83 = no lines per km
         //let lineLength = 3
 //        zPos = -53    //createLine defaults to -53
     for i in 0..<83 {   //83 = no times centre line is drawn per 1km
-    yOffset = CGFloat(i) * lineSpacing  //metres
+    yOffset = (CGFloat(i) * lineSpacing) - 500  //metres
         createLine(xOffset: xOffset, yOffset: yOffset, lLength: lineLength)
 //            print("Line Spacing = \(yOffset) metres : sMetre1 = \(sMetre1)")
 }   //end for loop
@@ -245,7 +252,7 @@ class StraightTrackScene: SKScene {
 
     func createInsideLines() {
     //Create Inside Lines
-        let yOffset = 0.0
+        let yOffset = -500.0
         let xOffset = (shoulderLineWidth / 2) + (shoulderWidth) + (centreStrip / 2)     //metres (no change from road surfaces)
 //        let roadLength = 1000.0
 //        let lWidth = lineWidth    //Default = lineWidth
@@ -255,7 +262,7 @@ class StraightTrackScene: SKScene {
 
     func createOutsideLines() {
         //Create Outside Lines
-        let yOffset = 0.0
+        let yOffset = -500.0
         let xOffset = (roadWidth - ((shoulderLineWidth / 2) + (shoulderWidth))) + (centreStrip / 2)
 //        let roadLength = 1000.0
 //        let lWidth = lineWidth  //Default = lineWidth

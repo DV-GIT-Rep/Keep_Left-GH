@@ -20,6 +20,7 @@ struct Keep_Left: App {
 //        ScreenShotView()
 //        SettingsView()
 //    }
+    
     var body: some Scene {
         WindowGroup {
             MainMenuView()

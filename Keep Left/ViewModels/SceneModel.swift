@@ -11,9 +11,11 @@ import SpriteKit
 
 class SceneModel: ObservableObject {
     
-    @Published var metre1: CGFloat
-    @Published var height: CGFloat
-    @Published var width: CGFloat
+    @Published var metre1: CGFloat  //Multiply metres by this constant to get points
+    @Published var height: CGFloat  //Height of screen in points
+    @Published var width: CGFloat   //Width of screen in points
+    @Published var sceneHeight: CGFloat //Height of screen in metres
+    @Published var sceneWidth: CGFloat  //Width of screen in metres
     @Published var portrait: Bool
     @Published var size: CGSize
 
@@ -21,6 +23,8 @@ class SceneModel: ObservableObject {
         metre1 = 1.0
         height = 1.0
         width = 1.0
+        sceneHeight = 1.0
+        sceneWidth = 1.0
         portrait = true
         size = CGSize(width: 1.0, height: 1.0)
     }
@@ -61,33 +65,33 @@ class SceneModel: ObservableObject {
         }
     }
     
-    func calcStraightScene(size: CGSize = UIScreen.main.bounds.size) {
+    func calcStraightScene(sSize: CGSize = UIScreen.main.bounds.size) {
 
-        height = size.height
-        width = size.width
-        
-        if (width < height) {
+        if (sSize.width < sSize.height) {
             
             portrait = true
+            
+            height = sSize.height
+            width = sSize.width
             
             //MARK: - Use width to calculate scale factor. sTrackWidth can vary to set scale.
             metre1 = width / sTrackWidth
 
-            sSceneWidth = width
+            sSceneWidth = sTrackWidth
             sSceneHeight = 1000 * metre1
 
         } else {
             
             portrait = false
             
+            height = sSize.width
+            width = sSize.height
+            
             //MARK: - Use width to calculate scale factor. sTrackWidth can vary to set scale.
-            metre1 = height / sTrackWidth
+            metre1 = width / sTrackWidth
 
-            sSceneWidth = width
+            sSceneWidth = sTrackWidth
             sSceneHeight = 1000 * metre1
-
-//            sSceneWidth = 1000 * metre1
-//            sSceneHeight = height
 
         }
     }
