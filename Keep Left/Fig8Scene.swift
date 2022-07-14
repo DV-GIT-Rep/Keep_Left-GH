@@ -16,7 +16,7 @@ import SwiftUI
 //var sprite: SKSpriteNode!   //Temporary to stop XCode errors!
 
 //Track scene may be temporary. Functions below MUST be called from within a scene!
-class Fig8Scene: SKScene {
+class Fig8Scene: SKScene, SKPhysicsContactDelegate {
     
     var f8Scene = SceneModel()
 

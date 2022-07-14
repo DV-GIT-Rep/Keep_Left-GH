@@ -19,7 +19,7 @@ var sprite: SKSpriteNode!   //Temporary to stop XCode errors!
 var dONTrEPEAT = false
 
 //Track scene may be temporary. Functions below MUST be called from within a scene!
-class StraightTrackScene: SKScene {
+class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
     
     //property and function for handling rotation
     var sOneTime = false    //Only allows container to be created once
@@ -35,15 +35,15 @@ class StraightTrackScene: SKScene {
 //    let self.view?.showsNodeCount = true
     
     override func didMove(to view: SKView) {
+        
         if sOneTime == false {
             self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
             self.addChild(sContainer) //add sContainer
 
-//            let isLandscape = UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight
             let isLandscape = view.bounds.size.width > view.bounds.size.height  //NOTE: Doesn't recognise UIDevice rotation here!!!
             let rotation = isLandscape ? CGFloat.pi/2 : 0
             print("Rotation = \(rotation) : isLandscape = \(isLandscape)\nsContainer.frame.width = \(view.bounds.size.width)\nsContainer.frame.height = \(view.bounds.size.height)")
-            sContainer.zRotation = rotation
+            sContainer.zRotation = rotation //Normally done in StraightTrackView.swift. Required here 1st time only when starting in landscape.
 
             sOneTime = true
         }
@@ -58,8 +58,8 @@ class StraightTrackScene: SKScene {
         sMetre1 = straightScene.metre1
         sSceneWidth = straightScene.width
         sSceneHeight = straightScene.height
-        scene?.size.width = sSceneWidth
-        scene?.size.height = sSceneHeight
+        scene?.size.width = straightScene.width
+        scene?.size.height = straightScene.height
         
         scene?.backgroundColor = UIColor(red: 0.19, green: 0.38, blue: 0.16, alpha: 1)
 //        scene?.zPosition = -55

@@ -61,7 +61,6 @@ class SceneModel: ObservableObject {
             } else {
                 metre1 = width / f8ScreenWidth
             }
-            
         }
     }
     
@@ -77,8 +76,8 @@ class SceneModel: ObservableObject {
             //MARK: - Use width to calculate scale factor. sTrackWidth can vary to set scale.
             metre1 = width / sTrackWidth
 
-            sSceneWidth = sTrackWidth
-            sSceneHeight = 1000 * metre1
+//            sceneWidth = sTrackWidth
+//            sceneHeight = 1000 * metre1 = sTrackLength
 
         } else {
             
@@ -90,10 +89,9 @@ class SceneModel: ObservableObject {
             //MARK: - Use width to calculate scale factor. sTrackWidth can vary to set scale.
             metre1 = width / sTrackWidth
 
-            sSceneWidth = sTrackWidth
-            sSceneHeight = 1000 * metre1
+//            sceneWidth = sTrackWidth
+//            sceneHeight = 1000 * metre1 = sTrackLength
 
         }
     }
-
 }
