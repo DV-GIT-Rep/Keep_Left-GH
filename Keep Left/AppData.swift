@@ -67,6 +67,8 @@ let shoulderWidth: CGFloat = 0.25    //Sets width of bitumen outside of shoulder
 let roadWidth = (laneWidth * 2) + lineWidth + (shoulderLineWidth * 2) + (shoulderWidth * 2)
 let linePeriod: CGFloat = (lineLength + lineGap)
 
+let asphalt: SKColor = SKColor(red: 42/256, green: 41/256, blue: 34/256, alpha: 1)
+
 let numLines: CGFloat = trunc(roadLength / linePeriod)  //Number of centre lines for road length
 
 //MARK: - These values are for the straight line auto track

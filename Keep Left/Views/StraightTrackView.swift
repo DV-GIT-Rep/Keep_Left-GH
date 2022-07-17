@@ -41,9 +41,13 @@ struct StraightTrackView: View {
         }
         .statusBar(hidden: true)
         .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
-            let isLandscape = UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight
-            let rotation = isLandscape ? CGFloat.pi/2 : 0
-            straitScene.set(sContainerZRotation:rotation)
+            let value = UIInterfaceOrientation.portrait.rawValue
+            UIDevice.current.setValue(value, forKey: "orientation")
+
+//Code below replaced by camera. Located in StraightTrackScene.swift.
+            //            let isLandscape = UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight
+//            let rotation = isLandscape ? CGFloat.pi/2 : 0
+//            straitScene.set(sContainerZRotation:rotation)
         }
 
     }
