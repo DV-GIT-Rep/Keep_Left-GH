@@ -45,9 +45,10 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 //
 
         if viewCreated == false {
-            
-            camera = sSceneCamera
-            camera?.position = CGPoint(x: 0, y: 0)
+  
+// XXX
+//            camera = sSceneCamera
+//            camera?.position = CGPoint(x: 0, y: 0)
 
         if sOneTime == false {
             self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
@@ -70,9 +71,11 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
         
         scene?.backgroundColor = UIColor(red: 0.19, green: 0.38, blue: 0.16, alpha: 1)
 //        scene?.zPosition = -55
-        scene?.scaleMode = .aspectFill
+//        scene?.scaleMode = .aspectFill
         physicsWorld.gravity = .zero
         
+        scene?.scaleMode = .resizeFill
+            
         //MARK: - Add 2x straight roads to StraightTrackScene
         addRoads()
         
@@ -102,15 +105,34 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 //        return false
 //    }
 //    ///////////////////////////////////////////
+    
+//    override func preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+//        return UIInterfaceOrientation.portrait
+//    }
 
     override func update(_ currentTime: TimeInterval) {
         
-//        let value = UIInterfaceOrientation.portrait.rawValue
-//        UIDevice.current.setValue(value, forKey: "orientation")
-//
-        let isLandscape = (UIScreen.main.bounds.size.width > UIScreen.main.bounds.size.height)  //NOTE: Doesn't recognise UIDevice rotation here!!!
-        let rotation = UIDevice.current.orientation.isLandscape ? CGFloat.pi/2 : 0
-        camera?.zRotation = rotation
+/* XXX        let orientation = UIDevice.current.orientation    //1: Portrait, 2: UpsideDown, 3: LandscapeLeft, 4: LandscapeRight
+        switch orientation {
+        case .portrait:
+            camera?.zRotation = 0
+        case .portraitUpsideDown:
+            camera?.zRotation = CGFloat.pi/3
+        case .landscapeLeft:
+            camera?.zRotation = 2 * CGFloat.pi
+        case .landscapeRight:
+            camera?.zRotation = CGFloat.pi/2
+        default:
+            camera?.zRotation = 0
+        }
+
+        let value = UIInterfaceOrientation.portrait.rawValue
+        UIDevice.current.setValue(value, forKey: "orientation")
+XXX         */
+        
+//        let isLandscape = (UIScreen.main.bounds.size.width > UIScreen.main.bounds.size.height)  //NOTE: Doesn't recognise UIDevice rotation here!!!
+//        let rotation = UIDevice.current.orientation.isLandscape ? CGFloat.pi/2 : 0
+//        camera?.zRotation = rotation
         
         let t1Vehicle = t1allVehicles
         let t2Vehicle = t2allVehicles
