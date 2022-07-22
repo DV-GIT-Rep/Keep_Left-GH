@@ -10,6 +10,10 @@ import SpriteKit
 import SwiftUI
 import UIKit
 
+//protocol CanReceiveTransitionEvents {
+//    func viewWillTransition(to size: CGSize)
+//}
+
 var vBody: SKSpriteNode!
 
 var sprite: SKSpriteNode!   //Temporary to stop XCode errors!
@@ -22,6 +26,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
     //property and function for handling rotation
     var sOneTime = false    //Only allows container to be created once
     var viewCreated = false
+    var updateOneTime = false
     
     var sSceneCamera: SKCameraNode = SKCameraNode()
     
@@ -34,8 +39,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
     var toggleSpeed: Int = 2
     
     override func didChangeSize(_ oldSize: CGSize) {
-        print("didChangeSize triggered")
-
+        updateOneTime = false
+//        print("didChangeSize triggered")
     }
     
     override func didMove(to view: SKView) {
@@ -46,9 +51,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 
         if viewCreated == false {
   
-// XXX
-//            camera = sSceneCamera
-//            camera?.position = CGPoint(x: 0, y: 0)
+// XXX  Camera
+            camera = sSceneCamera
+            camera?.position = CGPoint(x: 0, y: 0)
 
         if sOneTime == false {
             self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
@@ -112,23 +117,32 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 
     override func update(_ currentTime: TimeInterval) {
         
-/* XXX        let orientation = UIDevice.current.orientation    //1: Portrait, 2: UpsideDown, 3: LandscapeLeft, 4: LandscapeRight
+        if updateOneTime == false {
+        let orientation = UIDevice.current.orientation    //1: Portrait, 2: UpsideDown, 3: LandscapeLeft, 4: LandscapeRight
+        print("Orientation = \(orientation)")
         switch orientation {
         case .portrait:
             camera?.zRotation = 0
+            print("Portrait - orientation = \(orientation)")
         case .portraitUpsideDown:
             camera?.zRotation = CGFloat.pi/3
+            print("Portrait Upside Down - orientation = \(orientation)")
         case .landscapeLeft:
             camera?.zRotation = 2 * CGFloat.pi
+            print("Landscape Left - orientation = \(orientation)")
         case .landscapeRight:
             camera?.zRotation = CGFloat.pi/2
+            print("Landscape Right - orientation = \(orientation)")
         default:
             camera?.zRotation = 0
+            print("Default - orientation = \(orientation)")
         }
 
         let value = UIInterfaceOrientation.portrait.rawValue
         UIDevice.current.setValue(value, forKey: "orientation")
-XXX         */
+            
+            updateOneTime = true
+        }
         
 //        let isLandscape = (UIScreen.main.bounds.size.width > UIScreen.main.bounds.size.height)  //NOTE: Doesn't recognise UIDevice rotation here!!!
 //        let rotation = UIDevice.current.orientation.isLandscape ? CGFloat.pi/2 : 0
@@ -171,61 +185,61 @@ XXX         */
         switch toggleSpeed {
         case 0:
         for i in 1...numVehicles {
-            sContainer.childNode(withName: "s1Vehicle_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-            sContainer.childNode(withName: "s2Vehicle_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+            sContainer.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+            sContainer.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
         }
         case 1:
             for i in 1...numVehicles {
-                sContainer.childNode(withName: "s1Vehicle_\(i)")?.physicsBody?.velocity.dy = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//                sContainer.childNode(withName: "s2Vehicle_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour. (NOTE: THE INSTRUCTIONS COMMENTED OUT DON'T CHANGE THE SPEED!)
+                sContainer.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//                sContainer.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour. (NOTE: THE INSTRUCTIONS COMMENTED OUT DON'T CHANGE THE SPEED!)
             }
         case 2:
             for i in 1...numVehicles {
-                sContainer.childNode(withName: "s1Vehicle_\(i)")?.physicsBody?.velocity.dy = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-                sContainer.childNode(withName: "s2Vehicle_\(i)")?.physicsBody?.velocity.dy = -(0.6*kph) * multiplier   //1000 = metres in km. 3600 = secs in hour.
+                sContainer.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+                sContainer.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -(0.6*kph) * multiplier   //1000 = metres in km. 3600 = secs in hour.
             }
         case 3:
             for i in 1...numVehicles {
-                sContainer.childNode(withName: "s1Vehicle_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//                sContainer.childNode(withName: "s2Vehicle_\(i)")?.physicsBody?.velocity.dy = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+                sContainer.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//                sContainer.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
             }
         default:
             for i in 1...numVehicles {
-//                sContainer.childNode(withName: "s1Vehicle_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-                sContainer.childNode(withName: "s2Vehicle_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//                sContainer.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+                sContainer.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
             }
         }
         
 /*        switch toggleSpeed {
         case 0:
         for i in 1...numVehicles {
-            sContainer.childNode(withName: "s1Vehicle_\(i)")?.physicsBody?.velocity.dx = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-            sContainer.childNode(withName: "s2Vehicle_\(i)")?.physicsBody?.velocity.dx = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+            sContainer.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dx = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+            sContainer.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dx = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
         }
         case 1:
             for i in 1...numVehicles {
-                sContainer.childNode(withName: "s1Vehicle_\(i)")?.physicsBody?.velocity.dx = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//                sContainer.childNode(withName: "s2Vehicle_\(i)")?.physicsBody?.velocity.dx = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour. (NOTE: THE INSTRUCTIONS COMMENTED OUT DON'T CHANGE THE SPEED!)
+                sContainer.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dx = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//                sContainer.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dx = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour. (NOTE: THE INSTRUCTIONS COMMENTED OUT DON'T CHANGE THE SPEED!)
             }
         case 2:
             for i in 1...numVehicles {
-                sContainer.childNode(withName: "s1Vehicle_\(i)")?.physicsBody?.velocity.dx = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-                sContainer.childNode(withName: "s2Vehicle_\(i)")?.physicsBody?.velocity.dx = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+                sContainer.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dx = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+                sContainer.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dx = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
             }
         case 3:
             for i in 1...numVehicles {
-                sContainer.childNode(withName: "s1Vehicle_\(i)")?.physicsBody?.velocity.dx = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//                sContainer.childNode(withName: "s2Vehicle_\(i)")?.physicsBody?.velocity.dx = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+                sContainer.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dx = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//                sContainer.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dx = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
             }
         default:
             for i in 1...numVehicles {
-//                sContainer.childNode(withName: "s1Vehicle_\(i)")?.physicsBody?.velocity.dx = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-                sContainer.childNode(withName: "s2Vehicle_\(i)")?.physicsBody?.velocity.dx = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//                sContainer.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dx = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+                sContainer.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dx = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
             }
         }   */
         
 //            toggleSpeed = -1
-//        print("Vehicle 1 Node = \(childNode(withName: "s1Vehicle_1")!)")
+//        print("Vehicle 1 Node = \(childNode(withName: "sKLVehicle_1")!)")
 
         if toggleSpeed == 4 {
 //            toggleSpeed = -1
@@ -329,98 +343,98 @@ XXX         */
         }
 
     
-    func putVehicle() -> SKSpriteNode {
-//        let veh = SKSpriteNode(imageNamed: "VehicleImage/T1")
-        let veh = Vehicle(imageName: "VehicleImage/T1")
-
-        setAspectForWidth(sprite: veh)  //Sets veh width = 2m (default) & keeps aspect ratio
-        let vehSize = veh.size
-//        veh.position = CGPoint(x: ((view?.bounds.size.width)! / 2.0) - ((5.85 + centreStrip/2) * sMetre1), y: 400.0 * sMetre1)
-        veh.zPosition = -49
-        veh.physicsBody = SKPhysicsBody(rectangleOf: vehSize)
-        veh.physicsBody?.friction = 0
-        veh.physicsBody?.restitution = 0
-        veh.physicsBody?.linearDamping = 0
-        veh.physicsBody?.angularDamping = 0
-        veh.physicsBody?.allowsRotation = false
-//        sContainer.addChild(veh)
-        
-        return veh
-    }
+//    func putVehicle() -> SKSpriteNode {
+////        let veh = SKSpriteNode(imageNamed: "VehicleImage/T1")
+//        let veh = Vehicle(imageName: "VehicleImage/T1")
+//
+//        setAspectForWidth(sprite: veh)  //Sets veh width = 2m (default) & keeps aspect ratio
+//        let vehSize = veh.size
+////        veh.position = CGPoint(x: ((view?.bounds.size.width)! / 2.0) - ((5.85 + centreStrip/2) * sMetre1), y: 400.0 * sMetre1)
+//        veh.zPosition = -49
+//        veh.physicsBody = SKPhysicsBody(rectangleOf: vehSize)
+//        veh.physicsBody?.friction = 0
+//        veh.physicsBody?.restitution = 0
+//        veh.physicsBody?.linearDamping = 0
+//        veh.physicsBody?.angularDamping = 0
+//        veh.physicsBody?.allowsRotation = false
+////        sContainer.addChild(veh)
+//        
+//        return veh
+//    }
 
 //    func makeVehicle() -> Vehicle {
     func makeVehicle() {
         var fName: String = ""
         let maxVehicles: Int = (maxCars+maxTrucks+maxBuses)
-//        var s1Vehicle: SKSpriteNode = SKSpriteNode(imageNamed: "\(vehImage)C1")
-//???        var s2Vehicle: SKSpriteNode = SKSpriteNode(imageNamed: "\(vehImage)C1")
+//        var sKLVehicle: SKSpriteNode = SKSpriteNode(imageNamed: "\(vehImage)C1")
+//???        var sOtherVehicle: SKSpriteNode = SKSpriteNode(imageNamed: "\(vehImage)C1")
 
         for i in 1...numVehicles {
             var randomVehicle = Int.random(in: 1...maxVehicles)
 //            var vWidth: CGFloat = 2.0   //Car width. Set truck & bus width = 2.5m
             var vWidth: CGFloat = 2.3   //Car width. Set truck & bus width = 2.5m (allow 300mm for side mirrors?)
             switch randomVehicle {
-            case 1...maxCars:
+            case 1...maxCars:                       //Vehicle = Car
                 fName = "C\(randomVehicle)"
-            case (maxCars+1)...(maxCars+maxTrucks):
+            case (maxCars+1)...(maxCars+maxTrucks): //Vehicle = Truck
                 fName = "T\(randomVehicle-maxCars)"
                 vWidth = 2.5
-            default:
+            default:                                //Vehicle = Bus
                 fName = "B\(randomVehicle-maxCars-maxTrucks)"
                 vWidth = 2.5
             }
             
-//            s1Vehicle = SKSpriteNode(imageNamed: vehImage + String(fName))
-            var s1Vehicle: Vehicle = Vehicle(imageName: vehImage + String(fName))
+//            sKLVehicle = SKSpriteNode(imageNamed: vehImage + String(fName))
+            var sKLVehicle: Vehicle = Vehicle(imageName: vehImage + String(fName))
             
 //            vWidth = 2  //Temporary to force all vehicles to 2m width!
-            setAspectForWidth(sprite: s1Vehicle, width: vWidth)  //Sets veh width = 2m (default) & maintains aspect ratio
-            let vehSize = s1Vehicle.size
+            setAspectForWidth(sprite: sKLVehicle, width: vWidth)  //Sets veh width = 2m (default) & maintains aspect ratio
+            let vehSize = sKLVehicle.size
             
-            s1Vehicle.zPosition = -49
-            s1Vehicle.name = "s1Vehicle_\(i)"  //s1Vehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
-            s1Vehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: vehSize.width, height: vehSize.height + (1 * straightScene.metre1)))   //Make rectangle same size as sprite + 0.5m front and back!
-            s1Vehicle.physicsBody?.friction = 0
+            sKLVehicle.zPosition = -49
+            sKLVehicle.name = "sKLVehicle_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
+            sKLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: vehSize.width, height: vehSize.height + (1 * straightScene.metre1)))   //Make rectangle same size as sprite + 0.5m front and back!
+            sKLVehicle.physicsBody?.friction = 0
     //        car1.physicsBody?.affectedByGravity = false
-            s1Vehicle.physicsBody?.restitution = 0
-            s1Vehicle.physicsBody?.linearDamping = 0
-            s1Vehicle.physicsBody?.angularDamping = 0
-            s1Vehicle.physicsBody?.allowsRotation = false
-            s1Vehicle.physicsBody?.isDynamic = true
-//            s1Vehicle.physicsBody?.node?.zRotation = 0.0
-//            print("Name = \(s1Vehicle.name!)")
-//            print("s1Vehicle Dimensions = \(Int(s1Vehicle.size.width)) wide x \(Int(s1Vehicle.size.height)) long")
-//            s1Vehicle.physicsBody?.isDynamic = false   //Prevents reaction to other physics bodies!
+            sKLVehicle.physicsBody?.restitution = 0
+            sKLVehicle.physicsBody?.linearDamping = 0
+            sKLVehicle.physicsBody?.angularDamping = 0
+            sKLVehicle.physicsBody?.allowsRotation = false
+            sKLVehicle.physicsBody?.isDynamic = true
+//            sKLVehicle.physicsBody?.node?.zRotation = 0.0
+//            print("Name = \(sKLVehicle.name!)")
+//            print("sKLVehicle Dimensions = \(Int(sKLVehicle.size.width)) wide x \(Int(sKLVehicle.size.height)) long")
+//            sKLVehicle.physicsBody?.isDynamic = false   //Prevents reaction to other physics bodies!
             
-            sContainer.addChild(s1Vehicle)
+            sContainer.addChild(sKLVehicle)
 
-//            s2Vehicle = SKSpriteNode(imageNamed: vehImage + String(fName))
+//            sOtherVehicle = SKSpriteNode(imageNamed: vehImage + String(fName))
             
-            var s2Vehicle: Vehicle = Vehicle(imageName: vehImage + String(fName))
-            setAspectForWidth(sprite: s2Vehicle, width: vWidth)  //Sets veh width = 2m (default) & maintains aspect ratio
-            let secSize = s2Vehicle.size
+            var sOtherVehicle: Vehicle = Vehicle(imageName: vehImage + String(fName))
+            setAspectForWidth(sprite: sOtherVehicle, width: vWidth)  //Sets veh width = 2m (default) & maintains aspect ratio
+            let secSize = sOtherVehicle.size
             
-            s2Vehicle.zPosition = -49
-            s2Vehicle.name = "s2Vehicle_\(i)"  //s2Vehicle_x -> Straight Track 2, f2Vehicle_x -> Figure 8 Track 2, g2Vehicle_x -> Game Track 2.
-            s2Vehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: secSize.width, height: secSize.height + (1 * straightScene.metre1)))   //Make rectangle same size as sprite + 0.5m front and back!
-            s2Vehicle.physicsBody?.friction = 0
-            s2Vehicle.zRotation = CGFloat(Double.pi)  //rotate 180 degrees //XXXXXXXXXX
+            sOtherVehicle.zPosition = -49
+            sOtherVehicle.name = "sOtherVehicle_\(i)"  //sOtherVehicle_x -> Straight Track 2, f2Vehicle_x -> Figure 8 Track 2, g2Vehicle_x -> Game Track 2.
+            sOtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: secSize.width, height: secSize.height + (1 * straightScene.metre1)))   //Make rectangle same size as sprite + 0.5m front and back!
+            sOtherVehicle.physicsBody?.friction = 0
+            sOtherVehicle.zRotation = CGFloat(Double.pi)  //rotate 180 degrees //XXXXXXXXXX
     //        car1.physicsBody?.affectedByGravity = false
-            s2Vehicle.physicsBody?.restitution = 0
-            s2Vehicle.physicsBody?.linearDamping = 0
-            s2Vehicle.physicsBody?.angularDamping = 0
-            s2Vehicle.physicsBody?.allowsRotation = false
-            s2Vehicle.physicsBody?.isDynamic = true
-//            s1Vehicle.physicsBody?.node?.zRotation = 0.0
-//            print("Name = \(s1Vehicle.name!)")
-//            print("s1Vehicle Dimensions = \(Int(s1Vehicle.size.width)) wide x \(Int(s1Vehicle.size.height)) long")
-//            s1Vehicle.physicsBody?.isDynamic = false   //Prevents reaction to other physics bodies!
+            sOtherVehicle.physicsBody?.restitution = 0
+            sOtherVehicle.physicsBody?.linearDamping = 0
+            sOtherVehicle.physicsBody?.angularDamping = 0
+            sOtherVehicle.physicsBody?.allowsRotation = false
+            sOtherVehicle.physicsBody?.isDynamic = true
+//            sKLVehicle.physicsBody?.node?.zRotation = 0.0
+//            print("Name = \(sKLVehicle.name!)")
+//            print("sKLVehicle Dimensions = \(Int(sKLVehicle.size.width)) wide x \(Int(sKLVehicle.size.height)) long")
+//            sKLVehicle.physicsBody?.isDynamic = false   //Prevents reaction to other physics bodies!
             
-            sContainer.addChild(s2Vehicle)
+            sContainer.addChild(sOtherVehicle)
 
-            s1Vehicle = placeVehicle(s1Vehicle: s1Vehicle, s2Vehicle: s2Vehicle)
+            sKLVehicle = placeVehicle(sKLVehicle: sKLVehicle, sOtherVehicle: sOtherVehicle)
 
-            t1Stats["Name"]?.append(s1Vehicle.name!)
+            t1Stats["Name"]?.append(sKLVehicle.name!)
             t1Stats["Actual Speed"]?.append(0.0)
             if let unwrapped = t1Stats["Name"]?[i] {
                 if let speed = t1Stats["Actual Speed"]?[i] {
@@ -431,11 +445,11 @@ XXX         */
         }
         
         return
-//        return s1Vehicle
+//        return sKLVehicle
     }
     
 //Function will randomly place vehicles onscreen.
-    func placeVehicle(s1Vehicle: Vehicle, s2Vehicle: Vehicle) -> Vehicle {
+    func placeVehicle(sKLVehicle: Vehicle, sOtherVehicle: Vehicle) -> Vehicle {
     var spriteClear = false
     var randomPos: CGFloat
     var randomLane: Int
@@ -443,27 +457,27 @@ XXX         */
     repeat {
         randomPos = CGFloat.random(in: 0..<1000)    //Sets random y position in metres (0 - 999.99999 etc)
         randomLane = Int.random(in: 0...1)          //Sets initial Lane 0 (LHS) or 1 (RHS)
-        s1Vehicle.position.y = (randomPos * straightScene.metre1)
-//        s1Vehicle.position.x = (randomLane == 0) ? ((sSceneWidth / 2.0) - (((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1)) : ((sSceneWidth / 2.0) - (((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1))
-        s1Vehicle.position.x = (randomLane == 0) ? ( -(((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1)) : ( -(((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1))
-        s2Vehicle.position.y = (1000 * straightScene.metre1) - s1Vehicle.position.y
-//        s2Vehicle.position.x = (randomLane == 0) ? ((sSceneWidth / 2.0) + (((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1)) : ((sSceneWidth / 2.0) + (((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1))
-        s2Vehicle.position.x = (randomLane == 0) ? ( +(((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1)) : ( +(((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1))
+        sKLVehicle.position.y = (randomPos * straightScene.metre1)
+//        sKLVehicle.position.x = (randomLane == 0) ? ((sSceneWidth / 2.0) - (((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1)) : ((sSceneWidth / 2.0) - (((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1))
+        sKLVehicle.position.x = (randomLane == 0) ? ( -(((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1)) : ( -(((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1))
+        sOtherVehicle.position.y = (1000 * straightScene.metre1) - sKLVehicle.position.y
+//        sOtherVehicle.position.x = (randomLane == 0) ? ((sSceneWidth / 2.0) + (((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1)) : ((sSceneWidth / 2.0) + (((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1))
+        sOtherVehicle.position.x = (randomLane == 0) ? ( +(((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1)) : ( +(((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1))
         spriteClear = true
         
         //        veh.position = CGPoint(x: ((view?.bounds.size.width)! / 2.0) - ((5.85 + centreStrip/2) * sMetre1), y: 400.0 * sMetre1)
         //MARK: - Ensure vehicle doesn't overlap existing vehicle!
         for sprite in t1allVehicles {
-            if (s1Vehicle.intersects(sprite)) {
+            if (sKLVehicle.intersects(sprite)) {
                 spriteClear = false
             }
         }
     } while !spriteClear
     
-    t1allVehicles.append(s1Vehicle)
-    t2allVehicles.append(s2Vehicle)
+    t1allVehicles.append(sKLVehicle)
+    t2allVehicles.append(sOtherVehicle)
     
-    return s1Vehicle
+    return sKLVehicle
 }
 
     func setAspectForWidth(sprite: Vehicle, width: CGFloat = 2) {

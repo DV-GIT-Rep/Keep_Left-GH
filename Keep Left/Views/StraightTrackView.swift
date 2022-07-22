@@ -78,8 +78,10 @@ struct StraightTrackView: View {
     private func updateOrintation() {
         switch UIDevice.current.orientation {
         case .landscapeLeft:
+//            print("Landscape Left")
             self.angle = .degrees(0)    //.degrees(90)
         case .landscapeRight:
+//            print("Landscape Right")
             self.angle = .degrees(0)    //.degrees(90)
         case .portraitUpsideDown:
             self.angle = .degrees(0)    //0 OK for iPad - use 90 for iPhone?

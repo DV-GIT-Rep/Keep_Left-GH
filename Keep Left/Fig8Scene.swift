@@ -134,10 +134,10 @@ var zPos: Int = -4
  }
     
     func getKLVehicles() {
-//        let node = "s1Vehicle_1"
-//        print("Vehicle 1 Node = \(childNode(withName: "s1Vehicle_1")!)")
+//        let node = "sKLVehicle_1"
+//        print("Vehicle 1 Node = \(childNode(withName: "sKLVehicle_1")!)")
 //        var node_1 = get_node(
-//        let KLVehicle1 = childNode(withName: "s1Vehicle_1")!.copy() as! SKSpriteNode
+//        let KLVehicle1 = childNode(withName: "sKLVehicle_1")!.copy() as! SKSpriteNode
 //        let KLVehicle1: SKNode = childNode(withName: node)!
 //        addChild(KLVehicle1)
     }

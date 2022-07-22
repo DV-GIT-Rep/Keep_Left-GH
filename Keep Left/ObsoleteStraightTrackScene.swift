@@ -104,48 +104,48 @@ class StraightTrackScene: SKScene {
                 fName = "B\(randomVehicle-maxCars-maxTrucks)"
             }
     //        }()
-            let s1Vehicle = SKSpriteNode(imageNamed: vehicle + String(fName))
-//            s1Vehicle.name = "Vehicle \(i) Type \(fName)"
-            s1Vehicle.name = "s1Vehicle_\(i)"
-//            s1Vehicle.position = CGPoint(x: size.width / 2, y: 300)
-            s1Vehicle.scale(to: CGSize(width: 50, height: 110))
-            s1Vehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 50, height: 110))   //Make rectangle same size as sprite!
-            s1Vehicle.physicsBody?.friction = 0
+            let sKLVehicle = SKSpriteNode(imageNamed: vehicle + String(fName))
+//            sKLVehicle.name = "Vehicle \(i) Type \(fName)"
+            sKLVehicle.name = "sKLVehicle_\(i)"
+//            sKLVehicle.position = CGPoint(x: size.width / 2, y: 300)
+            sKLVehicle.scale(to: CGSize(width: 50, height: 110))
+            sKLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 50, height: 110))   //Make rectangle same size as sprite!
+            sKLVehicle.physicsBody?.friction = 0
     //        car1.physicsBody?.affectedByGravity = false
-            s1Vehicle.physicsBody?.restitution = 0
-            s1Vehicle.physicsBody?.linearDamping = 0
-            s1Vehicle.physicsBody?.angularDamping = 0
-            s1Vehicle.physicsBody?.allowsRotation = false
-//            s1Vehicle.physicsBody?.isDynamic = false
-//            print("Name = \(s1Vehicle.name!)")
-//            print("s1Vehicle Dimensions = \(Int(s1Vehicle.size.width)) wide x \(Int(s1Vehicle.size.height)) long")
-//            s1Vehicle.physicsBody?.isDynamic = false   //Prevents reaction to other physics bodies!
+            sKLVehicle.physicsBody?.restitution = 0
+            sKLVehicle.physicsBody?.linearDamping = 0
+            sKLVehicle.physicsBody?.angularDamping = 0
+            sKLVehicle.physicsBody?.allowsRotation = false
+//            sKLVehicle.physicsBody?.isDynamic = false
+//            print("Name = \(sKLVehicle.name!)")
+//            print("sKLVehicle Dimensions = \(Int(sKLVehicle.size.width)) wide x \(Int(sKLVehicle.size.height)) long")
+//            sKLVehicle.physicsBody?.isDynamic = false   //Prevents reaction to other physics bodies!
             
-                placeVehicle(s1Vehicle: s1Vehicle)
+                placeVehicle(sKLVehicle: sKLVehicle)
 
-            t1Stats["Name"]?.append(s1Vehicle.name!)
+            t1Stats["Name"]?.append(sKLVehicle.name!)
             t1Stats["Actual Speed"]?.append(0.0)
             if let unwrapped = t1Stats["Name"]?[i] {
                 if let speed = t1Stats["Actual Speed"]?[i] {
                 print("Name in Dictionary = \(unwrapped) : Speed = \(speed)")
                 
-                    let frontBuffer = addFrontBuffer(s1Vehicle: s1Vehicle, speed: speed as! Double, i: i)
+                    let frontBuffer = addFrontBuffer(sKLVehicle: sKLVehicle, speed: speed as! Double, i: i)
                     addChild(frontBuffer)
                     
 //                    print(<#T##items: Any...##Any#>)
                     
-//                    let fJoint = SKPhysicsJointFixed.joint(withBodyA: s1Vehicle.physicsBody!, bodyB: frontBuffer.physicsBody!, anchor: s1Vehicle.position)
+//                    let fJoint = SKPhysicsJointFixed.joint(withBodyA: sKLVehicle.physicsBody!, bodyB: frontBuffer.physicsBody!, anchor: sKLVehicle.position)
 //                    self.physicsWorld.add(fJoint)
                     
                     
-                    s1Vehicle.position = CGPoint(x: 500, y: 100)
-//                    s1Vehicle.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 80))
+                    sKLVehicle.position = CGPoint(x: 500, y: 100)
+//                    sKLVehicle.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 80))
 
-                    let Vehicle1 = childNode(withName: "s1Vehicle_1")
-                    if childNode(withName: "s1Vehicle_2") != nil {
+                    let Vehicle1 = childNode(withName: "sKLVehicle_1")
+                    if childNode(withName: "sKLVehicle_2") != nil {
                         Vehicle1?.position = CGPoint(x: 500, y: 600)
-                        s1Vehicle.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 150))
-//                        s1Vehicle.physicsBody?.isDynamic = false
+                        sKLVehicle.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 150))
+//                        sKLVehicle.physicsBody?.isDynamic = false
 
                         let thisNode = childNode(withName: "fBuff_2")
                         let action = SKAction.resize(toHeight: 100, duration: 6)
@@ -153,8 +153,8 @@ class StraightTrackScene: SKScene {
                             thisNode!.run(action)
                             thisNode!.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: thisNode!.frame.size.width, height: thisNode!.frame.size.height))   //Make rectangle same size as sprite!
 //                            thisNode!.anchorPoint = CGPoint(x: 0.5, y:0)
-                            thisNode!.position = CGPoint(x: s1Vehicle.position.x, y: s1Vehicle.position.y + s1Vehicle.size.height / 2)
-                            let fJoint = SKPhysicsJointFixed.joint(withBodyA: s1Vehicle.physicsBody!, bodyB: frontBuffer.physicsBody!, anchor: s1Vehicle.position)
+                            thisNode!.position = CGPoint(x: sKLVehicle.position.x, y: sKLVehicle.position.y + sKLVehicle.size.height / 2)
+                            let fJoint = SKPhysicsJointFixed.joint(withBodyA: sKLVehicle.physicsBody!, bodyB: frontBuffer.physicsBody!, anchor: sKLVehicle.position)
                             self.physicsWorld.add(fJoint)
                         })
                         thisNode?.run(actionBlock)
@@ -175,7 +175,7 @@ class StraightTrackScene: SKScene {
 
     }   */
     
-    func placeVehicle(s1Vehicle: SKSpriteNode) {
+    func placeVehicle(sKLVehicle: SKSpriteNode) {
         var spriteClear = false
         var randomPos: CGFloat
         var randomLane: Int
@@ -183,28 +183,28 @@ class StraightTrackScene: SKScene {
         repeat {
             randomPos = CGFloat.random(in: 0..<1000)
             randomLane = Int.random(in: 0...1)
-            s1Vehicle.position.y = (randomPos / 1000) * (size.height * 2)
-            s1Vehicle.position.x = (size.width / 2) + CGFloat(randomLane * 100)
+            sKLVehicle.position.y = (randomPos / 1000) * (size.height * 2)
+            sKLVehicle.position.x = (size.width / 2) + CGFloat(randomLane * 100)
             spriteClear = true
             
             //MARK: - Ensure vehicle doesn't overlap existing vehicle!
             for sprite in allVehicles {
-                if (s1Vehicle.intersects(sprite)) {
+                if (sKLVehicle.intersects(sprite)) {
                     spriteClear = false
                 }
             }
         } while !spriteClear
 */
-        t1allVehicles.append(s1Vehicle)
-        addChild(s1Vehicle)
+        t1allVehicles.append(sKLVehicle)
+        addChild(sKLVehicle)
         
-//        s1Vehicle.physicsBody?.applyImpulse(CGVector(dx: 0, dy: randomLane == 0 ? 80 : 120))
+//        sKLVehicle.physicsBody?.applyImpulse(CGVector(dx: 0, dy: randomLane == 0 ? 80 : 120))
         
     }
     
- /*   func addFrontBuffer(s1Vehicle: SKSpriteNode, speed: Double, i: Int) -> SKSpriteNode {
+ /*   func addFrontBuffer(sKLVehicle: SKSpriteNode, speed: Double, i: Int) -> SKSpriteNode {
         //frontBuffer.size.height = (kph/1.2 + 1) metres
-        let frontBuffer = SKSpriteNode(color: UIColor(red: 1, green: 1, blue: 0.1, alpha: fBuffVisible ? 0.2 : 0), size: CGSize(width: s1Vehicle.size.width, height: ((speed/1.2)*(s1Vehicle.size.width/2))+(s1Vehicle.size.width/2)))
+        let frontBuffer = SKSpriteNode(color: UIColor(red: 1, green: 1, blue: 0.1, alpha: fBuffVisible ? 0.2 : 0), size: CGSize(width: sKLVehicle.size.width, height: ((speed/1.2)*(sKLVehicle.size.width/2))+(sKLVehicle.size.width/2)))
         frontBuffer.name = "fBuff_\(i)"
         frontBuffer.anchorPoint = CGPoint(x: 0.5, y:0)
         frontBuffer.position = CGPoint(x: 0, y: 58)
