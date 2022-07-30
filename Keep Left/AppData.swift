@@ -90,7 +90,7 @@ var F8YZero: CGFloat = 0.0
 //var sSceneWidth: CGFloat = 0.0  //Straight Track Scene Width in Points
 //var sSceneHeight: CGFloat = 0.0 //Straight Track Scene Height in Points
 //var portrait = true
-let sTrackWidth: CGFloat = 42.0 //Width of straight track scene in metres
+let sTrackWidth: CGFloat = 40.0 //Width of straight track scene in metres
 let sTrackLength: CGFloat = 1000.0 //Length of straight track scene in metres
 let centreStrip: CGFloat = 4    //Width of centre strip in metres
 

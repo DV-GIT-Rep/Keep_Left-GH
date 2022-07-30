@@ -61,10 +61,14 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
     
     func redoCamera() {
         f8Background.alpha = ((whichScene == .figure8) ? 1.0 : 0)
+
         camera = ((whichScene == .figure8) ? f8TrackCamera : sTrackCamera)
-        sTrackCamera.position = CGPoint(x: 0, y: 500 * straightScene.metre1)
-        f8TrackCamera.position = CGPoint(x: 0, y: 500 * straightScene.metre1)
+        sTrackCamera.position = CGPoint(x: 0, y: 0 + 500)
+//        sTrackCamera.scene?.size.width = straightScene.width/sTrackWidth
+        f8TrackCamera.position = CGPoint(x: 0, y: 0)
 //        print("Camera Pos = \(camera!.position) : straightScene.metre1 = \(straightScene.metre1)\nf8Scene.metre1 = \(f8Scene.metre1)")
+        sTrackCamera.setScale(sTrackWidth/straightScene.width)
+//        camera?.setScale(1/4)
     }
     
     override func didMove(to view: SKView) {
@@ -74,10 +78,6 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 //
         if viewCreated == false {
   
-// XXX  Camera
-//            camera = sTrackCamera
-//            camera?.position = CGPoint(x: 0, y: 2000) //calc metre1 constant first - see below
-
         if sOneTime == false {
             self.anchorPoint = CGPoint(x: 0.5, y: 0.5)
             self.addChild(sContainer) //add sContainer
@@ -95,9 +95,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 //        sSceneHeight = straightScene.height
         
         scene?.size.width = straightScene.width //* 2         // XXXXXXXXXXXXXXXXXXXXXX !!!!!!!!!!
-        scene?.size.height = 1000 * straightScene.metre1
-//            camera?.position = CGPoint(x: 0, y: 500 * straightScene.metre1)
-//            camera?.setScale(1/4)
+        scene?.size.height = 1000
 
             sBackground.makeBackground(size: CGSize(width: straightScene.width * 2, height: 1000 * straightScene.metre1), zPos: -200)
             sBackground.anchorPoint = CGPoint(x: 0.5, y: 0)
@@ -133,6 +131,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
         //MARK: - Add 2x straight roads to StraightTrackScene
         addRoads()
         
+            sBackground.addChild(sTrackCamera)
+            f8Background.addChild(f8TrackCamera)
+            
         viewCreated = true
         }
         
@@ -206,11 +207,11 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 
         //Loop through both arrays simultaneously. Move back 1km when they've travelled 1km!
         for (vehT1, vehT2) in zip(t1Vehicle, t2Vehicle) {
-            if vehT1.position.y >= (1000 * straightScene.metre1) {
-                vehT1.position.y = (vehT1.position.y - (1000 * straightScene.metre1))
+            if vehT1.position.y >= 1000 {
+                vehT1.position.y = (vehT1.position.y - 1000)
             }
             if vehT2.position.y < 0 {
-                vehT2.position.y = (vehT2.position.y + (1000 * straightScene.metre1))
+                vehT2.position.y = (vehT2.position.y + 1000)
             }
 //            print("X.,\(vehT1.name!):,\((vehT1.position.x).dp2),\((vehT1.position.y).dp2),,\(vehT2.name!):,\((vehT2.position.x).dp2),\((vehT2.position.y).dp2)")
         }   //End of 'for' loop
@@ -252,7 +253,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
         guard let touch = touches.first else {return}   //Exit if not first touch!
         
         var kph: CGFloat = 110
-        let multiplier: CGFloat = 1000 / 3600 * straightScene.metre1  //Value by kph gives m/sec
+        let multiplier: CGFloat = 1000 / 3600  //Value by kph gives m/sec
         
         switch toggleSpeed {
         case 0:
@@ -397,16 +398,16 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 //        Line().createLine(xOffset: xOffset, yOffset: yOffset, lWidth: shoulderLineWidth, lLength: roadLength, lineParent: self)
 //        print("size.width = \(size.width)")
     }
-    
+    //KKK TEMPORARY TEXT ADDED B4 NEXT CHANGES !!! DELETE ONCE WORKING !!!
     func createLine(xOffset: CGFloat = 0, yOffset: CGFloat = 0, lWidth: CGFloat = lineWidth, lLength: CGFloat = lineLength, colour: SKColor = .white, zPos: CGFloat = +20, parent: SKNode) -> SKNode {
 //SKSpriteNode has better performance than SKShape!
         
-        let line1 = SKSpriteNode(color: colour, size: CGSize(width: (lWidth * straightScene.metre1), height: (lLength * straightScene.metre1)))
+        let line1 = SKSpriteNode(color: colour, size: CGSize(width: (lWidth), height: (lLength)))
 //        line1.size = CGSize(width: (lWidth * straightScene.metre1), height: (lLength * straightScene.metre1))
 //        line1.color = colour
         line1.anchorPoint = CGPoint(x: 0.5, y: 0) //Set anchorpoint to middle bottom
-        line1.position.y = (yOffset * straightScene.metre1)
-        line1.position.x = (xOffset * straightScene.metre1)
+        line1.position.y = (yOffset)
+        line1.position.x = (xOffset)
         line1.zPosition = zPos
         
         parent.addChild(line1)
@@ -464,7 +465,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
             
             sKLVehicle.zPosition = +50
             sKLVehicle.name = "sKLVehicle_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
-            sKLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: sKLVehicle.size.width, height: sKLVehicle.size.height + (1 * straightScene.metre1)))   //Make rectangle same size as sprite + 0.5m front and back!
+            sKLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: sKLVehicle.size.width, height: sKLVehicle.size.height + 1))   //Make rectangle same size as sprite + 0.5m front and back!
             sKLVehicle.physicsBody?.friction = 0
     //        car1.physicsBody?.affectedByGravity = false
             sKLVehicle.physicsBody?.restitution = 0
@@ -488,7 +489,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 
             f8KLVehicle.zPosition = 1
             f8KLVehicle.name = "f8KLVehicle_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
-            f8KLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: f8KLVehicle.size.width, height: f8KLVehicle.size.height + (1 * straightScene.metre1)))   //Make rectangle same size as sprite + 0.5m front and back!
+            f8KLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: f8KLVehicle.size.width, height: f8KLVehicle.size.height + 1))   //Make rectangle same size as sprite + 0.5m front and back!
             f8KLVehicle.physicsBody?.friction = 0
             f8KLVehicle.physicsBody?.restitution = 0
             f8KLVehicle.physicsBody?.linearDamping = 0
@@ -511,7 +512,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
             
             sOtherVehicle.zPosition = +50
             sOtherVehicle.name = "sOtherVehicle_\(i)"  //sOtherVehicle_x -> Straight Track 2, f2Vehicle_x -> Figure 8 Track 2, g2Vehicle_x -> Game Track 2.
-            sOtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: secSize.width, height: secSize.height + (1 * straightScene.metre1)))   //Make rectangle same size as sprite + 0.5m front and back!
+            sOtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: secSize.width, height: secSize.height + 1))   //Make rectangle same size as sprite + 0.5m front and back!
             sOtherVehicle.physicsBody?.friction = 0
             sOtherVehicle.zRotation = CGFloat(Double.pi)  //rotate 180 degrees //XXXXXXXXXX
     //        car1.physicsBody?.affectedByGravity = false
@@ -537,7 +538,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 
             f8OtherVehicle.zPosition = 1
             f8OtherVehicle.name = "f8OtherVehicle_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
-            f8OtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: f8OtherVehicle.size.width, height: f8OtherVehicle.size.height + (1 * straightScene.metre1)))   //Make rectangle same size as sprite + 0.5m front and back!
+            f8OtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: f8OtherVehicle.size.width, height: f8OtherVehicle.size.height + 1))   //Make rectangle same size as sprite + 0.5m front and back!
             f8OtherVehicle.physicsBody?.friction = 0
             f8OtherVehicle.physicsBody?.restitution = 0
             f8OtherVehicle.physicsBody?.linearDamping = 0
@@ -577,12 +578,12 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
     repeat {
         randomPos = CGFloat.random(in: 0..<1000)    //Sets random y position in metres (0 - 999.99999 etc)
         randomLane = Int.random(in: 0...1)          //Sets initial Lane 0 (LHS) or 1 (RHS)
-        sKLVehicle.position.y = ((randomPos) * straightScene.metre1)
+        sKLVehicle.position.y = randomPos
 //        sKLVehicle.position.x = (randomLane == 0) ? ((sSceneWidth / 2.0) - (((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1)) : ((sSceneWidth / 2.0) - (((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1))
-        sKLVehicle.position.x = (randomLane == 0) ? ( -(((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1)) : ( -(((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1))
-        sOtherVehicle.position.y = (1000 * straightScene.metre1) - ((randomPos) * straightScene.metre1)
+        sKLVehicle.position.x = (randomLane == 0) ? ( -((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2))) : ( -((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)))
+        sOtherVehicle.position.y = 1000 - randomPos
 //        sOtherVehicle.position.x = (randomLane == 0) ? ((sSceneWidth / 2.0) + (((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1)) : ((sSceneWidth / 2.0) + (((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1))
-        sOtherVehicle.position.x = (randomLane == 0) ? ( +(((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1)) : ( +(((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1))
+        sOtherVehicle.position.x = (randomLane == 0) ? ( +((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2))) : ( +((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)))
         spriteClear = true
         
         //        veh.position = CGPoint(x: ((view?.bounds.size.width)! / 2.0) - ((5.85 + centreStrip/2) * sMetre1), y: 400.0 * sMetre1)
@@ -602,7 +603,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 
     func setAspectForWidth(sprite: Vehicle, width: CGFloat = 2, metre: CGFloat) {
         let aspectRatio: CGFloat = sprite.size.height/sprite.size.width
-        sprite.size = CGSize(width: width * metre, height: width * aspectRatio * metre)
+        sprite.size = CGSize(width: width, height: width * aspectRatio)
 //        return sprite
     }
     
