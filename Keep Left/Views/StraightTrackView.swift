@@ -41,8 +41,10 @@ struct StraightTrackView: View {
          */ //  StraightScene ONLY for now!!!
 
         }
+        .statusBar(hidden: true)
         .onAppear {
             self.updateOrintation()
+            self.switchViews()
     }
 //
 ////            let value = UIInterfaceOrientation.portrait.rawValue
@@ -88,6 +90,15 @@ struct StraightTrackView: View {
         default:
             self.angle = .degrees(0)
         }
+    }
+    
+    private func switchViews() {
+                if whichScene == .figure8 {
+                 whichScene = .straight
+                } else {
+                    whichScene = .figure8
+                }
+//        print ("whichScene = \(whichScene)")
     }
 
 }

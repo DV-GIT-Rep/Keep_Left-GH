@@ -35,32 +35,42 @@ class SceneModel: ObservableObject {
     }
     */
 
-    func calcF8Scene(size: CGSize = UIScreen.main.bounds.size) {
+    func calcF8Scene(f8Size: CGSize = UIScreen.main.bounds.size) {
 
-        height = size.height
-        width = size.width
-        
-        if (width < height) {
+        if (f8Size.width < f8Size.height) {
             
             portrait = true
             
+            height = f8Size.height
+            width = f8Size.width
+            
             //MARK: - Use width to calculate scale factor for very tall screens Fig 8 Track only!
-            if ((height > (2 * width))) {
-                metre1 = width / f8ScreenWidth
+            if ((f8Size.height > (2 * f8Size.width))) {
+                metre1 = f8Size.width / f8ScreenWidth
             } else {
-                metre1 = height / f8ScreenHeight
+                metre1 = f8Size.height / f8ScreenHeight
             }
             
         } else {
             
             portrait = false
             
-            //MARK: - Use height to calculate scale factor for very wide screens Fig 8 Track only!
-            if (width > (2 * height)) {
-                metre1 = height / f8ScreenHeight
+            height = f8Size.width
+            width = f8Size.height
+            
+            //MARK: - Use width to calculate scale factor for very tall screens Fig 8 Track only!
+            if ((f8Size.height > (2 * f8Size.width))) {
+                metre1 = f8Size.width / f8ScreenWidth
             } else {
-                metre1 = width / f8ScreenWidth
+                metre1 = f8Size.height / f8ScreenHeight
             }
+            
+//            //MARK: - Use height to calculate scale factor for very wide screens Fig 8 Track only!
+//            if (f8Size.width > (2 * f8Size.height)) {
+//                metre1 = f8Size.height / f8ScreenHeight
+//            } else {
+//                metre1 = f8Size.width / f8ScreenWidth
+//            }
         }
     }
     

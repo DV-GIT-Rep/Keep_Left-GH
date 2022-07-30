@@ -21,7 +21,7 @@ class StraightTrackScene: SKScene {
     let car4 = SKSpriteNode(imageNamed: "VehicleImage/C2")
 
     override func didMove(to view: SKView) {
-        t1allVehicles.removeAll()
+        sKLAllVehicles.removeAll()
         
         self.view?.ignoresSiblingOrder = true   //Faster: use zPosition for layering
 
@@ -80,7 +80,7 @@ class StraightTrackScene: SKScene {
     }
     
     override func update(_ currentTime: TimeInterval) {
-        for vehicle in t1allVehicles {
+        for vehicle in sKLAllVehicles {
             if vehicle.position.y >= (1000 * sMetre1) {
                 vehicle.position.y = (vehicle.position.y - 1000)
             }
@@ -195,7 +195,7 @@ class StraightTrackScene: SKScene {
             }
         } while !spriteClear
 */
-        t1allVehicles.append(sKLVehicle)
+        sKLAllVehicles.append(sKLVehicle)
         addChild(sKLVehicle)
         
 //        sKLVehicle.physicsBody?.applyImpulse(CGVector(dx: 0, dy: randomLane == 0 ? 80 : 120))

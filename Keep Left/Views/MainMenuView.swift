@@ -13,6 +13,7 @@ struct MainMenuView: View {
     @StateObject var scene = SceneModel()
     @StateObject var model = MenuModel()
     
+    
     var body: some View {
         
         NavigationView {
@@ -62,14 +63,26 @@ func getView(viewNo: Int) -> AnyView {
     
     switch viewNo {
     case 1:
-        let destinationView: AnyView = AnyView(Fig8TrackView())
+//        let destinationView: AnyView = AnyView(Fig8TrackView())
+        let destinationView: AnyView = AnyView(StraightTrackView())
+//        whichScene = .figure8
         return destinationView
     case 2:
         let destinationView: AnyView = AnyView(StraightTrackView())
 //        let destinationView: AnyView = AnyView(StraightTrackScene())
+//        whichScene = .straight
+//        if whichScene == .figure8 {
+//         whichScene = .straight
+//        } else {
+//            whichScene = .figure8
+//        }
+//        print ("whichScene = \(whichScene)")
+//        print("!!! XXXXXXXXXXXXXXXXXXX  !!!")
         return destinationView
     case 3:
         let destinationView: AnyView = AnyView(GameTrackView())
+//        whichScene = .game
+//        print("!!! XXXXXXXXXXXXXXXXXXX  !!!")
         return destinationView
     case 4:
         let destinationView: AnyView = AnyView(ScreenShotView())

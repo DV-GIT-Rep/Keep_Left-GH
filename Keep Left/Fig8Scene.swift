@@ -19,8 +19,8 @@ class Fig8Scene: SKScene, SKPhysicsContactDelegate {
         //MARK: - Create background colour width: screenwidth height: 1km. Define sMetre1 = multiplier for metres to points
 //        calcF8Size()
         
-        f8Scene.calcF8Scene(size: view.bounds.size)
-        portrait = f8Scene.portrait
+        f8Scene.calcF8Scene(f8Size: view.bounds.size)
+//        portrait = f8Scene.portrait
         f8Metre1 = f8Scene.metre1
         f8SceneWidth = f8Scene.width
         f8SceneHeight = f8Scene.height
@@ -66,72 +66,72 @@ class Fig8Scene: SKScene, SKPhysicsContactDelegate {
         addChild(f8Image)
     }
     
- func createF8RoadSurfaces() {
-//    var roadLength: CGFloat = 1000.0
-//    var roadWidth: CGFloat = 8.0
-// var xOffset: CGFloat = ((scene?.size.width)! / 2)     //Centre of screen
-// var yOffset: CGFloat = ((scene?.size.height)! / 2)    //Centre of screen
-     var xOffset: CGFloat = (roadWidth / 2) + (centreStrip / 2)     //metres
-     var yOffset: CGFloat = 0.0  //metres
-var zPos: Int = -4
- createF8Line(xOffset: xOffset, yOffset: yOffset, lWidth: roadWidth, lLength: roadLength, colour: SKColor(red: 42/256, green: 41/256, blue: 34/256, alpha: 1), zPos: -4)   //Lay down bitumen
- }
-
-    func createF8CentreLines() {
-        var yOffset = 0.0
-        let xOffset = (roadWidth / 2) + (centreStrip / 2)     //metres (no change from road surfaces)
-//        let numLines: CGFloat = trunc(roadLength / linePeriod)
-        let lineSpacing: CGFloat = 1000/83  //where 1000 = track length & 83 = no lines per km
-//let lineLength = 3
-//        zPos = -3    //createLine defaults to -3
-        for i in 0..<83 {   //83 = no times centre line is drawn per 1km
-            yOffset = CGFloat(i) * lineSpacing  //metres
-            createF8Line(xOffset: xOffset, yOffset: yOffset, lLength: lineLength)
-//            print("Line Spacing = \(yOffset) metres : sMetre1 = \(sMetre1)")
-        }   //end for loop
-    }
-
- func createF8InsideLines() {
-     let yOffset = 0.0
-     let xOffset = (shoulderLineWidth / 2) + (shoulderWidth) + (centreStrip / 2)     //metres (no change from road surfaces)
-//        let roadLength = 1000.0
-//        let lWidth = lineWidth    //Default = lineWidth
-//        zPos = -3                 //Default = -3
- createF8Line(xOffset: xOffset, yOffset: yOffset, lWidth: shoulderLineWidth, lLength: roadLength)
- }
-
- func createF8OutsideLines() {
-     let yOffset = 0.0
-     let xOffset = (roadWidth - ((shoulderLineWidth / 2) + (shoulderWidth))) + (centreStrip / 2)
-//        let roadLength = 1000.0
-//        let lWidth = lineWidth  //Default = lineWidth
-//        zPos = -3    //createLine defaults to -3 & colour defaults to white
-     createF8Line(xOffset: xOffset, yOffset: yOffset, lWidth: shoulderLineWidth, lLength: roadLength)
- }
+// func createF8RoadSurfaces() {
+////    var roadLength: CGFloat = 1000.0
+////    var roadWidth: CGFloat = 8.0
+//// var xOffset: CGFloat = ((scene?.size.width)! / 2)     //Centre of screen
+//// var yOffset: CGFloat = ((scene?.size.height)! / 2)    //Centre of screen
+//     var xOffset: CGFloat = (roadWidth / 2) + (centreStrip / 2)     //metres
+//     var yOffset: CGFloat = 0.0  //metres
+//var zPos: Int = -4
+// createF8Line(xOffset: xOffset, yOffset: yOffset, lWidth: roadWidth, lLength: roadLength, colour: SKColor(red: 42/256, green: 41/256, blue: 34/256, alpha: 1), zPos: -4)   //Lay down bitumen
+// }
+//
+//    func createF8CentreLines() {
+//        var yOffset = 0.0
+//        let xOffset = (roadWidth / 2) + (centreStrip / 2)     //metres (no change from road surfaces)
+////        let numLines: CGFloat = trunc(roadLength / linePeriod)
+//        let lineSpacing: CGFloat = 1000/83  //where 1000 = track length & 83 = no lines per km
+////let lineLength = 3
+////        zPos = -3    //createLine defaults to -3
+//        for i in 0..<83 {   //83 = no times centre line is drawn per 1km
+//            yOffset = CGFloat(i) * lineSpacing  //metres
+//            createF8Line(xOffset: xOffset, yOffset: yOffset, lLength: lineLength)
+////            print("Line Spacing = \(yOffset) metres : sMetre1 = \(sMetre1)")
+//        }   //end for loop
+//    }
+//
+// func createF8InsideLines() {
+//     let yOffset = 0.0
+//     let xOffset = (shoulderLineWidth / 2) + (shoulderWidth) + (centreStrip / 2)     //metres (no change from road surfaces)
+////        let roadLength = 1000.0
+////        let lWidth = lineWidth    //Default = lineWidth
+////        zPos = -3                 //Default = -3
+// createF8Line(xOffset: xOffset, yOffset: yOffset, lWidth: shoulderLineWidth, lLength: roadLength)
+// }
+//
+// func createF8OutsideLines() {
+//     let yOffset = 0.0
+//     let xOffset = (roadWidth - ((shoulderLineWidth / 2) + (shoulderWidth))) + (centreStrip / 2)
+////        let roadLength = 1000.0
+////        let lWidth = lineWidth  //Default = lineWidth
+////        zPos = -3    //createLine defaults to -3 & colour defaults to white
+//     createF8Line(xOffset: xOffset, yOffset: yOffset, lWidth: shoulderLineWidth, lLength: roadLength)
+// }
  
- func createF8Line(xOffset: CGFloat, yOffset: CGFloat, lWidth: CGFloat = lineWidth, lLength: CGFloat, colour: SKColor = .white, zPos: CGFloat = -3, multiLine: Bool = true) {
-     //SKSpriteNode has better performance than SKShape!
-     var line1 = SKSpriteNode(color: colour, size: CGSize(width: (lWidth * sMetre1), height: (lLength * sMetre1)))
-//        line1.name = "line1A"
-     line1.anchorPoint = CGPoint(x: 0.5, y: 0) //Set anchorpoint to middle bottom
-//        line1.position = CGPoint(x: size.width/2, y: size.height/2)
-     line1.position.y = (yOffset * sMetre1)
-     line1.position.x = (size.width / 2) - (xOffset * sMetre1)
-     line1.zPosition = zPos
-     self.addChild(line1)
-
-     if multiLine {
-     var line2 = SKSpriteNode(color: colour, size: CGSize(width: (lWidth * sMetre1), height: (lLength * sMetre1)))
-//        line2.name = "line1B"
-     line2.anchorPoint = CGPoint(x: 0.5, y: 0) //Set anchorpoint to middle bottom
-     line2.position.y = (yOffset * sMetre1)
-     line2.position.x = (size.width / 2) + (xOffset * sMetre1)
-     line2.zPosition = zPos
-     self.addChild(line2)
-     }
-
-     return
- }
+// func createF8Line(xOffset: CGFloat, yOffset: CGFloat, lWidth: CGFloat = lineWidth, lLength: CGFloat, colour: SKColor = .white, zPos: CGFloat = -3, multiLine: Bool = true) {
+//     //SKSpriteNode has better performance than SKShape!
+//     var line1 = SKSpriteNode(color: colour, size: CGSize(width: (lWidth * sMetre1), height: (lLength * sMetre1)))
+////        line1.name = "line1A"
+//     line1.anchorPoint = CGPoint(x: 0.5, y: 0) //Set anchorpoint to middle bottom
+////        line1.position = CGPoint(x: size.width/2, y: size.height/2)
+//     line1.position.y = (yOffset * sMetre1)
+//     line1.position.x = (size.width / 2) - (xOffset * sMetre1)
+//     line1.zPosition = zPos
+//     self.addChild(line1)
+//
+//     if multiLine {
+//     var line2 = SKSpriteNode(color: colour, size: CGSize(width: (lWidth * sMetre1), height: (lLength * sMetre1)))
+////        line2.name = "line1B"
+//     line2.anchorPoint = CGPoint(x: 0.5, y: 0) //Set anchorpoint to middle bottom
+//     line2.position.y = (yOffset * sMetre1)
+//     line2.position.x = (size.width / 2) + (xOffset * sMetre1)
+//     line2.zPosition = zPos
+//     self.addChild(line2)
+//     }
+//
+//     return
+// }
     
     func getKLVehicles() {
 //        let node = "sKLVehicle_1"
