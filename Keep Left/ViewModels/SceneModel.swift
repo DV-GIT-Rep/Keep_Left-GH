@@ -35,7 +35,9 @@ class SceneModel: ObservableObject {
     }
     */
 
-    func calcF8Scene(f8Size: CGSize = UIScreen.main.bounds.size) {
+    func calcF8Scene(f8Size: CGSize = UIScreen.main.bounds.size) -> Bool {
+        
+    var hGTWx2: Bool = false
 
         if (f8Size.width < f8Size.height) {
             
@@ -46,6 +48,7 @@ class SceneModel: ObservableObject {
             
             //MARK: - Use width to calculate scale factor for very tall screens Fig 8 Track only!
             if ((f8Size.height > (2 * f8Size.width))) {
+                hGTWx2 = true
                 metre1 = f8Size.width / f8ScreenWidth
             } else {
                 metre1 = f8Size.height / f8ScreenHeight
@@ -60,6 +63,7 @@ class SceneModel: ObservableObject {
             
             //MARK: - Use width to calculate scale factor for very tall screens Fig 8 Track only!
             if ((f8Size.height > (2 * f8Size.width))) {
+                hGTWx2 = true
                 metre1 = f8Size.width / f8ScreenWidth
             } else {
                 metre1 = f8Size.height / f8ScreenHeight
@@ -72,6 +76,7 @@ class SceneModel: ObservableObject {
 //                metre1 = f8Size.width / f8ScreenWidth
 //            }
         }
+        return hGTWx2
     }
     
     func calcStraightScene(sSize: CGSize = UIScreen.main.bounds.size) {

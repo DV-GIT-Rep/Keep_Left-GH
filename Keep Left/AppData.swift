@@ -7,6 +7,30 @@ import Foundation
 import SwiftUI
 import SpriteKit
 
+///Returns CGFloat of sin(45deg) as constant. Saves calculation time.
+let sin45Deg = sin(CGFloat(45).degrees())   //Replace calculation by constant
+
+///Returns CGFloat of cos(45deg) as constant. Saves calculation time.
+let cos45Deg = cos(CGFloat(45).degrees())   //Replace calculation by constant
+
+///Returns a value of (1.5 times pi) as a CGFloat
+let piBy1p5 = CGFloat(1.5) * .pi
+
+///Returns a value of (2 times pi) as a CGFloat
+let piBy2 = CGFloat(2) * .pi
+
+///Returns a value of (3 times pi) as a CGFloat
+let piBy3 = CGFloat(3) * .pi
+
+///Returns the x or y distance from origin for a 45' line of length f8Radius (sin45 = cos45)
+let halfDiagonalXY: CGFloat = sin45Deg * f8Radius //x/y length in metres
+
+///Returns a multiplier. Multiply y1Mx by a distance around the circumference to get the angle change
+let y1Mx: CGFloat = 270 / (1.5 * .pi * f8Radius)
+
+///Returns y coordinate change between (0,0) and the fig 8 circle centre in metres
+let f8CircleCentre: CGFloat = f8Radius / cos45Deg
+
 var carXWidth: CGFloat = .zero
 var carXLength: CGFloat = .zero
 var carXRatio: CGFloat = .zero
@@ -29,12 +53,12 @@ var maxTrucks = trucks.count
 var maxBuses = buses.count
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 100 //28
+var numVehicles = 22 //28
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
 var sOtherAllVehicles: [Vehicle] = []   //Array of vehicles on Other Straight Track
-var f8KLAllVehicles: [f8Vehicle] = []     //Array of vehicles on Keep Left Figure 8 Track
-var f8OtherAllVehicles: [f8Vehicle] = []  //Array of vehicles on Other Figure 8 Track
+var f8KLAllVehicles: [F8Vehicle] = []     //Array of vehicles on Keep Left Figure 8 Track
+var f8OtherAllVehicles: [F8Vehicle] = []  //Array of vehicles on Other Figure 8 Track
 
 //Vehicle Stats = Inner Dictionary =
 //  Name, Actual Speed, Intended Speed, Speed Limited, Algorithm
@@ -73,8 +97,6 @@ let asphalt: SKColor = SKColor(red: 42/256, green: 41/256, blue: 34/256, alpha: 
 
 let numLines: CGFloat = trunc(roadLength / linePeriod)  //Number of centre lines for road length
 
-let backgroundColour: UIColor = UIColor(red: 0.19, green: 0.38, blue: 0.16, alpha: 1)   //Green
-
 let degreesToRadians = CGFloat.pi / 180
 let radiansToDegrees = 180 / CGFloat.pi
 
@@ -90,7 +112,7 @@ var F8YZero: CGFloat = 0.0
 //var sSceneWidth: CGFloat = 0.0  //Straight Track Scene Width in Points
 //var sSceneHeight: CGFloat = 0.0 //Straight Track Scene Height in Points
 //var portrait = true
-let sTrackWidth: CGFloat = 40.0 //Width of straight track scene in metres
+let sTrackWidth: CGFloat = 60.0 //Width of straight track scene in metres
 let sTrackLength: CGFloat = 1000.0 //Length of straight track scene in metres
 let centreStrip: CGFloat = 4    //Width of centre strip in metres
 
@@ -102,18 +124,27 @@ var f8SceneWidth: CGFloat = 0.0     //Figure 8 Track Scene Width in Points
 var f8SceneHeight: CGFloat = 0.0    //Figure 8 Track Scene Height in Points
 var f8ScreenHeight: CGFloat = 400.0    //Figure 8 track screen height (longest axis) in metres
 let f8ScreenWidth: CGFloat = 200.0      //Figure 8 track screen width (shortest axis) in metres
-var f8Radius: CGFloat = 75.0        //Radius of centre of figure 8 curves
+var f8Radius: CGFloat = 75.0       //Radius of centre of figure 8 curves
+let f8CentreStrip: CGFloat = 9.5    //Width of centre strip in metres
+
+let closeLane: CGFloat = (f8CentreStrip / 2) + shoulderWidth + shoulderLineWidth + (laneWidth / 2)
+let farLane: CGFloat = closeLane + (laneWidth / 2) + lineWidth + (laneWidth / 2)
 
 var f8ScreenRatio: CGFloat = 0  //If height of screen > 2 x width then scale metres from width else use height
 
 var f8BackgroundColour: UIColor = backgroundColour
 
+let f8ImageWidth: CGFloat = 2406
+let f8ImageHeight: CGFloat = 4096
+let f8ImageSize: CGSize = CGSize(width: f8ImageWidth, height: f8ImageHeight)
+let f8ImageAspect: CGFloat = f8ImageHeight / f8ImageWidth
 
 //MARK: - These values are for the game track (one direction only - Vehicle_1 is under User Control!)
 var gMetre1: CGFloat = 0.0         //Multiply metres by this constant to get display points
 var gSceneWidth: CGFloat = 0.0  //Game Track Scene Width in Points
 var gSceneHeight: CGFloat = 0.0 //Game Track Scene Height in Points
 
+let backgroundColour: UIColor = UIColor(red: 0.19, green: 0.38, blue: 0.16, alpha: 1)   //Green
 var gBackgroundColour: UIColor = backgroundColour
 
 extension CGFloat {

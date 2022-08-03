@@ -31,6 +31,9 @@ var sprite: SKSpriteNode!   //Temporary to stop XCode errors!
 //Track scene may be temporary. Functions below MUST be called from within a scene!
 class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
     
+    @StateObject var vehicle = Vehicle()
+    @StateObject var f8Vehicle = F8Vehicle()
+
 //    static var sBackground: SKSpriteNode = SKSpriteNode(color: UIColor(red: 0.19, green: 0.38, blue: 0.16, alpha: 1), size: CGSize(width: 2, height: 4))
 
     //property and function for handling rotation
@@ -69,6 +72,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 //        print("Camera Pos = \(camera!.position) : straightScene.metre1 = \(straightScene.metre1)\nf8Scene.metre1 = \(f8Scene.metre1)")
         sTrackCamera.setScale(sTrackWidth/straightScene.width)
 //        camera?.setScale(1/4)
+//        f8TrackCamera.setScale(f8Scene.height/f8ImageHeight)
+        print("f8Scene.height: \(f8Scene.height), width: \(f8Scene.width)\nf8ImageHeight: \(f8ImageHeight), width: \(f8ImageWidth)")
     }
     
     override func didMove(to view: SKView) {
@@ -88,7 +93,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
         //MARK: - Create background colour (width: screenwidth, height: 1km). Define sMetre1 = multiplier for metres to points
 //        calcScale()
 
-        straightScene.calcStraightScene(sSize: view.bounds.size)
+        straightScene.calcStraightScene(sSize: view.bounds.size)    //Define straightScene parameters
 //        portrait = straightScene.portrait
 //        sMetre1 = straightScene.metre1
 //        sSceneWidth = straightScene.width
@@ -118,13 +123,18 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
         
         scene?.scaleMode = .resizeFill
             
-            f8Scene.calcF8Scene(f8Size: view.bounds.size)
-
-            f8Background.makeBackground(size: CGSize(width: straightScene.width, height: straightScene.height), image: "Fig 8 Track", zPos: 0)
+            let hGTWx2: Bool = f8Scene.calcF8Scene(f8Size: view.bounds.size)       //Define f8Scene parameters
+//            setAspectForWidth(sprite: <#T##Vehicle#>, width: <#T##CGFloat#>, metre: <#T##CGFloat#>)
+            
+            let f8BackgroundHeight = f8ScreenHeight                     //= 400m
+            let f8BackgroundWidth = f8BackgroundHeight/f8ImageAspect    //Assumes track image height = 400m !!!
+            f8Background.makeBackground(size: CGSize(width: f8BackgroundWidth, height: f8BackgroundHeight), image: "Fig 8 Track", zPos: 0)
+//            f8Background.makeBackground(size: CGSize(width: f8ScreenWidth, height: f8ScreenHeight), image: "Fig 8 Track", zPos: 0)
             f8Background.position = CGPoint(x: 0, y: 500 * straightScene.metre1)
             F8YZero = f8Background.position.y
             addChild(f8Background)
             f8Background.alpha = ((whichScene == .figure8) ? 1.0 : 0)
+            f8TrackCamera.setScale(f8BackgroundHeight/straightScene.height) //Camera Scale - 0.6 temporary !!!   XXXXXXXXXXXXXXX
 //            f8Background.inputViewController?.prefersStatusBarHidden  //Doesn't affect status bar!
 //            print("didMoveToView triggered. Fig 8 alpha = \(f8Background.alpha). whichScene = \(whichScene)")
 
@@ -134,11 +144,82 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
             sBackground.addChild(sTrackCamera)
             f8Background.addChild(f8TrackCamera)
             
+//            //MARK: - Add magnifier: TEMP CODE FOR TESTING!!!
+//            var magView = f8Background.texture
+//
+//            var f8MagnifierRadius: CGFloat = 10.0
+//            var f8Magnifier = SKShapeNode(circleOfRadius: f8MagnifierRadius)
+//            f8Magnifier.fillTexture = f8Background.texture
+//            f8Magnifier.strokeColor = .black
+//            f8Magnifier.zPosition = 50
+////            f8Magnifier.fillTexture?.size().width = f8Background.texture?.size().width * 2
+//
+//            f8Magnifier.physicsBody = SKPhysicsBody(circleOfRadius: f8MagnifierRadius)
+//            f8Magnifier.physicsBody?.node?.zPosition = 50
+//            f8Magnifier.physicsBody?.node?.setScale(2)
+//
+//            f8Background.addChild(f8Magnifier)
+//
+            
+//            //__________________________ TEMP 16m dia red circles spaced 50m apart
+//            let showMarkers = true
+//            if showMarkers == true {
+//            for x in stride(from: -150, through: 150, by: 50) {
+//                let aa = SKShapeNode(circleOfRadius: 8)
+//                aa.fillColor = SKColor(red: 0, green: 1, blue: 1, alpha: 0.5)
+//                aa.zPosition = 1
+//                aa.position = CGPoint(x: x, y: 0)
+//                f8Background.addChild(aa)
+//            }
+//            for y in stride(from: -250, through: 250, by: 50) {
+//                let aa = SKShapeNode(circleOfRadius: 8)
+//                aa.fillColor = SKColor(displayP3Red: 0, green: 0, blue: 1, alpha: 1)
+//                aa.zPosition = 1
+//                aa.position = CGPoint(x: 0, y: y)
+//                f8Background.addChild(aa)
+//            }
+//
+//            let aa = SKSpriteNode(color: .red, size: CGSize(width: 300, height: 1))
+//
+//            let bb = SKSpriteNode(color: .red, size: CGSize(width: 1, height: 10))
+//            bb.zPosition = 100
+//            aa.addChild(bb)
+//
+////            aa.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+//            aa.zRotation = CGFloat(45).degrees()
+//            aa.zPosition = 100
+////            aa.strokeColor = SKColor(red: 1, green: 0, blue: 0, alpha: 1)
+//            aa.position = CGPoint(x: -(sin(CGFloat(45).degrees()) * 75), y: (sin(CGFloat(45).degrees()) * 75))
+//            print("Line Pos: \(aa.position)")
+//            f8Background.addChild(aa)
+//
+//            let gg = SKSpriteNode(color: .red, size: CGSize(width: 300, height: 1))
+//
+//            let hh = SKSpriteNode(color: .red, size: CGSize(width: 1, height: 10))
+//            hh.zPosition = 100
+//            gg.addChild(hh)
+//
+////            gg.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+//            gg.zRotation = -CGFloat(45).degrees()
+//            gg.zPosition = 100
+////            gg.strokeColor = SKColor(red: 1, green: 0, blue: 0, alpha: 1)
+//            gg.position = CGPoint(x: (sin(CGFloat(45).degrees()) * 75), y: (sin(CGFloat(45).degrees()) * 75))
+//            print("Line Pos: \(gg.position)")
+//            f8Background.addChild(gg)
+//            }
+//            //_________________ above is TEMP 16m dia red circles spaced 50m apart
+
         viewCreated = true
         }
         
         redoCamera()    //Don't call until metre1 calculated!!!
 
+//        var ms250 = Timer.scheduledTimer(timeInterval: 0.25, target: self, selector: Selector, userInfo: nil, repeats: true) {ms250 in
+//            every250ms()
+//        }
+//        var ms250 = Timer(timeInterval: 0.25, repeats: true, block: <#T##(Timer) -> Void#>)
+        let ms500Timer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(every500ms), userInfo: nil, repeats: true)
+        
 //        let isLandscape = (view.bounds.size.width > view.bounds.size.height)  //NOTE: Doesn't recognise UIDevice rotation here!!!
 //        let rotation = isLandscape ? CGFloat.pi/2 : 0
 //        print("Rotation = \(rotation) : isLandscape = \(isLandscape)\nsContainer.frame.width = \(view.bounds.size.width)\nsContainer.frame.height = \(view.bounds.size.height)")
@@ -163,10 +244,10 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 //    }
 //    ///////////////////////////////////////////
     
-//    override func preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+//    override func preferredInterfaceOrientationForPr  esentation: UIInterfaceOrientation {
 //        return UIInterfaceOrientation.portrait
 //    }
-
+    
     override func update(_ currentTime: TimeInterval) {
         
         f8Background.alpha = ((whichScene == .figure8) ? 1.0 : 0)
@@ -198,53 +279,54 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
             updateOneTime = true
         }
         
-//        let isLandscape = (UIScreen.main.bounds.size.width > UIScreen.main.bounds.size.height)  //NOTE: Doesn't recognise UIDevice rotation here!!!
-//        let rotation = UIDevice.current.orientation.isLandscape ? CGFloat.pi/2 : 0
-//        camera?.zRotation = rotation
-        
-        let t1Vehicle = sKLAllVehicles   //Straight Track Vehicles
-        let t2Vehicle = sOtherAllVehicles
-
-        //Loop through both arrays simultaneously. Move back 1km when they've travelled 1km!
-        for (vehT1, vehT2) in zip(t1Vehicle, t2Vehicle) {
-            if vehT1.position.y >= 1000 {
-                vehT1.position.y = (vehT1.position.y - 1000)
-            }
-            if vehT2.position.y < 0 {
-                vehT2.position.y = (vehT2.position.y + 1000)
-            }
-//            print("X.,\(vehT1.name!):,\((vehT1.position.x).dp2),\((vehT1.position.y).dp2),,\(vehT2.name!):,\((vehT2.position.x).dp2),\((vehT2.position.y).dp2)")
-        }   //End of 'for' loop
-        
-        let f81Vehicle = f8KLAllVehicles   //Figure 8 Track Vehicles
-        let f82Vehicle = f8OtherAllVehicles
-        let tempScene = f8Scene
-
-        //Loop through both arrays simultaneously. Move into new position based on Straight Track Vehicles!
-        for (vehF8KL, vehF8Other) in zip(f81Vehicle, f82Vehicle) {
-            if (vehF8KL != nil) && (vehF8Other != nil) {
-                
-//                print("1.,\(vehF8KL.name!):,\((vehF8KL.position.x).dp2),\((vehF8KL.position.y).dp2),,\(vehF8Other.name!):,\((vehF8Other.position.x).dp2),\((vehF8Other.position.y).dp2)")
-//                DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-//                    vehF8Other.moveF8Vehicle(f8Node: vehF8Other, meta1: tempScene.metre1, F8YZero: F8YZero)
-//                    vehF8KL.moveF8Vehicle(f8Node: vehF8KL, meta1: tempScene.metre1, F8YZero: F8YZero)
-//                }
-//                print("2.,\(vehF8KL.name!):,\(vehF8KL.position.x.dp2),\(vehF8KL.position.y.dp2),,\(vehF8Other.name!):,\(vehF8Other.position.x.dp2),\(vehF8Other.position.y.dp2)")
-            } else {
-            }
-        }   //End of 'for' loop
+//        let t1Vehicle = sKLAllVehicles   //Straight Track Vehicles
+//        let t2Vehicle = sOtherAllVehicles
+//
+//        //Loop through both arrays simultaneously. Move back 1km when they've travelled 1km!
+//        for (sKLNode, sOtherNode) in zip(t1Vehicle, t2Vehicle) {
+//            if sKLNode.position.y >= 1000 {
+//                //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
+//                sKLNode.position.y = (sKLNode.position.y - 1000)
+//            }
+////            print("sKLNodePos: \(sKLNode.position)")
+//            sKLNode.moveF8Vehicle(sNode: sKLNode, sNodePos: sKLNode.position, meta1: 0, F8YZero: 0)
+//            if sOtherNode.position.y < 0 {
+//                //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
+//                sOtherNode.position.y = (sOtherNode.position.y + 1000)
+//            }
+//            sOtherNode.moveF8Vehicle(sNode: sOtherNode, sNodePos: sOtherNode.position, meta1: 0, F8YZero: 0)
+////            print("X.,\(sKLNode.name!):,\((sKLNode.position.x).dp2),\((sKLNode.position.y).dp2),,\(sOtherNode.name!):,\((sOtherNode.position.x).dp2),\((sOtherNode.position.y).dp2)")
+//        }   //End of 'for' loop
+//
+//        let f81Vehicle = f8KLAllVehicles   //Figure 8 Track Vehicles
+//        let f82Vehicle = f8OtherAllVehicles
+//        let tempScene = f8Scene
+//
+//        //Loop through both arrays simultaneously. Move into new position based on Straight Track Vehicles!
+//        for (vehF8KL, vehF8Other) in zip(f81Vehicle, f82Vehicle) {
+//            if (vehF8KL != nil) && (vehF8Other != nil) {
+//
+////                print("1.,\(vehF8KL.name!):,\((vehF8KL.position.x).dp2),\((vehF8KL.position.y).dp2),,\(vehF8Other.name!):,\((vehF8Other.position.x).dp2),\((vehF8Other.position.y).dp2)")
+////                DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+////                    vehF8Other.moveF8Vehicle(f8Node: vehF8Other, meta1: tempScene.metre1, F8YZero: F8YZero)
+////                    vehF8KL.moveF8Vehicle(f8Node: vehF8KL, meta1: tempScene.metre1, F8YZero: F8YZero)
+////                }
+////                print("2.,\(vehF8KL.name!):,\(vehF8KL.position.x.dp2),\(vehF8KL.position.y.dp2),,\(vehF8Other.name!):,\(vehF8Other.position.x.dp2),\(vehF8Other.position.y.dp2)")
+//            } else {
+//            }
+//        }   //End of 'for' loop
         
     }   //End of override update
     
     //        //The following code can replace the above - it's easier to follow but I suspect
     //        //creating the extra array would have a time penalty
     //        let dualArray = Array(zip(t1Vehicle, t2Vehicle))
-    //        for (vehT1, vehT2) in dualArray  {
-    //            if vehT1.position.y >= (1000 * sMetre1) {
-    //                vehT1.position.y = (vehT1.position.y - (1000 * sMetre1))
+    //        for (sKLNode, sOtherNode) in dualArray  {
+    //            if sKLNode.position.y >= (1000 * sMetre1) {
+    //                sKLNode.position.y = (sKLNode.position.y - (1000 * sMetre1))
     //            }
-    //            if vehT2.position.y < 0 {
-    //                vehT2.position.y = (vehT2.position.y + (1000 * sMetre1))
+    //            if sOtherNode.position.y < 0 {
+    //                sOtherNode.position.y = (sOtherNode.position.y + (1000 * sMetre1))
     //            }
     //        }
     //
@@ -252,7 +334,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else {return}   //Exit if not first touch!
         
-        var kph: CGFloat = 110
+        var kph: CGFloat = 130
         let multiplier: CGFloat = 1000 / 3600  //Value by kph gives m/sec
         
         switch toggleSpeed {
@@ -269,8 +351,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
         case 2:
             for i in 1...numVehicles {
                 sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -(0.6*kph) * multiplier   //1000 = metres in km. 3600 = secs in hour.
-            }
+                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -(0.9 * kph) * multiplier   //1000 = metres in km. 3600 = secs in hour.
+            }   //$$$$$$$$$$$$$$$     !!! Other lane slowed above to create difference !!!     $$$$$$$$$$$$$$$$$$$$$$$$$$$$
         case 3:
             for i in 1...numVehicles {
                 sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
@@ -460,7 +542,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
             var sKLVehicle: Vehicle = Vehicle(imageName: vehImage + String(fName))
             
 //            vWidth = 2  //Temporary to force all vehicles to 2m width!
-            setAspectForWidth(sprite: sKLVehicle, width: vWidth, metre: straightScene.metre1)  //Sets veh width = 2m (default) & maintains aspect ratio
+            setAspectForWidth(sprite: sKLVehicle, width: vWidth)  //Sets veh width = 2m (default) & maintains aspect ratio
             let vehSize = sKLVehicle.size
             
             sKLVehicle.zPosition = +50
@@ -481,11 +563,11 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
             sBackground.addChild(sKLVehicle)
             
             //_________________________ Fig 8 Track below __________________________________________________
-            var f8KLVehicle: f8Vehicle = f8Vehicle(imageName: vehImage + String(fName))
+            var f8KLVehicle: F8Vehicle = F8Vehicle(imageName: vehImage + String(fName))
 
             f8KLVehicle.size = vehSize
-            f8KLVehicle.size.width = vehSize.width / 4
-            f8KLVehicle.size.height = vehSize.height / 4
+//            f8KLVehicle.size.width = vehSize.width / 4
+//            f8KLVehicle.size.height = vehSize.height / 4
 
             f8KLVehicle.zPosition = 1
             f8KLVehicle.name = "f8KLVehicle_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
@@ -507,9 +589,10 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
             //_________________________ Fig 8 Track above __________________________________________________
 
             var sOtherVehicle: Vehicle = Vehicle(imageName: vehImage + String(fName))
-            setAspectForWidth(sprite: sOtherVehicle, width: vWidth, metre: straightScene.metre1)  //Sets veh width = 2m (default) & maintains aspect ratio
+            setAspectForWidth(sprite: sOtherVehicle, width: vWidth)  //Sets veh width = 2m (default) & maintains aspect ratio
             let secSize = sOtherVehicle.size
             
+            sOtherVehicle.otherTrack = true //Flag identifies vehicle as being on the otherTrack!
             sOtherVehicle.zPosition = +50
             sOtherVehicle.name = "sOtherVehicle_\(i)"  //sOtherVehicle_x -> Straight Track 2, f2Vehicle_x -> Figure 8 Track 2, g2Vehicle_x -> Game Track 2.
             sOtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: secSize.width, height: secSize.height + 1))   //Make rectangle same size as sprite + 0.5m front and back!
@@ -530,12 +613,13 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 
 //            f8KLVehicle.moveF8Vehicle(f8Node: f8KLVehicle)
             //_________________________ Fig 8 Track below __________________________________________________
-            var f8OtherVehicle: f8Vehicle = f8Vehicle(imageName: vehImage + String(fName))
+            var f8OtherVehicle: F8Vehicle = F8Vehicle(imageName: vehImage + String(fName))
 
             f8OtherVehicle.size = secSize
-            f8OtherVehicle.size.width = f8OtherVehicle.size.width / 4
-            f8OtherVehicle.size.height = f8OtherVehicle.size.height / 4
+//            f8OtherVehicle.size.width = f8OtherVehicle.size.width / 4
+//            f8OtherVehicle.size.height = f8OtherVehicle.size.height / 4
 
+            sOtherVehicle.otherTrack = true //Flag identifies vehicle as being on the otherTrack!
             f8OtherVehicle.zPosition = 1
             f8OtherVehicle.name = "f8OtherVehicle_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
             f8OtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: f8OtherVehicle.size.width, height: f8OtherVehicle.size.height + 1))   //Make rectangle same size as sprite + 0.5m front and back!
@@ -558,10 +642,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
             t1Stats["Name"]?.append(sKLVehicle.name!)
             t1Stats["Actual Speed"]?.append(0.0)
             if let unwrapped = t1Stats["Name"]?[i] {
-                if let speed = t1Stats["Actual Speed"]?[i] {
-//                print("Name in Dictionary = \(unwrapped) : Speed = \(speed)")
-                
-                }
+//                if let speed = t1Stats["Actual Speed"]?[i] {
+////                print("Name in Dictionary = \(unwrapped) : Speed = \(speed)")
+//                }
             }
         }
         
@@ -581,9 +664,13 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
         sKLVehicle.position.y = randomPos
 //        sKLVehicle.position.x = (randomLane == 0) ? ((sSceneWidth / 2.0) - (((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1)) : ((sSceneWidth / 2.0) - (((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1))
         sKLVehicle.position.x = (randomLane == 0) ? ( -((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2))) : ( -((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)))
+        sKLVehicle.lane = CGFloat(randomLane)
+        
         sOtherVehicle.position.y = 1000 - randomPos
 //        sOtherVehicle.position.x = (randomLane == 0) ? ((sSceneWidth / 2.0) + (((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1)) : ((sSceneWidth / 2.0) + (((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1))
         sOtherVehicle.position.x = (randomLane == 0) ? ( +((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2))) : ( +((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)))
+        sOtherVehicle.lane = CGFloat(randomLane)
+        
         spriteClear = true
         
         //        veh.position = CGPoint(x: ((view?.bounds.size.width)! / 2.0) - ((5.85 + centreStrip/2) * sMetre1), y: 400.0 * sMetre1)
@@ -601,11 +688,37 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
     return sKLVehicle
 }
 
-    func setAspectForWidth(sprite: Vehicle, width: CGFloat = 2, metre: CGFloat) {
+    func setAspectForWidth(sprite: Vehicle, width: CGFloat = 2) {
         let aspectRatio: CGFloat = sprite.size.height/sprite.size.width
         sprite.size = CGSize(width: width, height: width * aspectRatio)
-//        return sprite
     }
     
+    func setAspectForHeight(sprite: Vehicle, height: CGFloat = 400) {
+        let aspectRatio: CGFloat = sprite.size.height/sprite.size.width
+        sprite.size = CGSize(width: height / aspectRatio, height: height)
+    }
+    
+    //MARK: - the function below runs every 500ms
+    @objc func every500ms() {
+    let t1Vehicle = sKLAllVehicles   //Straight Track Vehicles
+    let t2Vehicle = sOtherAllVehicles
+
+    //Loop through both arrays simultaneously. Move back 1km when they've travelled 1km!
+    for (sKLNode, sOtherNode) in zip(t1Vehicle, t2Vehicle) {
+        if sKLNode.position.y >= 1000 {
+            //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
+            sKLNode.position.y = (sKLNode.position.y - 1000)
+        }
+//            print("sKLNodePos: \(sKLNode.position)")
+        sKLNode.moveF8Vehicle(sNode: sKLNode, sNodePos: sKLNode.position, meta1: 0, F8YZero: 0)
+        if sOtherNode.position.y < 0 {
+            //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
+            sOtherNode.position.y = (sOtherNode.position.y + 1000)
+        }
+        sOtherNode.moveF8Vehicle(sNode: sOtherNode, sNodePos: sOtherNode.position, meta1: 0, F8YZero: 0)
+//            print("X.,\(sKLNode.name!):,\((sKLNode.position.x).dp2),\((sKLNode.position.y).dp2),,\(sOtherNode.name!):,\((sOtherNode.position.x).dp2),\((sOtherNode.position.y).dp2)")
+    }   //End of 'for' loop
+}
+
 }
 
