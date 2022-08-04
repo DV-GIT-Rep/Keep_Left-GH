@@ -68,7 +68,7 @@ func getView(viewNo: Int) -> AnyView {
 //        whichScene = .figure8
         return destinationView
     case 2:
-        let destinationView: AnyView = AnyView(StraightTrackView())
+        let destinationView: AnyView = AnyView(GameTrackView())
 //        let destinationView: AnyView = AnyView(StraightTrackScene())
 //        whichScene = .straight
 //        if whichScene == .figure8 {
@@ -80,12 +80,12 @@ func getView(viewNo: Int) -> AnyView {
 //        print("!!! XXXXXXXXXXXXXXXXXXX  !!!")
         return destinationView
     case 3:
-        let destinationView: AnyView = AnyView(GameTrackView())
+        let destinationView: AnyView = AnyView(ScreenShotView())
 //        whichScene = .game
 //        print("!!! XXXXXXXXXXXXXXXXXXX  !!!")
         return destinationView
     case 4:
-        let destinationView: AnyView = AnyView(ScreenShotView())
+        let destinationView: AnyView = AnyView(StatsView())
         return destinationView
     case 5:
         let destinationView: AnyView = AnyView(UserGuideView())

@@ -8,9 +8,9 @@
 import Foundation
 
 enum ViewName {
-    case Fig8TrackView
     case StraightTrackView
     case GameTrackView
+    case StatsView
     case ScreenShotView
     case SettingsView
     

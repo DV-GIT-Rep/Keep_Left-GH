@@ -1,6 +1,6 @@
 [
     {
-    "name": "Figure 8 Track",
+    "name": "Smart Track",
     "image": "fig8Icon",
     "view": 1,
     "features": [
@@ -12,22 +12,9 @@
         ]
     },
     {
-    "name": "Straight Track",
-    "image": "straightTrackIcon",
-    "view": 2,
-    "features": [
-        "Two lane \"Keep Left\" track",
-        "Two lane \"Other\" track",
-        "Selectable speed limits",
-        "Able to select number of vehicles",
-        "Full track length approximately 1km",
-        "Able to zoom track length/width"
-        ]
-    },
-    {
     "name": "Game Track",
     "image": "gameTrackIcon",
-    "view": 3,
+    "view": 2,
     "features": [
         "Two lane \"Keep Left\" track",
         "Selectable speed limits",
@@ -41,11 +28,24 @@
     {
     "name": "Screen Shots",
     "image": "screenShotIcon",
-    "view": 4,
+    "view": 3,
     "features": [
         "View existing screen shots",
         "Enable auto screen shots",
         "Set auto screen shot time/date and/or distance"
+        ]
+    },
+    {
+    "name": "Statistics",
+    "image": "statsIcon",
+    "view": 4,
+    "features": [
+        "Two lane \"Keep Left\" track",
+        "Two lane \"Other\" track",
+        "Selectable speed limits",
+        "Able to select number of vehicles",
+        "Full track length approximately 1km",
+        "Able to zoom track length/width"
         ]
     },
     {

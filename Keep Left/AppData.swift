@@ -53,7 +53,7 @@ var maxTrucks = trucks.count
 var maxBuses = buses.count
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 22 //28
+var numVehicles = 18 //28
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
 var sOtherAllVehicles: [Vehicle] = []   //Array of vehicles on Other Straight Track
@@ -138,6 +138,12 @@ let f8ImageWidth: CGFloat = 2406
 let f8ImageHeight: CGFloat = 4096
 let f8ImageSize: CGSize = CGSize(width: f8ImageWidth, height: f8ImageHeight)
 let f8ImageAspect: CGFloat = f8ImageHeight / f8ImageWidth
+
+let bridgeRailWidth: CGFloat = 0.35
+let bridgeWidth: CGFloat = (2 * roadWidth) + f8CentreStrip + (2 * bridgeRailWidth)
+
+let fudgeFactor: CGFloat = 0.75     //TEMPORARY!!!  Value is added to radius of fig 8 to offset sideways vehicle movement due to lag
+                                    //              Note: will push stationary & low speed vehicles further out!
 
 //MARK: - These values are for the game track (one direction only - Vehicle_1 is under User Control!)
 var gMetre1: CGFloat = 0.0         //Multiply metres by this constant to get display points

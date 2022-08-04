@@ -99,7 +99,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
         }
         
         var f8NodeRot: CGFloat = 0
-        let aniDuration: CGFloat = 0.3
+        let aniDuration: CGFloat = 0.4
         
         var key = f8Node.name
         key = String(key!.suffix(3))
@@ -136,6 +136,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
             }
 
             let f8NodePos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
+            f8Node.zPosition = 10       //Set zPosition lower than bridge (zPos: 15)
 
             let newF8Pos = SKAction.move(to: f8NodePos, duration: aniDuration)
             let newF8Rot = SKAction.rotate(toAngle: f8NodeRot, duration: aniDuration, shortestUnitArc: true)
@@ -155,8 +156,8 @@ class Vehicle: SKSpriteNode, ObservableObject {
             newF8NodePos.y = f8CircleCentre
             let laneRadius: CGFloat = f8Radius - lanePos
 
-            newF8NodePos.x = newF8NodePos.x + (laneRadius * cos(CGFloat(y1Deg).degrees()))
-            newF8NodePos.y = newF8NodePos.y + (laneRadius * sin(CGFloat(y1Deg).degrees()))
+            newF8NodePos.x = newF8NodePos.x + ((laneRadius + fudgeFactor) * cos(CGFloat(y1Deg).degrees()))
+            newF8NodePos.y = newF8NodePos.y + ((laneRadius + fudgeFactor) * sin(CGFloat(y1Deg).degrees()))
                 
             let f8NodePos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
 
@@ -194,6 +195,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
             }
 
             let f8NodePos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
+            f8Node.zPosition = 20       //Set zPosition higher than bridge (zPos: 15)
 
             let newF8Pos = SKAction.move(to: f8NodePos, duration: aniDuration)
             let newF8Rot = SKAction.rotate(toAngle: f8NodeRot, duration: aniDuration, shortestUnitArc: true)
@@ -217,8 +219,8 @@ class Vehicle: SKSpriteNode, ObservableObject {
             newF8NodePos.y = -f8CircleCentre
             let laneRadius: CGFloat = f8Radius + lanePos
 
-            newF8NodePos.x = newF8NodePos.x + (laneRadius * cos(CGFloat(y1Deg).degrees()))
-            newF8NodePos.y = newF8NodePos.y + (laneRadius * sin(CGFloat(y1Deg).degrees()))
+            newF8NodePos.x = newF8NodePos.x + ((laneRadius + fudgeFactor) * cos(CGFloat(y1Deg).degrees()))
+            newF8NodePos.y = newF8NodePos.y + ((laneRadius + fudgeFactor) * sin(CGFloat(y1Deg).degrees()))
                 
             let f8NodePos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
 
@@ -256,6 +258,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
             }
 
             let f8NodePos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
+            f8Node.zPosition = 10       //Set zPosition lower than bridge (zPos: 15)
 
             let newF8Pos = SKAction.move(to: f8NodePos, duration: aniDuration)
             let newF8Rot = SKAction.rotate(toAngle: f8NodeRot, duration: aniDuration, shortestUnitArc: true)

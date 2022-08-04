@@ -53,6 +53,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
     var f8Scene = SceneModel()
     var sBackground = Background()      //Straight Track Parent and Background
     var f8Background = Background()     //Figure 8 Track Parent and Background
+    var bridge = Background()           //Create bridge at higher zPos
 
     var toggleSpeed: Int = 2
     
@@ -129,14 +130,30 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
             let f8BackgroundHeight = f8ScreenHeight                     //= 400m
             let f8BackgroundWidth = f8BackgroundHeight/f8ImageAspect    //Assumes track image height = 400m !!!
             f8Background.makeBackground(size: CGSize(width: f8BackgroundWidth, height: f8BackgroundHeight), image: "Fig 8 Track", zPos: 0)
-//            f8Background.makeBackground(size: CGSize(width: f8ScreenWidth, height: f8ScreenHeight), image: "Fig 8 Track", zPos: 0)
             f8Background.position = CGPoint(x: 0, y: 500 * straightScene.metre1)
             F8YZero = f8Background.position.y
             addChild(f8Background)
             f8Background.alpha = ((whichScene == .figure8) ? 1.0 : 0)
-            f8TrackCamera.setScale(f8BackgroundHeight/straightScene.height) //Camera Scale - 0.6 temporary !!!   XXXXXXXXXXXXXXX
-//            f8Background.inputViewController?.prefersStatusBarHidden  //Doesn't affect status bar!
-//            print("didMoveToView triggered. Fig 8 alpha = \(f8Background.alpha). whichScene = \(whichScene)")
+            f8TrackCamera.setScale(f8BackgroundHeight/straightScene.height)
+//            f8TrackCamera.setScale(0.2 * f8BackgroundHeight/straightScene.height) //Camera Scale - mx by 0.5 temporary !!!   XXXXXXXXXXXXXXX
+
+            
+            //MARK: - Create mask for overhead bridge
+            let bridge = SKCropNode()
+            bridge.position = CGPoint(x: 0, y: 0)
+            bridge.zPosition = 15       //Set "altitude" of bridge
+            bridge.maskNode = SKSpriteNode(color: .red, size: CGSize(width: bridgeWidth, height: bridgeWidth))
+            bridge.zRotation = CGFloat(45).degrees()        //Create cropping mask
+
+            let bridgeCrop = SKSpriteNode(imageNamed: "Fig 8 Track")    //Set bridgeCrop equiv to f8Background
+            bridgeCrop.size = f8Background.size
+            bridgeCrop.position = CGPoint(x: 0, y: 0)
+            bridgeCrop.name = "bridge"
+            bridgeCrop.zRotation = -CGFloat(45).degrees()   //Compensate for mask rotation
+            
+            bridge.addChild(bridgeCrop)
+            f8Background.addChild(bridge)
+            
 
         //MARK: - Add 2x straight roads to StraightTrackScene
         addRoads()
@@ -218,7 +235,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 //            every250ms()
 //        }
 //        var ms250 = Timer(timeInterval: 0.25, repeats: true, block: <#T##(Timer) -> Void#>)
-        let ms500Timer = Timer.scheduledTimer(timeInterval: 0.2, target: self, selector: #selector(every500ms), userInfo: nil, repeats: true)
+        let ms500Timer = Timer.scheduledTimer(timeInterval: 0.33, target: self, selector: #selector(every500ms), userInfo: nil, repeats: true)
         
 //        let isLandscape = (view.bounds.size.width > view.bounds.size.height)  //NOTE: Doesn't recognise UIDevice rotation here!!!
 //        let rotation = isLandscape ? CGFloat.pi/2 : 0
@@ -569,7 +586,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 //            f8KLVehicle.size.width = vehSize.width / 4
 //            f8KLVehicle.size.height = vehSize.height / 4
 
-            f8KLVehicle.zPosition = 1
+            f8KLVehicle.zPosition = 10      //Set starting "altitude" above track and below bridge
             f8KLVehicle.name = "f8KLVehicle_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
             f8KLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: f8KLVehicle.size.width, height: f8KLVehicle.size.height + 1))   //Make rectangle same size as sprite + 0.5m front and back!
             f8KLVehicle.physicsBody?.friction = 0
@@ -619,8 +636,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate {
 //            f8OtherVehicle.size.width = f8OtherVehicle.size.width / 4
 //            f8OtherVehicle.size.height = f8OtherVehicle.size.height / 4
 
-            sOtherVehicle.otherTrack = true //Flag identifies vehicle as being on the otherTrack!
-            f8OtherVehicle.zPosition = 1
+            sOtherVehicle.otherTrack = true     //Flag identifies vehicle as being on the otherTrack!
+            f8OtherVehicle.zPosition = 10       //Set starting "altitude" above track and below bridge
             f8OtherVehicle.name = "f8OtherVehicle_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
             f8OtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: f8OtherVehicle.size.width, height: f8OtherVehicle.size.height + 1))   //Make rectangle same size as sprite + 0.5m front and back!
             f8OtherVehicle.physicsBody?.friction = 0
