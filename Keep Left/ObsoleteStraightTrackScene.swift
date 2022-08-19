@@ -188,7 +188,7 @@ class StraightTrackScene: SKScene {
             spriteClear = true
             
             //MARK: - Ensure vehicle doesn't overlap existing vehicle!
-            for sprite in allVehicles {
+            for sprite in awlVehicles {
                 if (sKLVehicle.intersects(sprite)) {
                     spriteClear = false
                 }

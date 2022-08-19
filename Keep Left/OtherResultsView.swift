@@ -23,11 +23,14 @@ struct OtherSummaryView: View {
             Text("All Vehicles")
                 .font(.system(size: 8.6))
                 .bold()
+                .foregroundColor(Color(UIColor(red: 0.15, green: 0.3, blue: 0.15, alpha: 1)))
             HStack {
                 OtherSummaryDescriptionView()
                 OtherSummaryResultsView()
             }
             .font(.system(size: 7.8))
+            .foregroundColor(Color(UIColor(red: 0.26, green: 0.35, blue: 0.26, alpha: 1)))
+//            .foregroundColor(Color(UIColor.darkGray))
         }
     }
 }
@@ -52,10 +55,10 @@ struct OtherSummaryDescriptionView: View {
 struct OtherSummaryResultsView: View {
     var body: some View {
         VStack (alignment: .leading) {
-            Text("84 kph")
+            Text("87 kph")
                 .bold()
                 .foregroundColor(.black)
-            Text("110 kph")
+            Text("117 kph")
             Text("31 kph")
             Text("318,624")
                 .bold()

@@ -10,13 +10,30 @@ import SpriteKit
 
 struct StraightTrackView: View {
     
+//    //Reference the top and bottom figure 8 labels
+//    @ObservedObject var topLabel = LabelData()
+//    @ObservedObject var bottomLabel = LabelData()
+//
+//    var straitScene: SKScene {
+    let straitScene = StraightTrackScene()
+//        straitScene.topLabel = topLabel
+//        straitScene.bottomLabel = bottomLabel
+////            straitScene.size = CGSize(width: view?.bounds.size.width, height: view.bounds.size.height)
+////            straitScene.scaleMode = .aspectFill
+//        return straitScene
+//    }
+
     @State private var angle: Angle = .degrees(0)
-    @State private var straitScene = StraightTrackScene()
+//    @State var straitScene = StraightTrackScene()
+//    @State private static var straitScene = StraightTrackScene()  //try later !!! x2
 
     var body: some View {
-
+        
+        var scale: CGFloat = 1.875 - 0.25
+        
         ZStack {
             SpriteView(scene: straitScene, options: .ignoresSiblingOrder, debugOptions: [.showsFPS, .showsNodeCount])
+//            SpriteView(scene: StraightTrackView.straitScene, options: .ignoresSiblingOrder, debugOptions: [.showsFPS, .showsNodeCount]) //try later !!! x2
 //                .frame(width: 1000, height: 1200)
                 .ignoresSafeArea()
                 .rotationEffect(angle, anchor: .center)
@@ -24,21 +41,21 @@ struct StraightTrackView: View {
         /*  StraightScene ONLY for now!!!
             SpriteView(scene: fig8Scene)
                 .ignoresSafeArea()
-            
-            VStack {
-                Spacer()
-                ResultsView()
-                    .scaleEffect(scale)
-                Spacer()
-                Text("f8Metre1 = \(f8Metre1)")
-                Spacer()
-//                Spacer(minLength: UIScreen.main.bounds.height / 2.2)    //iPad 12.9"
-//                Spacer(minLength: UIScreen.main.bounds.height / 2.6)    //iPh 13
-                ResultsView()
-                    .scaleEffect(scale)
-                Spacer()
-            }
          */ //  StraightScene ONLY for now!!!
+
+//            if (whichScene != .figure8) {
+//            VStack {
+//                Spacer()
+////                ResultsView()
+////                    .scaleEffect(scale)
+//                Spacer(minLength: UIScreen.main.bounds.height / 2.6)
+////                Spacer(minLength: UIScreen.main.bounds.height / 2.2)    //iPad 12.9"
+////                Spacer(minLength: UIScreen.main.bounds.height / 2.6)    //iPh 13
+//                OtherResultsView()
+//                    .scaleEffect(scale)
+//                Spacer(minLength: UIScreen.main.bounds.height / 5.5)
+//            }
+//            }
 
         }
         .statusBar(hidden: true)

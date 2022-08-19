@@ -1,0 +1,22 @@
+[
+    {
+        "Keep \(Left)",
+        "All Vehicles",
+    "avgSpeed": "d",
+    "maxSpeed": "d",
+    "minSpeed": "d",
+    "avgDistance": "d",
+    "maxDistance": "d",
+    "minDistance": "f"
+    },
+    {
+        "Other",
+        "All Vehicles",
+    "avgSpeed": "d",
+    "maxSpeed": "d",
+    "minSpeed": "d",
+    "avgDistance": "d",
+    "maxDistance": "d",
+    "minDistance": "f"
+    }
+]

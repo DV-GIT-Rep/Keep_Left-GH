@@ -10,6 +10,7 @@ import Foundation
 enum ViewName {
     case StraightTrackView
     case GameTrackView
+    case QuizView
     case StatsView
     case ScreenShotView
     case SettingsView

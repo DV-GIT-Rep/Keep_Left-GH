@@ -7,6 +7,29 @@ import Foundation
 import SwiftUI
 import SpriteKit
 
+///Keep Left - true or false?
+var keepLeft = true         //Determines which side of the road vehicles travel on
+
+///Metric - true or false? True = km, false = miles
+var Metric = true           //Determines whether km or miles are used
+
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+var TEMPAA = false
+var TEMPBB = false
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+//Metric string constants
+///Returns "km" or "Miles"
+var Km = Metric ? "km" : "Miles"
+///Returns "km" or "miles"
+var km = Metric ? "km" : "miles"
+///Returns "kph" or "mph"
+var kph = Metric ? "kph" : "mph"
+
+//Keep Left string constants
+///Returns "Left" or "Right"
+var Left = keepLeft ? "Left" : "Right"
+
 ///Returns CGFloat of sin(45deg) as constant. Saves calculation time.
 let sin45Deg = sin(CGFloat(45).degrees())   //Replace calculation by constant
 
@@ -53,7 +76,7 @@ var maxTrucks = trucks.count
 var maxBuses = buses.count
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 18 //28
+var numVehicles = 16 //28
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
 var sOtherAllVehicles: [Vehicle] = []   //Array of vehicles on Other Straight Track
@@ -112,7 +135,7 @@ var F8YZero: CGFloat = 0.0
 //var sSceneWidth: CGFloat = 0.0  //Straight Track Scene Width in Points
 //var sSceneHeight: CGFloat = 0.0 //Straight Track Scene Height in Points
 //var portrait = true
-let sTrackWidth: CGFloat = 60.0 //Width of straight track scene in metres
+let sTrackWidth: CGFloat = 120.0 //Width of straight track scene in metres
 let sTrackLength: CGFloat = 1000.0 //Length of straight track scene in metres
 let centreStrip: CGFloat = 4    //Width of centre strip in metres
 
@@ -124,7 +147,8 @@ var f8SceneWidth: CGFloat = 0.0     //Figure 8 Track Scene Width in Points
 var f8SceneHeight: CGFloat = 0.0    //Figure 8 Track Scene Height in Points
 var f8ScreenHeight: CGFloat = 400.0    //Figure 8 track screen height (longest axis) in metres
 let f8ScreenWidth: CGFloat = 200.0      //Figure 8 track screen width (shortest axis) in metres
-var f8Radius: CGFloat = 75.0       //Radius of centre of figure 8 curves
+var f8Radius: CGFloat = sTrackLength / (4 + piBy3)       //Radius of centre of figure 8 curves
+//var f8Radius: CGFloat = 75.0       //Radius of centre of figure 8 curves (see above: ~ 74.489m)
 let f8CentreStrip: CGFloat = 9.5    //Width of centre strip in metres
 
 let closeLane: CGFloat = (f8CentreStrip / 2) + shoulderWidth + shoulderLineWidth + (laneWidth / 2)
@@ -142,6 +166,12 @@ let f8ImageAspect: CGFloat = f8ImageHeight / f8ImageWidth
 let bridgeRailWidth: CGFloat = 0.35
 let bridgeWidth: CGFloat = (2 * roadWidth) + f8CentreStrip + (2 * bridgeRailWidth)
 
+var f8DisplayDat: Int = 0 {
+    didSet {
+        print("Change fig 8 display")   //Load display here: 0 = "All Vehicles", 1 = "Vehicle 1", 2 = "Vehicle 2" etc
+    }
+}
+
 let fudgeFactor: CGFloat = 0.75     //TEMPORARY!!!  Value is added to radius of fig 8 to offset sideways vehicle movement due to lag
                                     //              Note: will push stationary & low speed vehicles further out!
 
@@ -156,5 +186,29 @@ var gBackgroundColour: UIColor = backgroundColour
 extension CGFloat {
     var dp2: String {
         return String(format: "%.2f", self)
+    }
+}
+
+extension CGFloat {
+    ///Max 2 dp's to 1,000, 1 dp to 100,000 then 0 dp's. Adds thousands separater.
+    var varDP: String {
+        var val = self
+        var dp = 0
+        var result: String = ""
+        
+        if self < 1000 {
+            dp = 2  //return String(format: "%.2f", self)
+        } else if self < 100000 {
+            dp = 1  //return String(format: "%.1f", self)
+        } else {
+            dp = 0  //return String(format: "%.0f", self)
+        }
+        
+        let formatter = NumberFormatter()
+        formatter.locale = Locale.current // Change this to another locale if you want to force a specific locale, otherwise this is redundant as the current locale is the default already
+        formatter.maximumFractionDigits = dp
+        formatter.numberStyle = .decimal
+        result = formatter.string(from: val as NSNumber)  ?? " "
+        return result
     }
 }

@@ -36,9 +36,19 @@
         ]
     },
     {
+    "name": "Quiz",
+    "image": "quizIcon",
+    "view": 4,
+    "features": [
+        "View existing screen shots",
+        "Enable auto screen shots",
+        "Set auto screen shot time/date and/or distance"
+        ]
+    },
+    {
     "name": "Statistics",
     "image": "statsIcon",
-    "view": 4,
+    "view": 5,
     "features": [
         "Two lane \"Keep Left\" track",
         "Two lane \"Other\" track",
@@ -51,7 +61,7 @@
     {
     "name": "User Guide",
     "image": "userGuideIcon",
-    "view": 5,
+    "view": 6,
     "features": [
         "View existing screen shots",
         "Enable auto screen shots",

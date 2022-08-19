@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ResultsView: View {
+    
     var body: some View {
         SummaryView()
     }
@@ -16,6 +17,7 @@ struct ResultsView: View {
 struct SummaryView: View {
 
     var body: some View {
+        
         VStack {
             Text("Keep Left")
                 .font(.system(size: 17.0))
@@ -23,16 +25,20 @@ struct SummaryView: View {
             Text("All Vehicles")
                 .font(.system(size: 8.6))
                 .bold()
+                .foregroundColor(Color(UIColor(red: 0.15, green: 0.3, blue: 0.15, alpha: 1)))
             HStack {
                 SummaryDescriptionView()
                 SummaryResultsView()
             }
             .font(.system(size: 7.8))
+            .foregroundColor(Color(UIColor(red: 0.26, green: 0.35, blue: 0.26, alpha: 1)))
+//            .foregroundColor(Color(UIColor.darkGray))
         }
     }
 }
 
 struct SummaryDescriptionView: View {
+    
     var body: some View {
         VStack(alignment: .trailing) {
             Text("Avg Speed")
@@ -50,12 +56,13 @@ struct SummaryDescriptionView: View {
 }
 
 struct SummaryResultsView: View {
+    
     var body: some View {
         VStack (alignment: .leading) {
-            Text("87 kph")
+            Text("110 kph")
                 .bold()
                 .foregroundColor(.black)
-            Text("110 kph")
+            Text("130 kph")
             Text("36 kph")
             Text("325,248")
                 .bold()
@@ -67,6 +74,7 @@ struct SummaryResultsView: View {
 }
 
 struct ResultsView_Previews: PreviewProvider {
+    
     static var previews: some View {
         ResultsView()
             .previewLayout(.sizeThatFits)

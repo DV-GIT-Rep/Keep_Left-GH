@@ -9,6 +9,9 @@ import SwiftUI
 
 struct MainMenuView: View {
     
+//    //Create an instance of LabelData
+//    @StateObject var ld = LabelData()       //Instance of state of truth created at root level
+
     //Reference the Scene and View Models
     @StateObject var scene = SceneModel()
     @StateObject var model = MenuModel()
@@ -53,8 +56,10 @@ struct MainMenuView: View {
             }
             .navigationTitle("Select")
         }
+        .accentColor(Color(UIColor(red: 0.05, green: 0.2, blue: 0.05, alpha: 1)))
         .environmentObject(scene)   //Anything inside NavigationView to access SceneModel class
         .environmentObject(model)   //Anything inside NavigationView to access MenuModel class
+//        .environmentObject(ld)      //Modifier to pass source of truth to child views (doesn't require same name!)
     }
 }
 
@@ -84,10 +89,15 @@ func getView(viewNo: Int) -> AnyView {
 //        whichScene = .game
 //        print("!!! XXXXXXXXXXXXXXXXXXX  !!!")
         return destinationView
-    case 4:
-        let destinationView: AnyView = AnyView(StatsView())
+   case 4:
+        let destinationView: AnyView = AnyView(QuizView())
+//        whichScene = .game
+//        print("!!! XXXXXXXXXXXXXXXXXXX  !!!")
         return destinationView
     case 5:
+        let destinationView: AnyView = AnyView(StatsView())
+        return destinationView
+    case 6:
         let destinationView: AnyView = AnyView(UserGuideView())
         return destinationView
     default:
@@ -98,6 +108,7 @@ func getView(viewNo: Int) -> AnyView {
 
 struct MainMenuView_Previews: PreviewProvider {
     static var previews: some View {
+//        MainMenuView(topLabel: LabelData(), bottomLabel: LabelData())
         MainMenuView()
             .previewInterfaceOrientation(.portrait)
     }

@@ -1,9 +1,7 @@
-//
 //  Fig8TrackView.swift
 //  Keep Left
-//
-//  Created by Bill Drayton on 2/6/2022.
-//
+
+
 
 import SwiftUI
 import SpriteKit
@@ -35,10 +33,8 @@ struct Fig8TrackView: View {
                 Spacer(minLength: UIScreen.main.bounds.height / 5.5)
             }
             .foregroundColor(Color(red: 0.2, green: 0.2, blue: 0.2))
-
         }
         .statusBar(hidden: true)
-
     }
 }
 

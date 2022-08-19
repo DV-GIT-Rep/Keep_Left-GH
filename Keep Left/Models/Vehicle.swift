@@ -11,24 +11,50 @@ import SwiftUI
 
 class Vehicle: SKSpriteNode, ObservableObject {
     
-    @Published var txVehicle = [Vehicle]()
+//    @Published var txVehicle = [Vehicle]()
     
     @Published var speedKPH: CGFloat
     @Published var km: CGFloat
     @Published var lane: CGFloat
     
+    @Published var laps: CGFloat
+    @Published var distance: CGFloat        //Distance travelled in km
+    @Published var distanceMax: CGFloat        //Distance travelled in km
+    @Published var distanceMin: CGFloat        //Distance travelled in km
+
     @Published var otherTrack: Bool
     
+    @Published var startPos: CGFloat        //Set to position.y when vehicle defined
+    
+    @Published var speedAvg: CGFloat        //Speed in kph
+    @Published var speedMax: CGFloat        //Speed in kph
+    @Published var speedMin: CGFloat        //Speed in kph
+
+    @Published var kmAvg: CGFloat     //Distance in km
+    @Published var kmMax: CGFloat     //Distance in km
+    @Published var kmMin: CGFloat     //Distance in km
+
 //    @Published var indicate: String
 //    @Published var lights: Bool
-
+    
     //MARK: - Init
     init(imageName: String) {
         let texture = SKTexture(imageNamed: imageName)
         speedKPH = 0.0
         km = 0.0
         lane = 0.0
+        laps = 0.0
+        distance = 0.0
+        distanceMax = 0.0
+        distanceMin = 0.0
+        startPos = 0.0
         otherTrack = false
+        speedAvg = 0.0
+        speedMax = 0.0
+        speedMin = 0.0
+        kmAvg = 0.0
+        kmMax = 0.0
+        kmMin = 0.0
 
         super.init(texture: texture, color: UIColor.clear, size: texture.size())
 //        super.init(imageName: imageName)
@@ -67,22 +93,34 @@ class Vehicle: SKSpriteNode, ObservableObject {
     }
     
     //MARK: - Lights and taillights on/off as per enum - ALL Vehicles!
-    func lights() {
-        
         enum Lights: CaseIterable {
             case off        //Lights Off
             case low        //Low Beam On
             case high       //High Beam On
+            
+            mutating func toggleLights() {
+                switch self {
+                case .off: self = .low
+                case .low: self = .off
+                case .high: self = .off
+             }
         }
     }
+    
+//    //MARK: - Lights and taillights on/off as per enum - ALL Vehicles!
+//    func lights() {
+//
+//        enum Lights: CaseIterable {
+//            case off        //Lights Off
+//            case low        //Low Beam On
+//            case high       //High Beam On
+//        }
+//    }
 
     @State var oneGo = false
 
     func moveF8Vehicle(sNode: SKNode, sNodePos: CGPoint, meta1: CGFloat, F8YZero: CGFloat) {
         
-//        guard let sEquiv = self else {
-//            return
-//        }
         //Note: self = f8 Node
         var f8EquivName: String = sNode.name!  //lazy???
 
@@ -112,10 +150,9 @@ class Vehicle: SKSpriteNode, ObservableObject {
         
         var newF8NodePos = f8Node.position
         var currentSNodePos = sNode.position
-//        var crossRoadAngle: CGFloat = 0
         
         //MARK: - Calculate position of figure 8 vehicle based on straight track vehicle
-        switch currentSNodePos.y {
+        switch currentSNodePos.y {          //NOTE: self = the current vehicle
         case let y1 where y1 <= f8Radius:
             //1st straight stretch 45' from origin up and to right
             
@@ -125,15 +162,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
             newF8NodePos.x = newF8NodePos.x - (cos45Deg * lanePos)
             newF8NodePos.y = newF8NodePos.y + (sin45Deg * lanePos)
 
-            if otherTrack == false {
-//                newF8NodePos.x = newF8NodePos.x - (cos45Deg * lanePos)
-//                newF8NodePos.y = newF8NodePos.y + (sin45Deg * lanePos)
-                f8NodeRot = -CGFloat(45).degrees()
-            } else {
-//                newF8NodePos.x = newF8NodePos.x + (cos45Deg * lanePos)
-//                newF8NodePos.y = newF8NodePos.y - (sin45Deg * lanePos)
-                f8NodeRot = CGFloat(135).degrees()
-            }
+            f8NodeRot = otherTrack ? CGFloat(135).degrees() : -CGFloat(45).degrees()
 
             let f8NodePos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
             f8Node.zPosition = 10       //Set zPosition lower than bridge (zPos: 15)
@@ -143,7 +172,6 @@ class Vehicle: SKSpriteNode, ObservableObject {
             let group = SKAction.group([newF8Pos, newF8Rot])
             
             f8Node.run(group, withKey: "key")
-//            print("1.\t\(f8Node.name!)\n\tsy: \(currentSNodePos.y.dp2)\tf8y: \(f8NodePos.y.dp2)\t\ty1: \(y1.dp2)\t\(key!)")
 
         case var y1 where y1 <= (f8Radius + (piBy1p5 * f8Radius)):
             //1st 3/4 circle heading up and to left
@@ -184,15 +212,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
             newF8NodePos.x = newF8NodePos.x + (cos45Deg * lanePos)
             newF8NodePos.y = newF8NodePos.y + (sin45Deg * lanePos)
 
-            if otherTrack == false {
-//                newF8NodePos.x = newF8NodePos.x + (cos45Deg * lanePos)
-//                newF8NodePos.y = newF8NodePos.y + (sin45Deg * lanePos)
-                f8NodeRot = -CGFloat(135).degrees()
-            } else {
-//                newF8NodePos.x = newF8NodePos.x - (cos45Deg * lanePos)
-//                newF8NodePos.y = newF8NodePos.y - (sin45Deg * lanePos)
-                f8NodeRot = CGFloat(45).degrees()
-            }
+            f8NodeRot = otherTrack ? CGFloat(45).degrees() : -CGFloat(135).degrees()
 
             let f8NodePos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
             f8Node.zPosition = 20       //Set zPosition higher than bridge (zPos: 15)
@@ -202,11 +222,6 @@ class Vehicle: SKSpriteNode, ObservableObject {
             let group = SKAction.group([newF8Pos, newF8Rot])
             
             f8Node.run(group, withKey: "key")
-
-//            f8Node.position.x = (cos(45 * degreesToRadians) / currentSNodePos.y) * meta1
-//            f8Node.position.y = F8YZero - ((sin(45 * degreesToRadians) / currentSNodePos.y) * meta1)
-//            print("3.,y1,\(y1.dp2),\(f8Node.name!),\(currentSNodePos.y.dp2),meta1:,\(meta1)")
-            return
 
         case var y1 where y1 <= ((3 * f8Radius) + (piBy3 * f8Radius)):
             //2nd 3/4 circle heading down and to left
@@ -221,7 +236,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
 
             newF8NodePos.x = newF8NodePos.x + ((laneRadius + fudgeFactor) * cos(CGFloat(y1Deg).degrees()))
             newF8NodePos.y = newF8NodePos.y + ((laneRadius + fudgeFactor) * sin(CGFloat(y1Deg).degrees()))
-                
+
             let f8NodePos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
 
             if otherTrack == false { y1Deg = y1Deg - 180}    //Turns vehicle 180 degrees
@@ -231,15 +246,14 @@ class Vehicle: SKSpriteNode, ObservableObject {
             let newF8Pos = SKAction.move(to: f8NodePos, duration: aniDuration)
             let newF8Rot = SKAction.rotate(toAngle: f8NodeRot, duration: aniDuration, shortestUnitArc: true)
             let group = SKAction.group([newF8Pos, newF8Rot])
-            
+
             f8Node.removeAction(forKey: "key")
             f8Node.run(group, withKey: "key")
 
         case var y1 where y1 <= ((4 * f8Radius) + (piBy3 * f8Radius)):
             //3rd straight stretch 45' up & back to origin
 //            y1 = y1 - ((3 * f8Radius) + (piBy3 * f8Radius))
-            y1 = 1000.0 - y1    //Changes y1 so 1000 = the origin (easier calculation)
-            
+            y1 = ((4 * f8Radius) + (piBy3 * f8Radius)) - y1    //Changes y1 so 1006.858 (for f8Radius = 75m) = the origin (easier calculation)
             
             newF8NodePos.x = -(cos45Deg * y1)
             newF8NodePos.y = -(sin45Deg * y1)
@@ -247,15 +261,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
             newF8NodePos.x = newF8NodePos.x - (cos45Deg * lanePos)
             newF8NodePos.y = newF8NodePos.y + (sin45Deg * lanePos)
 
-            if otherTrack == false {
-//                newF8NodePos.x = newF8NodePos.x - (cos45Deg * lanePos)
-//                newF8NodePos.y = newF8NodePos.y + (sin45Deg * lanePos)
-                f8NodeRot = -CGFloat(45).degrees()
-            } else {
-//                newF8NodePos.x = newF8NodePos.x + (cos45Deg * lanePos)
-//                newF8NodePos.y = newF8NodePos.y - (sin45Deg * lanePos)
-                f8NodeRot = CGFloat(135).degrees()
-            }
+            f8NodeRot = otherTrack ? CGFloat(135).degrees() : -CGFloat(45).degrees()
 
             let f8NodePos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
             f8Node.zPosition = 10       //Set zPosition lower than bridge (zPos: 15)
@@ -266,21 +272,13 @@ class Vehicle: SKSpriteNode, ObservableObject {
             
             f8Node.run(group, withKey: "key")
 
-//        default:
-//            f8Node.position.x = (0.08) * meta1
-//            f8Node.position.y = F8YZero + ((0.08) * meta1)
-//            print("5.,y1,\(y1.dp2),\(f8Node.name!),\(currentSNodePos.y.dp2),meta1:,\(meta1)")
-//            \\childNode(withName: "f8KLVehicle_5").position = CGP
-            return
         default:
-//            print("6.,y1,\(currentSNodePos.y.dp2),\(f8Node.name!),\(currentSNodePos.y.dp2),meta1:,\(meta1),Default:")
             return
 
         }
-        
     }
     
-}
+}           //End of Vehicle class
 
 class F8Vehicle: Vehicle {
 //    self.physicsBody.rotationEffect(.degrees(45))

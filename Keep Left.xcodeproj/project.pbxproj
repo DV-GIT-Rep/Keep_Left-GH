@@ -9,6 +9,12 @@
 /* Begin PBXBuildFile section */
 		9D174FC2281507FC00DF0996 /* ResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D174FC1281507FC00DF0996 /* ResultsView.swift */; };
 		9D2E9D8E289AC862002B7882 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2E9D8D289AC862002B7882 /* StatsView.swift */; };
+		9D2E9DAD289BBB19002B7882 /* SKLabelNodePlus.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D2E9DAC289BBB19002B7882 /* SKLabelNodePlus.m */; };
+		9D2E9DAF289BCA47002B7882 /* F8DataLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2E9DAE289BCA47002B7882 /* F8DataLabel.swift */; };
+		9D2E9DB3289CA24D002B7882 /* QuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2E9DB2289CA24D002B7882 /* QuizView.swift */; };
+		9D2E9DB5289CD92E002B7882 /* F8DataLabelModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2E9DB4289CD92E002B7882 /* F8DataLabelModel.swift */; };
+		9D2E9DD428A1EE92002B7882 /* createTrackLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2E9DD328A1EE92002B7882 /* createTrackLabels.swift */; };
+		9D2E9DD628A76108002B7882 /* LabelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2E9DD528A76108002B7882 /* LabelData.swift */; };
 		9D38345028559F300061D6C0 /* VehicleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D38344F28559F300061D6C0 /* VehicleModel.swift */; };
 		9D3834522855A02E0061D6C0 /* vehicles.json in Resources */ = {isa = PBXBuildFile; fileRef = 9D3834512855A02E0061D6C0 /* vehicles.json */; };
 		9D38345528570ECA0061D6C0 /* Readme.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 9D38345428570ECA0061D6C0 /* Readme.rtf */; };
@@ -47,6 +53,15 @@
 /* Begin PBXFileReference section */
 		9D174FC1281507FC00DF0996 /* ResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsView.swift; sourceTree = "<group>"; };
 		9D2E9D8D289AC862002B7882 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
+		9D2E9DAA289BB939002B7882 /* SKLabelNodePlus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SKLabelNodePlus.h; sourceTree = "<group>"; };
+		9D2E9DAB289BBB19002B7882 /* Keep Left-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keep Left-Bridging-Header.h"; sourceTree = "<group>"; };
+		9D2E9DAC289BBB19002B7882 /* SKLabelNodePlus.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SKLabelNodePlus.m; sourceTree = "<group>"; };
+		9D2E9DAE289BCA47002B7882 /* F8DataLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = F8DataLabel.swift; sourceTree = "<group>"; };
+		9D2E9DB2289CA24D002B7882 /* QuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizView.swift; sourceTree = "<group>"; };
+		9D2E9DB4289CD92E002B7882 /* F8DataLabelModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = F8DataLabelModel.swift; sourceTree = "<group>"; };
+		9D2E9DB6289CDD85002B7882 /* F8LabelData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = F8LabelData.json; sourceTree = "<group>"; };
+		9D2E9DD328A1EE92002B7882 /* createTrackLabels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = createTrackLabels.swift; sourceTree = "<group>"; };
+		9D2E9DD528A76108002B7882 /* LabelData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelData.swift; sourceTree = "<group>"; };
 		9D38344F28559F300061D6C0 /* VehicleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleModel.swift; sourceTree = "<group>"; };
 		9D3834512855A02E0061D6C0 /* vehicles.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = vehicles.json; sourceTree = "<group>"; };
 		9D38345428570ECA0061D6C0 /* Readme.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Readme.rtf; sourceTree = "<group>"; };
@@ -94,6 +109,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9D2E9DA9289BB57E002B7882 /* SKLabelNodePlus */ = {
+			isa = PBXGroup;
+			children = (
+				9D2E9DAA289BB939002B7882 /* SKLabelNodePlus.h */,
+				9D2E9DAC289BBB19002B7882 /* SKLabelNodePlus.m */,
+				9D2E9DAB289BBB19002B7882 /* Keep Left-Bridging-Header.h */,
+			);
+			path = SKLabelNodePlus;
+			sourceTree = "<group>";
+		};
 		9D38345328570E700061D6C0 /* ViewModelReview */ = {
 			isa = PBXGroup;
 			children = (
@@ -109,6 +134,7 @@
 				9D6CF28F2848A0D5001CD66C /* ViewData.swift */,
 				9D6CF28128484BCB001CD66C /* menus.json */,
 				9D3834512855A02E0061D6C0 /* vehicles.json */,
+				9D2E9DB6289CDD85002B7882 /* F8LabelData.json */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -127,6 +153,8 @@
 				9D3834A9288D301E0061D6C0 /* Background.swift */,
 				9D6CF27B28473B67001CD66C /* Menu.swift */,
 				9D45447B27E1706000D105F9 /* Vehicle.swift */,
+				9D2E9DAE289BCA47002B7882 /* F8DataLabel.swift */,
+				9D2E9DD528A76108002B7882 /* LabelData.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -138,6 +166,7 @@
 				9D6CF27D28473C3A001CD66C /* MenuModel.swift */,
 				9D38344F28559F300061D6C0 /* VehicleModel.swift */,
 				9D38345E286C04D50061D6C0 /* OldSceneModel.swift */,
+				9D2E9DB4289CD92E002B7882 /* F8DataLabelModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -154,6 +183,7 @@
 				9D89A5C9284ABE26009D41D0 /* UserGuideView.swift */,
 				9D6CF28B284856FD001CD66C /* SettingsView.swift */,
 				9D38345C286196BF0061D6C0 /* TempView.swift */,
+				9D2E9DB2289CA24D002B7882 /* QuizView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -183,12 +213,14 @@
 				9D6CF2742846FCCB001CD66C /* Models */,
 				9D6CF2732846FCBE001CD66C /* Services */,
 				9D6CF2722846FCAB001CD66C /* Data */,
+				9D2E9DA9289BB57E002B7882 /* SKLabelNodePlus */,
 				9D38345328570E700061D6C0 /* ViewModelReview */,
 				9DD199DA27901F8500866318 /* ContentView.swift */,
 				9D174FC1281507FC00DF0996 /* ResultsView.swift */,
 				9D6CF2912849CFF0001CD66C /* OtherResultsView.swift */,
 				9DD199E627901FE900866318 /* ObsoleteStraightTrackScene.swift */,
 				9D6F45D627ABC53E0022DAE7 /* StraightTrackScene.swift */,
+				9D2E9DD328A1EE92002B7882 /* createTrackLabels.swift */,
 				9D85C15527FD483F0035332C /* Line.swift */,
 				9D70F43227C8A1BE006F2A14 /* Fig8Scene.swift */,
 				9D70F43027C22297006F2A14 /* PrintOnly.swift */,
@@ -240,6 +272,7 @@
 				TargetAttributes = {
 					9DD199D427901F8500866318 = {
 						CreatedOnToolsVersion = 13.2.1;
+						LastSwiftMigration = 1340;
 					};
 				};
 			};
@@ -282,10 +315,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				9D85C158280552650035332C /* F8Vehicle.swift in Sources */,
+				9D2E9DAD289BBB19002B7882 /* SKLabelNodePlus.m in Sources */,
+				9D2E9DB3289CA24D002B7882 /* QuizView.swift in Sources */,
 				9D6CF27828470291001CD66C /* MainMenuView.swift in Sources */,
 				9D38345B285AD48C0061D6C0 /* SceneModel.swift in Sources */,
 				9D6CF28A284856F1001CD66C /* ScreenShotView.swift in Sources */,
+				9D2E9DB5289CD92E002B7882 /* F8DataLabelModel.swift in Sources */,
 				9D6CF286284856BF001CD66C /* StraightTrackView.swift in Sources */,
+				9D2E9DAF289BCA47002B7882 /* F8DataLabel.swift in Sources */,
 				9D6CF27E28473C3A001CD66C /* MenuModel.swift in Sources */,
 				9D6CF28C284856FD001CD66C /* SettingsView.swift in Sources */,
 				9D6CF27C28473B67001CD66C /* Menu.swift in Sources */,
@@ -298,12 +335,14 @@
 				9D89A5CA284ABE26009D41D0 /* UserGuideView.swift in Sources */,
 				9D6CF2922849CFF1001CD66C /* OtherResultsView.swift in Sources */,
 				9D38345F286C04D60061D6C0 /* OldSceneModel.swift in Sources */,
+				9D2E9DD428A1EE92002B7882 /* createTrackLabels.swift in Sources */,
 				9D174FC2281507FC00DF0996 /* ResultsView.swift in Sources */,
 				9DD199E727901FE900866318 /* ObsoleteStraightTrackScene.swift in Sources */,
 				9D70F43327C8A1BF006F2A14 /* Fig8Scene.swift in Sources */,
 				9D3834AA288D301F0061D6C0 /* Background.swift in Sources */,
 				9D6CF284284856AF001CD66C /* Fig8TrackView.swift in Sources */,
 				9D85C15627FD483F0035332C /* Line.swift in Sources */,
+				9D2E9DD628A76108002B7882 /* LabelData.swift in Sources */,
 				9DD199EB2797AF4300866318 /* AppData.swift in Sources */,
 				9D6CF2902848A0D5001CD66C /* ViewData.swift in Sources */,
 				9D38345028559F300061D6C0 /* VehicleModel.swift in Sources */,
@@ -438,6 +477,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Keep Left/Preview Content\"";
@@ -459,6 +499,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "Drayvest.Keep-Left";
 				PRODUCT_NAME = "Keep Left";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Keep Left/SKLabelNodePlus/Keep Left-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -469,6 +511,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Keep Left/Preview Content\"";
@@ -490,6 +533,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "Drayvest.Keep-Left";
 				PRODUCT_NAME = "Keep Left";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Keep Left/SKLabelNodePlus/Keep Left-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
