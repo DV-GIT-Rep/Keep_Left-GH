@@ -127,8 +127,12 @@ let radiansToDegrees = 180 / CGFloat.pi
 enum sceneName {
 case figure8, straight, game
 }
-var whichScene: sceneName = .figure8
+var whichScene: sceneName = .figure8    //Value determines which scene is displayed
 var F8YZero: CGFloat = 0.0
+enum runCondition {
+    case stop, run
+}
+var runStop: runCondition = .stop       //Vehicles go when set to run
 
 //MARK: - These values are for the straight line auto track
 //var sMetre1: CGFloat = 0.0       //Multiply metres by this constant to get display points

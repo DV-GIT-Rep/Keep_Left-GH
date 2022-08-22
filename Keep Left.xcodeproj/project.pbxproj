@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		9D174FC2281507FC00DF0996 /* ResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D174FC1281507FC00DF0996 /* ResultsView.swift */; };
+		9D2544D128B2483E00A0B58C /* tempOnly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2544D028B2483E00A0B58C /* tempOnly.swift */; };
 		9D2E9D8E289AC862002B7882 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2E9D8D289AC862002B7882 /* StatsView.swift */; };
 		9D2E9DAD289BBB19002B7882 /* SKLabelNodePlus.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D2E9DAC289BBB19002B7882 /* SKLabelNodePlus.m */; };
 		9D2E9DAF289BCA47002B7882 /* F8DataLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2E9DAE289BCA47002B7882 /* F8DataLabel.swift */; };
@@ -15,6 +16,8 @@
 		9D2E9DB5289CD92E002B7882 /* F8DataLabelModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2E9DB4289CD92E002B7882 /* F8DataLabelModel.swift */; };
 		9D2E9DD428A1EE92002B7882 /* createTrackLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2E9DD328A1EE92002B7882 /* createTrackLabels.swift */; };
 		9D2E9DD628A76108002B7882 /* LabelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2E9DD528A76108002B7882 /* LabelData.swift */; };
+		9D2E9DD828AF30B6002B7882 /* StartStop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2E9DD728AF30B6002B7882 /* StartStop.swift */; };
+		9D2E9DDA28AF332C002B7882 /* SwitchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2E9DD928AF332C002B7882 /* SwitchView.swift */; };
 		9D38345028559F300061D6C0 /* VehicleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D38344F28559F300061D6C0 /* VehicleModel.swift */; };
 		9D3834522855A02E0061D6C0 /* vehicles.json in Resources */ = {isa = PBXBuildFile; fileRef = 9D3834512855A02E0061D6C0 /* vehicles.json */; };
 		9D38345528570ECA0061D6C0 /* Readme.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 9D38345428570ECA0061D6C0 /* Readme.rtf */; };
@@ -52,6 +55,7 @@
 
 /* Begin PBXFileReference section */
 		9D174FC1281507FC00DF0996 /* ResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsView.swift; sourceTree = "<group>"; };
+		9D2544D028B2483E00A0B58C /* tempOnly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = tempOnly.swift; sourceTree = "<group>"; };
 		9D2E9D8D289AC862002B7882 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
 		9D2E9DAA289BB939002B7882 /* SKLabelNodePlus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SKLabelNodePlus.h; sourceTree = "<group>"; };
 		9D2E9DAB289BBB19002B7882 /* Keep Left-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Keep Left-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -62,6 +66,8 @@
 		9D2E9DB6289CDD85002B7882 /* F8LabelData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = F8LabelData.json; sourceTree = "<group>"; };
 		9D2E9DD328A1EE92002B7882 /* createTrackLabels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = createTrackLabels.swift; sourceTree = "<group>"; };
 		9D2E9DD528A76108002B7882 /* LabelData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelData.swift; sourceTree = "<group>"; };
+		9D2E9DD728AF30B6002B7882 /* StartStop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartStop.swift; sourceTree = "<group>"; };
+		9D2E9DD928AF332C002B7882 /* SwitchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchView.swift; sourceTree = "<group>"; };
 		9D38344F28559F300061D6C0 /* VehicleModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VehicleModel.swift; sourceTree = "<group>"; };
 		9D3834512855A02E0061D6C0 /* vehicles.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = vehicles.json; sourceTree = "<group>"; };
 		9D38345428570ECA0061D6C0 /* Readme.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Readme.rtf; sourceTree = "<group>"; };
@@ -124,6 +130,7 @@
 			children = (
 				9D38345428570ECA0061D6C0 /* Readme.rtf */,
 				9D383456285712470061D6C0 /* Roads.swift */,
+				9D2544D028B2483E00A0B58C /* tempOnly.swift */,
 			);
 			path = ViewModelReview;
 			sourceTree = "<group>";
@@ -155,6 +162,8 @@
 				9D45447B27E1706000D105F9 /* Vehicle.swift */,
 				9D2E9DAE289BCA47002B7882 /* F8DataLabel.swift */,
 				9D2E9DD528A76108002B7882 /* LabelData.swift */,
+				9D2E9DD728AF30B6002B7882 /* StartStop.swift */,
+				9D2E9DD928AF332C002B7882 /* SwitchView.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -316,6 +325,7 @@
 			files = (
 				9D85C158280552650035332C /* F8Vehicle.swift in Sources */,
 				9D2E9DAD289BBB19002B7882 /* SKLabelNodePlus.m in Sources */,
+				9D2E9DDA28AF332C002B7882 /* SwitchView.swift in Sources */,
 				9D2E9DB3289CA24D002B7882 /* QuizView.swift in Sources */,
 				9D6CF27828470291001CD66C /* MainMenuView.swift in Sources */,
 				9D38345B285AD48C0061D6C0 /* SceneModel.swift in Sources */,
@@ -323,11 +333,13 @@
 				9D2E9DB5289CD92E002B7882 /* F8DataLabelModel.swift in Sources */,
 				9D6CF286284856BF001CD66C /* StraightTrackView.swift in Sources */,
 				9D2E9DAF289BCA47002B7882 /* F8DataLabel.swift in Sources */,
+				9D2E9DD828AF30B6002B7882 /* StartStop.swift in Sources */,
 				9D6CF27E28473C3A001CD66C /* MenuModel.swift in Sources */,
 				9D6CF28C284856FD001CD66C /* SettingsView.swift in Sources */,
 				9D6CF27C28473B67001CD66C /* Menu.swift in Sources */,
 				9D45447C27E1706000D105F9 /* Vehicle.swift in Sources */,
 				9D6CF288284856D8001CD66C /* GameTrackView.swift in Sources */,
+				9D2544D128B2483E00A0B58C /* tempOnly.swift in Sources */,
 				9DD199DB27901F8500866318 /* ContentView.swift in Sources */,
 				9D6CF28028473CC3001CD66C /* DataService.swift in Sources */,
 				9D6F45D727ABC53F0022DAE7 /* StraightTrackScene.swift in Sources */,

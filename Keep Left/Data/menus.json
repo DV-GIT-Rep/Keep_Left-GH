@@ -1,7 +1,7 @@
 [
     {
     "name": "Smart Track",
-    "image": "fig8Icon",
+    "image": "fig8TrackIcon",
     "view": 1,
     "features": [
         "Two lane \"Keep Left\" track",

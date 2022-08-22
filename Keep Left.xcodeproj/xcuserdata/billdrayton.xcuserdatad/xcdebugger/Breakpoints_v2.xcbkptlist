@@ -14,8 +14,8 @@
             filePath = "Keep Left/StraightTrackScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "868"
-            endingLineNumber = "868"
+            startingLineNumber = "925"
+            endingLineNumber = "925"
             landmarkName = "every500ms()"
             landmarkType = "7">
          </BreakpointContent>

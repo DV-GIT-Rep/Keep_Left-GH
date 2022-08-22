@@ -21,6 +21,24 @@ public extension CGFloat {
 var toggleSpeed: Int = 1    //Temp for vehicle speed
 var firstThru = true        //Set to false when up to speed ???? (not yet)
 
+var f8SwitchView: SwitchView = SwitchView()   //Move between Straight Track and Figure 8 Track views.
+var f8StartStop: StartStop = StartStop()      //Start and stop vehicle movement.
+var sSwitchView: SwitchView = SwitchView()   //Move between Straight Track and Figure 8 Track views.
+var sStartStop: StartStop = StartStop()      //Start and stop vehicle movement.
+
+var f8Scale: CGFloat = 0        //Ratio of screen display to physical display
+var sScale: CGFloat = 0
+
+var straightScene = SceneModel()    //Includes .metre1 scale factor
+var f8Scene = SceneModel()          //Includes .metre1 scale factor
+var sBackground = Background()      //Straight Track Parent and Background
+var f8Background = Background()     //Figure 8 Track Parent and Background
+var commonLabelBackground = SKSpriteNode()
+
+var sTrackCamera: SKCameraNode = SKCameraNode()     //Create SKCameraNode instance
+var f8TrackCamera: SKCameraNode = SKCameraNode()    //Create SKCameraNode instance
+var kamera: SKScene?
+
 //protocol CanReceiveTransitionEvents {
 //    func viewWillTransition(to size: CGSize)
 //}
@@ -65,9 +83,6 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
     var viewCreated = false
     var updateOneTime = false
     
-    var sTrackCamera: SKCameraNode = SKCameraNode()     //Create SKCameraNode instance
-    var f8TrackCamera: SKCameraNode = SKCameraNode()    //Create SKCameraNode instance
-    
 //    var f8KLLabelTitle: Label = Label() //Create Label instance
 
 
@@ -76,10 +91,6 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         sContainer.zRotation = sContainerZRotation
     }
     
-    var straightScene = SceneModel()
-    var f8Scene = SceneModel()
-    var sBackground = Background()      //Straight Track Parent and Background
-    var f8Background = Background()     //Figure 8 Track Parent and Background
     var bridge = Background()           //Create bridge at higher zPos
 
 //    var toggleSpeed: Int = 2
@@ -88,20 +99,6 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         
         updateOneTime = false
 //        print("didChangeSize triggered. Fig 8 alpha = \(f8Background.alpha). whichScene = \(whichScene)")
-    }
-    
-    func redoCamera() {
-        f8Background.alpha = ((whichScene == .figure8) ? 1.0 : 0)
-
-        camera = ((whichScene == .figure8) ? f8TrackCamera : sTrackCamera)
-        sTrackCamera.position = CGPoint(x: 0, y: 0 + 500)
-//        sTrackCamera.scene?.size.width = straightScene.width/sTrackWidth
-        f8TrackCamera.position = CGPoint(x: 0, y: 0)
-//        print("Camera Pos = \(camera!.position) : straightScene.metre1 = \(straightScene.metre1)\nf8Scene.metre1 = \(f8Scene.metre1)")
-        sTrackCamera.setScale(sTrackWidth/straightScene.width)
-//        camera?.setScale(1/4)
-//        f8TrackCamera.setScale(f8Scene.height/f8ImageHeight)
-//        print("f8Scene.height: \(f8Scene.height), width: \(f8Scene.width)\nf8ImageHeight: \(f8ImageHeight), width: \(f8ImageWidth)")
     }
     
     override func didMove(to view: SKView) {
@@ -152,7 +149,6 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         scene?.scaleMode = .resizeFill
             
             let hGTWx2: Bool = f8Scene.calcF8Scene(f8Size: view.bounds.size)       //Define f8Scene parameters
-//            setAspectForWidth(sprite: <#T##Vehicle#>, width: <#T##CGFloat#>, metre: <#T##CGFloat#>)
             
             //MARK: - Create f8Background Node
             let f8BackgroundHeight = f8ScreenHeight                     //= 400m
@@ -163,11 +159,27 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             F8YZero = f8Background.position.y
             addChild(f8Background)
             f8Background.alpha = ((whichScene == .figure8) ? 1.0 : 0)
-            f8TrackCamera.setScale(f8BackgroundHeight/straightScene.height)
+            f8Scale = (f8BackgroundHeight/straightScene.height)
+            f8TrackCamera.setScale(f8Scale)
 //            f8TrackCamera.setScale(0.2 * f8BackgroundHeight/straightScene.height) //Camera Scale - mx by 0.5 temporary !!!   XXXXXXXXXXXXXXX
+            
+//            f8TrackCamera.position = CGPoint(x: 0, y: 0)
+            sTrackCamera.position = CGPoint(x: 0, y: 0 + 500)
+            sTrackCamera.setScale(sTrackWidth/straightScene.width)
 
+            sTrackCamera.name = "sTrackCamera"
+            f8TrackCamera.name = "f8TrackCamera"
+
+            self.camera = ((whichScene == .figure8) ? f8TrackCamera : sTrackCamera)
+
+            //MARK: - Create sLabelParent Node
+            let sLabelParent = SKSpriteNode()                    //Labels are children of f8Background. Groups them together and puts the
+            sLabelParent.position = CGPoint(x: 0, y: (sTrackLength / 2))    //  base zPos = sBackground + 100
+            sLabelParent.zPosition = 1000000000
+            sBackground.addChild(sLabelParent)
+            
             //MARK: - Create f8LabelParent Node
-            let f8LabelParent = SKNode()                    //Labels are children of f8Background. Groups them together and puts the
+            let f8LabelParent = SKSpriteNode()                    //Labels are children of f8Background. Groups them together and puts the
             f8LabelParent.position = CGPoint(x: 0, y: 0)    //  base zPos = sBackground + 100
             f8LabelParent.zPosition = 100
             f8Background.addChild(f8LabelParent)
@@ -184,6 +196,46 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //            f8OtherLabel.zPosition = 0
             f8LabelParent.addChild(f8OtherLabel)                       //Make child of f8LabelParent
             
+            //MARK: - Create commonViewBackground Node
+            commonLabelBackground.zPosition = 1
+            commonLabelBackground.name = "commonLabelBackground"
+            f8Background.addChild(commonLabelBackground)
+            commonLabelBackground.size = f8Background.size
+            
+            var cornerIconX: CGFloat = 94          //X offset from centre in f8 metres
+            var cornerIconY: CGFloat = 182          //Y offset from centre in f8 metres
+            //MARK: - Create Start/Stop Button
+            //Figure 8 Track
+            f8Background.addChild(f8StartStop)
+            f8StartStop.position = CGPoint(x: cornerIconX, y: -cornerIconY)
+//            f8StartStop.position = CGPoint(x: f8BackgroundWidth * 0.42, y: f8BackgroundHeight * -0.46)
+            f8StartStop.zPosition = 10000
+            
+            //Straight Track
+            sLabelParent.addChild(sStartStop)
+            sStartStop.position = CGPoint(x: cornerIconX * (f8Scene.metre1 / straightScene.metre1), y: -cornerIconY * (f8Scene.metre1 / straightScene.metre1))
+            sStartStop.size = CGSize(width: f8StartStop.size.width * (f8Scene.metre1 / straightScene.metre1), height: f8StartStop.size.height * (f8Scene.metre1 / straightScene.metre1))
+            sStartStop.zPosition = 10000000000000
+            print("UIScreen: \(UIScreen.main.bounds)")
+            print("UIScreenNative: \(UIScreen.main.nativeBounds)")
+            print("Camera: \(self.camera)!")
+
+            //MARK: - Create Change View Button
+            //Figure 8 Track
+            f8LabelParent.addChild(f8SwitchView)
+            f8SwitchView.position = CGPoint(x: -cornerIconX, y: -cornerIconY)
+//            f8SwitchView.position = CGPoint(x: f8BackgroundWidth * -0.42, y: f8BackgroundHeight * -0.46)
+            f8SwitchView.zPosition = 10
+
+            //Straight Track
+            sLabelParent.addChild(sSwitchView)
+//            sSwitchView.position = CGPoint(x: -50, y: -95)
+            sSwitchView.position = CGPoint(x: -cornerIconX * (f8Scene.metre1 / straightScene.metre1), y: -cornerIconY * (f8Scene.metre1 / straightScene.metre1))
+            sSwitchView.texture = SKTexture(imageNamed: "fig8Icon")
+            sSwitchView.size = CGSize(width: f8StartStop.size.width * (f8Scene.metre1 / straightScene.metre1), height: f8StartStop.size.height * (f8Scene.metre1 / straightScene.metre1))
+//            sSwitchView.position = CGPoint(x: sBackground.size.width * 0.42, y: sBackground.size.height * -0.46)
+            sSwitchView.zPosition = 100000000
+
             //MARK: - Create mask for overhead bridge
             let bridge = SKCropNode()
             bridge.position = CGPoint(x: 0, y: 0)
@@ -200,6 +252,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             bridge.addChild(bridgeCrop)
             f8Background.addChild(bridge)
             
+            kamera = self       //'self' here = sBackground
 
         //MARK: - Add 2x straight roads to StraightTrackScene
         addRoads()
@@ -338,7 +391,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
     
     override func update(_ currentTime: TimeInterval) {
         
-        f8Background.alpha = ((whichScene == .figure8) ? 1.0 : 0)
+//        f8Background.alpha = ((whichScene == .figure8) ? 1.0 : 0)
 
         if updateOneTime == false {
         let orientation = UIDevice.current.orientation    //1: Portrait, 2: UpsideDown, 3: LandscapeLeft, 4: LandscapeRight
@@ -426,34 +479,34 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         let multiplier: CGFloat = 1000 / 3600  //Value by kph gives m/sec
         
         toggleSpeed += 1
-        switch toggleSpeed {
-        case 0:
-        for i in 1...numVehicles {
-            sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-            sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-        }
-        case 1:
-            for i in 1...numVehicles {
-                sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour. (NOTE: THE INSTRUCTIONS COMMENTED OUT DON'T CHANGE THE SPEED!)
-            }
-        case 2:
-            for i in 1...numVehicles {
-                sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -(0.9 * kph) * multiplier   //1000 = metres in km. 3600 = secs in hour.
-            }   //$$$$$$$$$$$$$$$     !!! Other lane slowed above to create difference !!!     $$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        case 3:
-            for i in 1...numVehicles {
-                sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-            }
-        default:
-            for i in 1...numVehicles {
+//        switch toggleSpeed {
+//        case 0:
+//        for i in 1...numVehicles {
+//            sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//            sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//        }
+//        case 1:
+//            for i in 1...numVehicles {
+//                sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+////                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour. (NOTE: THE INSTRUCTIONS COMMENTED OUT DON'T CHANGE THE SPEED!)
+//            }
+//        case 2:
+//            for i in 1...numVehicles {
+//                sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -(0.9 * kph) * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//            }   //$$$$$$$$$$$$$$$     !!! Other lane slowed above to create difference !!!     $$$$$$$$$$$$$$$$$$$$$$$$$$$$
+//        case 3:
+//            for i in 1...numVehicles {
 //                sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-            }
-        }
-        
+////                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//            }
+//        default:
+//            for i in 1...numVehicles {
+////                sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//            }
+//        }
+//
 /*        switch toggleSpeed {
         case 0:
         for i in 1...numVehicles {
@@ -803,7 +856,6 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //        sKLAllVehicles[randVerc].physicsBody?.velocity.dy = newNo / 3.6
 
 
-
     //Loop through both arrays simultaneously. Move back 1km when they've travelled 1km!
     for (sKLNode, sOtherNode) in zip(t1Vehicle, t2Vehicle) {
         if sKLNode.position.y >= 1000 {
@@ -815,7 +867,12 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         maxSumKL = max(maxSumKL, sKLNode.distance)
         minSumKL = min(minSumKL, sKLNode.distance)
         
-        if toggleSpeed == 2 {   //Wait until vehicles started
+        switch runStop {   //Wait until vehicles started
+        case .stop:
+            sKLNode.physicsBody?.velocity.dy = 0  // !!!! TEMPORARY !!!!
+            sOtherNode.physicsBody?.velocity.dy = 0  // !!!! TEMPORARY !!!!
+
+        case .run:
             sKLNode.physicsBody?.velocity.dy = tempSpd  // !!!! TEMPORARY !!!!
             sOtherNode.physicsBody?.velocity.dy = -otherTempSpeed  // !!!! TEMPORARY !!!!
         }
@@ -885,5 +942,17 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //
 //    }
 
+}
+
+func redoCamera() {
+    f8Background.alpha = ((whichScene == .figure8) ? 1.0 : 0)
+
+    kamera?.camera = ((whichScene == .figure8) ? f8TrackCamera : sTrackCamera)
+    sTrackCamera.position = CGPoint(x: 0, y: 0 + 500)
+//        sTrackCamera.scene?.size.width = straightScene.width/sTrackWidth
+    f8TrackCamera.position = CGPoint(x: 0, y: 0)
+//    sTrackCamera.setScale(sTrackWidth/straightScene.width)
+////        camera?.setScale(1/4)
+////        f8TrackCamera.setScale(f8Scene.height/f8ImageHeight)
 }
 
