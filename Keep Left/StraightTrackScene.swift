@@ -102,8 +102,17 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
     }
     
     override func didMove(to view: SKView) {
+        
+        //MARK: - Create swipe gesture recognisers
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(StraightTrackScene.swipeLeft(sender:)))
+        swipeLeft.direction = .left
+        view.addGestureRecognizer(swipeLeft)
 
-//        let value = UIInterfaceOrientation.portrait.rawValue
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(StraightTrackScene.swipeRight(sender:)))
+        swipeRight.direction = .right
+        view.addGestureRecognizer(swipeRight)
+
+        //        let value = UIInterfaceOrientation.portrait.rawValue
 //        UIDevice.current.setValue(value, forKey: "orientation")
 //
         if viewCreated == false {
@@ -187,13 +196,13 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             //MARK: - Create f8KLLabel Node
             let f8KLLabel = SKNode()                                //Hierarchy: f8Background -> f8LabelParent -> f8KLLabel
             f8KLLabel.position = CGPoint(x: 0, y: f8CircleCentre)   //Set position inside top loop of figure 8 track
-//            f8KLLabel.zPosition = 0
+            f8KLLabel.zPosition = 10
             f8LabelParent.addChild(f8KLLabel)                       //Make child of f8LabelParent
             
             //MARK: - Create f8OtherLabel Node
             let f8OtherLabel = SKNode()                                //Hierarchy: f8Background -> f8LabelParent -> f8KLLabel
             f8OtherLabel.position = CGPoint(x: 0, y: -1 * f8CircleCentre)   //Set position inside lower loop of figure 8 track
-//            f8OtherLabel.zPosition = 0
+            f8OtherLabel.zPosition = 1000000000000000000
             f8LabelParent.addChild(f8OtherLabel)                       //Make child of f8LabelParent
             
             //MARK: - Create commonViewBackground Node
@@ -206,7 +215,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             var cornerIconY: CGFloat = 182          //Y offset from centre in f8 metres
             //MARK: - Create Start/Stop Button
             //Figure 8 Track
-            f8Background.addChild(f8StartStop)
+            f8LabelParent.addChild(f8StartStop)
             f8StartStop.position = CGPoint(x: cornerIconX, y: -cornerIconY)
 //            f8StartStop.position = CGPoint(x: f8BackgroundWidth * 0.42, y: f8BackgroundHeight * -0.46)
             f8StartStop.zPosition = 10000
@@ -215,7 +224,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             sLabelParent.addChild(sStartStop)
             sStartStop.position = CGPoint(x: cornerIconX * (f8Scene.metre1 / straightScene.metre1), y: -cornerIconY * (f8Scene.metre1 / straightScene.metre1))
             sStartStop.size = CGSize(width: f8StartStop.size.width * (f8Scene.metre1 / straightScene.metre1), height: f8StartStop.size.height * (f8Scene.metre1 / straightScene.metre1))
-            sStartStop.zPosition = 10000000000000
+            sStartStop.zPosition = 10000000000
             print("UIScreen: \(UIScreen.main.bounds)")
             print("UIScreenNative: \(UIScreen.main.nativeBounds)")
             print("Camera: \(self.camera)!")
@@ -669,11 +678,21 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         sKLAll.name = "sKLVehicle_0"
         sKLAll.distance = 0.0
 //        sBackground.addChild(sKLAll)          //May not need to add to scene ???
+        sKLAllVehicles.append(sKLAll)       //Place sKAll into position 0 of array
+        var f8KLAll: F8Vehicle = F8Vehicle(imageName: vehImage + "C1")       //Dummy node for 'All Vehicles' KL
+        f8KLAll.name = "sKLVehicle_0"
+        f8KLAll.distance = 0.0
+        f8KLAllVehicles.append(f8KLAll)
 
         var sOtherAll: Vehicle = Vehicle(imageName: vehImage + "C1")    //Dummy node for 'All Vehicles' Other
         sOtherAll.name = "sOtherVehicle_0"
         sOtherAll.distance = 0.0
 //        sBackground.addChild(sOtherAll)       //May not need to add to scene ???
+        sOtherAllVehicles.append(sOtherAll) //Place sOtherAll into position 0 of array
+        var f8OtherAll: F8Vehicle = F8Vehicle(imageName: vehImage + "C1")    //Dummy node for 'All Vehicles' Other
+        f8OtherAll.name = "f8OtherVehicle_0"
+        f8OtherAll.distance = 0.0
+        f8OtherAllVehicles.append(f8OtherAll)
 
         for i in 1...numVehicles {
             var randomVehicle = Int.random(in: 1...maxVehicles)
@@ -829,7 +848,48 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         sprite.size = CGSize(width: height / aspectRatio, height: height)
     }
     
-    
+    //MARK: - Swipe left/right on figure 8 screen
+    @objc func swipeLeft(sender: UISwipeGestureRecognizer) {
+        
+        if whichScene == .figure8 {
+            if f8DisplayDat >= (numVehicles) {
+                f8DisplayDat = 0
+            } else {
+                f8DisplayDat += 1
+            }
+            let delay5 = SKAction.wait(forDuration: oneVehicleDisplayTime)
+            let backToAll = SKAction.run {
+                f8DisplayDat = 0
+            }
+            let backToAllSequence = SKAction.sequence([delay5, backToAll])
+            run(backToAllSequence, withKey: "backToAll")
+//            run(backToAllSequence)
+        } else {
+        }
+
+    }
+
+    @objc func swipeRight(sender: UISwipeGestureRecognizer) {
+        
+        if whichScene == .figure8 {
+            if f8DisplayDat == 0 {
+                f8DisplayDat = numVehicles
+            } else {
+                f8DisplayDat -= 1
+            }
+            let delay5 = SKAction.wait(forDuration: oneVehicleDisplayTime)
+            let backToAll = SKAction.run {
+                f8DisplayDat = 0
+            }
+            let backToAllSequence = SKAction.sequence([delay5, backToAll])
+            run(backToAllSequence, withKey: "backToAll")
+//            run(backToAllSequence)
+        } else {
+            //.straight code here
+        }
+        
+    }
+
     //MARK: - the function below runs every 500ms
     @objc func every500ms() {
     let t1Vehicle = sKLAllVehicles   //Straight Track Vehicles
@@ -857,7 +917,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
 
     //Loop through both arrays simultaneously. Move back 1km when they've travelled 1km!
-    for (sKLNode, sOtherNode) in zip(t1Vehicle, t2Vehicle) {
+        for (sKLNode, sOtherNode) in zip(t1Vehicle.dropFirst(), t2Vehicle.dropFirst()) {
         if sKLNode.position.y >= 1000 {
             //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
             sKLNode.position.y = (sKLNode.position.y - 1000)
@@ -955,4 +1015,3 @@ func redoCamera() {
 ////        camera?.setScale(1/4)
 ////        f8TrackCamera.setScale(f8Scene.height/f8ImageHeight)
 }
-

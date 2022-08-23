@@ -33,9 +33,9 @@ struct StraightTrackView: View {
         var scale: CGFloat = 1.875 - 0.25
         
         ZStack {
-            SpriteView(scene: straitScene, options: .ignoresSiblingOrder)
+//            SpriteView(scene: straitScene, options: .ignoresSiblingOrder)
 //            SpriteView(scene: gameScene, options: .ignoresSiblingOrder)
-//            SpriteView(scene: straitScene, options: .ignoresSiblingOrder, debugOptions: [.showsFPS, .showsNodeCount])
+            SpriteView(scene: straitScene, options: .ignoresSiblingOrder, debugOptions: [.showsFPS, .showsNodeCount])
 //            SpriteView(scene: StraightTrackView.straitScene, options: .ignoresSiblingOrder, debugOptions: [.showsFPS, .showsNodeCount]) //try later !!! x2
 //                .frame(width: 1000, height: 1200)
                 .ignoresSafeArea()

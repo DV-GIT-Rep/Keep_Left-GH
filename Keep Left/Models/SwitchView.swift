@@ -42,9 +42,9 @@ class SwitchView: SKSpriteNode {
 //            commonLabelBackground.setScale(1.8)
 //            sSwitchView.position = CGPoint(x: sTrackCamera.frame.width * 0.42, y: sTrackCamera.frame.height * -0.46)
 //            sStartStop.position = CGPoint(x: UIScreen.main.bounds.width * -0.42, y: (UIScreen.main.bounds.height * -0.46))
-            print("s cLBack: \(commonLabelBackground.parent!)")
-            print("kamera: \(kamera!)\nkamera.camera: \(kamera!.camera ?? sTrackCamera)")
-            print("sMetre1: \(straightScene.metre1),   f8Metre1: \(f8Scene.metre1)")
+//            print("s cLBack: \(commonLabelBackground.parent!)")
+//            print("kamera: \(kamera!)\nkamera.camera: \(kamera!.camera ?? sTrackCamera)")
+//            print("sMetre1: \(straightScene.metre1),   f8Metre1: \(f8Scene.metre1)")
 //        case .straight:   //gameScene = third option
         default:
             whichScene = .figure8
@@ -54,8 +54,8 @@ class SwitchView: SKSpriteNode {
 //            switchView.position = CGPoint(x: scene!.view!.bounds.width * -0.42, y: scene!.view!.bounds.height * -0.46)
 //            commonLabelBackground.setScale(5)
 //            commonLabelBackground.setScale(0.6)
-            print("f8 cLBack: \(commonLabelBackground.parent!)")
-            print("kamera: \(kamera!)\nkamera.camera: \(kamera!.camera ?? sTrackCamera)")
+//            print("f8 cLBack: \(commonLabelBackground.parent!)")
+//            print("kamera: \(kamera!)\nkamera.camera: \(kamera!.camera ?? sTrackCamera)")
 //            position = CGPoint(x: f8TrackCamera.frame.width * -0.42, y: f8TrackCamera.frame.height * -0.46)
         }
 //        setScale(2)

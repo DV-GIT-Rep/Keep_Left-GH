@@ -67,7 +67,7 @@ let vehicles = ["C1", "C2", "C3", "C4", "C5", "C6"] //Obsolete!
 
 //The following arrays represent all vehicles for which there are images. Names match filenames!
 let cars = ["C1", "C2", "C3", "C4", "C5", "C6"]
-let trucks = ["T1", "T2"]
+let trucks = ["T1", "T2", "T3"]
 let buses = ["B1", "B2", "B3"]
 let vehImage = "VehicleImage/"
 
@@ -175,6 +175,8 @@ var f8DisplayDat: Int = 0 {
         print("Change fig 8 display")   //Load display here: 0 = "All Vehicles", 1 = "Vehicle 1", 2 = "Vehicle 2" etc
     }
 }
+
+var oneVehicleDisplayTime: CGFloat = 10.0    //Labels will revert to 'All Vehicles' after this many seconds
 
 let fudgeFactor: CGFloat = 0.75     //TEMPORARY!!!  Value is added to radius of fig 8 to offset sideways vehicle movement due to lag
                                     //              Note: will push stationary & low speed vehicles further out!

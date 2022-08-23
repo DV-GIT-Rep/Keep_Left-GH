@@ -9,7 +9,19 @@ import SpriteKit
 import Combine
 
 class LabelData: SKLabelNode, ObservableObject {
+    
+    override init() {
+//        var texture = SKTexture(imageNamed: "runIcon")
+        super.init()
+//        super.init(texture: texture, color: UIColor.clear, size: texture.size())
 
+        isUserInteractionEnabled = true
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     //MARK: - Variables for the figure 8 labels
     @Published var kLTitle: String = "Keep \(Left)"
 //    @Published var allVehicles: String = "All Vehicles"
@@ -192,15 +204,15 @@ class LabelData: SKLabelNode, ObservableObject {
     func updateLabel(topLabel: Bool, vehicel: Vehicle) {
         f8KLLabelTitle.text = topLabel ? "\(kLTitle)" : "Std Track"
         f8KLLabelDescription.text = f8DisplayDat == 0 ? "All Vehicles" : "Vehicle \(f8DisplayDat)"
-        avgDistanceDesc.text = f8DisplayDat == 0 ? "Avg \(Km)" : ""
-        maxDistanceDesc.text = f8DisplayDat == 0 ? "Max \(Km)" : "Total \(Km)"
-        minDistanceDesc.text = f8DisplayDat == 0 ? "Min \(Km)" : ""
+        avgDistanceDesc.text = f8DisplayDat == 0 ? "Avg \(Km)" : "Total \(Km)"
+        maxDistanceDesc.text = f8DisplayDat == 0 ? "Max \(Km)" : ""
+        minDistanceDesc.text = f8DisplayDat == 0 ? "Min \(Km)" : topLabel ? "Honda" : ""
         avgSpd.text = f8DisplayDat == 0 ? "\(Int(vehicel.speedAvg)) \(kph)" : "\(Int(vehicel.speedAvg)) \(kph)"
         maxSpd.text = f8DisplayDat == 0 ? "\(Int(vehicel.speedMax)) \(kph)" : "\(Int(vehicel.speedMax)) \(kph)"
         minSpd.text = f8DisplayDat == 0 ? "\(Int(vehicel.speedMin)) \(kph)" : "\(Int(vehicel.speedMin)) \(kph)"
-        avgDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distance).varDP)" : ""
-        maxDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distanceMax).varDP)" : "\(abs(vehicel.distance).varDP)"
-        minDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distanceMin).varDP)" : ""
+        avgDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distance).varDP)" : "\(abs(vehicel.distance).varDP)"
+        maxDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distanceMax).varDP)" : ""
+        minDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distanceMin).varDP)" : topLabel ? "S2000" : ""
         
         //May require the following to refresh between 'All Vehicles' and single vehicle display!!!
 //        maxDistanceDesc.fontName = f8DisplayDat == 0 ? "Helvetica Neue Light" : "Helvetica Neue Medium"
@@ -208,5 +220,16 @@ class LabelData: SKLabelNode, ObservableObject {
 //        maxDistance.fontName = f8DisplayDat == 0 ? "Helvetica Neue Light" : "Helvetica Neue Medium"
 //        maxDistance.fontColor = f8DisplayDat == 0 ? spdSubTitleColour : spdTitleColour
     }
+    
+//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        guard let touch = touches.first else {return}   //Exit if not first touch!
+//        
+////        nodes(at: CGPoint)
+//        
+//        print("f8DisplayDat b4: \(f8DisplayDat)")
+//        f8DisplayDat += 1
+//        print("f8DisplayDat afta: \(f8DisplayDat)")
+//
+//    }
 
 }

@@ -137,7 +137,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
         }
         
         var f8NodeRot: CGFloat = 0
-        let aniDuration: CGFloat = 0.4
+        let aniDuration: CGFloat = 0.55
         
         var key = f8Node.name
         key = String(key!.suffix(3))
