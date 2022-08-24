@@ -36,12 +36,45 @@ class StartStop: SKSpriteNode {
         case .stop:
             runStop = .run
             self.texture = SKTexture(imageNamed: "stopIcon")
-//            move(toParent:)
+            
+            //The following will enable the runTimer after a delay
+            let delayRun = SKAction.wait(forDuration: runTimerDelay)    //runTimerDelay ~ 12 secs?
+            let setRun = SKAction.run {
+                enableMinSpeed = true
+//                print("runTimer Enabled !!!")
+            }
+            let delayRunSequence = SKAction.sequence([delayRun, setRun])
+            run(delayRunSequence, withKey: "delayRun")
+
 //        case .run:
         default:
             runStop = .stop
             self.texture = SKTexture(imageNamed: "runIcon")
+
+            removeAction(forKey: "delayRun")    //Disable delay to prevent runTimerEnabled setting!
+            enableMinSpeed = false          //Stop runTimer while vehicles stationary
+//            print("runTimer Disabled !!!")
+
         }
     }
 
 }
+
+
+
+
+//var runStop: runCondition = .stop {       //Vehicles go when set to run
+//    didSet {
+//        if runStop == .stop {
+//            enableMinSpeed = false
+//        } else {
+//            //The following will set display back to All Vehicles after a delay
+//            let delayRun = SKAction.wait(forDuration: runTimerDelay)    //runTimerDelay ~ 12 secs?
+//            let setRun = SKAction.run {
+//                enableMinSpeed = true
+//            }
+//            let delayRunSequence = SKAction.sequence([delayRun, setRun])
+//            run(delayRunSequence, withKey: "delayRun")
+//        }
+//    }
+//}

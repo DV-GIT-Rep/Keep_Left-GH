@@ -209,7 +209,7 @@ class LabelData: SKLabelNode, ObservableObject {
         minDistanceDesc.text = f8DisplayDat == 0 ? "Min \(Km)" : topLabel ? "Honda" : ""
         avgSpd.text = f8DisplayDat == 0 ? "\(Int(vehicel.speedAvg)) \(kph)" : "\(Int(vehicel.speedAvg)) \(kph)"
         maxSpd.text = f8DisplayDat == 0 ? "\(Int(vehicel.speedMax)) \(kph)" : "\(Int(vehicel.speedMax)) \(kph)"
-        minSpd.text = f8DisplayDat == 0 ? "\(Int(vehicel.speedMin)) \(kph)" : "\(Int(vehicel.speedMin)) \(kph)"
+        minSpd.text = f8DisplayDat == 0 ? "\(vehicel.speedMin < 500 ? Int(vehicel.speedMin) : Int(vehicel.speedAvg)) \(kph)" : "\(vehicel.speedMin < 500 ? Int(vehicel.speedMin) : Int(vehicel.speedAvg)) \(kph)"
         avgDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distance).varDP)" : "\(abs(vehicel.distance).varDP)"
         maxDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distanceMax).varDP)" : ""
         minDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distanceMin).varDP)" : topLabel ? "S2000" : ""

@@ -132,7 +132,11 @@ var F8YZero: CGFloat = 0.0
 enum runCondition {
     case stop, run
 }
-var runStop: runCondition = .stop       //Vehicles go when set to run
+var runTimer: CGFloat = 0.5       //Timer increments once/sec (+0.5 every 500ms) when runStop != .stop
+                                //  except for the first ignoreSpeed seconds
+let runTimerDelay: CGFloat = 12 //Seconds delay before speed is acknowledged
+var enableMinSpeed: Bool = false
+var runStop: runCondition = .stop
 
 //MARK: - These values are for the straight line auto track
 //var sMetre1: CGFloat = 0.0       //Multiply metres by this constant to get display points
@@ -172,7 +176,7 @@ let bridgeWidth: CGFloat = (2 * roadWidth) + f8CentreStrip + (2 * bridgeRailWidt
 
 var f8DisplayDat: Int = 0 {
     didSet {
-        print("Change fig 8 display")   //Load display here: 0 = "All Vehicles", 1 = "Vehicle 1", 2 = "Vehicle 2" etc
+        print("Change Fig 8 Vehicle Display")   //Load display here: 0 = "All Vehicles", 1 = "Vehicle 1", 2 = "Vehicle 2" etc
     }
 }
 
@@ -196,15 +200,15 @@ extension CGFloat {
 }
 
 extension CGFloat {
-    ///Max 2 dp's to 1,000, 1 dp to 100,000 then 0 dp's. Adds thousands separater.
+    ///Max 2 dp's to 10,000, 1 dp to 1,000,000 then 0 dp's. Adds thousands separater.
     var varDP: String {
         var val = self
         var dp = 0
         var result: String = ""
         
-        if self < 1000 {
+        if self < 10000 {
             dp = 2  //return String(format: "%.2f", self)
-        } else if self < 100000 {
+        } else if self < 1000000 {
             dp = 1  //return String(format: "%.1f", self)
         } else {
             dp = 0  //return String(format: "%.0f", self)
