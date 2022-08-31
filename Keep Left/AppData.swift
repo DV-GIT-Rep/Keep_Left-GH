@@ -76,7 +76,7 @@ var maxTrucks = trucks.count
 var maxBuses = buses.count
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 16 //28
+var numVehicles = 18 //28
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
 var sOtherAllVehicles: [Vehicle] = []   //Array of vehicles on Other Straight Track
@@ -132,9 +132,8 @@ var F8YZero: CGFloat = 0.0
 enum runCondition {
     case stop, run
 }
-var runTimer: CGFloat = 0.5       //Timer increments once/sec (+0.5 every 500ms) when runStop != .stop
-                                //  except for the first ignoreSpeed seconds
-let runTimerDelay: CGFloat = 12 //Seconds delay before speed is acknowledged
+var runTimer: CGFloat = 0.5         //Timer increments once/sec (+0.5 every 500ms) when runStop != .stop
+let runTimerDelay: CGFloat = 12     //Seconds delay before speed is acknowledged
 var enableMinSpeed: Bool = false
 var runStop: runCondition = .stop
 
@@ -180,7 +179,7 @@ var f8DisplayDat: Int = 0 {
     }
 }
 
-var oneVehicleDisplayTime: CGFloat = 10.0    //Labels will revert to 'All Vehicles' after this many seconds
+var oneVehicleDisplayTime: CGFloat = 15.0    //Labels will revert to 'All Vehicles' after this many seconds
 
 let fudgeFactor: CGFloat = 0.75     //TEMPORARY!!!  Value is added to radius of fig 8 to offset sideways vehicle movement due to lag
                                     //              Note: will push stationary & low speed vehicles further out!
@@ -194,6 +193,7 @@ let backgroundColour: UIColor = UIColor(red: 0.19, green: 0.38, blue: 0.16, alph
 var gBackgroundColour: UIColor = backgroundColour
 
 extension CGFloat {
+    ///Formats number as string with maximum of 2 decimal places
     var dp2: String {
         return String(format: "%.2f", self)
     }
@@ -220,5 +220,12 @@ extension CGFloat {
         formatter.numberStyle = .decimal
         result = formatter.string(from: val as NSNumber)  ?? " "
         return result
+    }
+}
+
+extension Int {
+    ///Extract number from string: if let <var> = Int.parse(from: <String>) { use here }
+    static func parse(from string: String) -> Int? {
+        return Int(string.components(separatedBy: CharacterSet.decimalDigits.inverted).joined())
     }
 }

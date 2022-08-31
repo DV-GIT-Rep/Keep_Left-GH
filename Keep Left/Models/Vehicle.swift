@@ -137,7 +137,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
         }
         
         var f8NodeRot: CGFloat = 0
-        let aniDuration: CGFloat = 0.55
+        let aniDuration: CGFloat = 0.5  //SAME period as 'every500ms' timer!
         
         var key = f8Node.name
         key = String(key!.suffix(3))
@@ -285,3 +285,17 @@ class F8Vehicle: Vehicle {
 //    static var straightName: String = replacingCharacters(in: name, with: <#T##String#>)
     
 }
+
+//extension Vehicle {
+//
+//    func addGlow(radius: Float = 80) {
+//        let effectNode = SKEffectNode()
+//        effectNode.shouldRasterize = true
+//        addChild(effectNode)
+//        let effect = SKSpriteNode(texture: texture)
+//        effect.color = self.color
+//        effect.colorBlendFactor = 1
+//        effectNode.addChild(effect)
+//        effectNode.filter = CIFilter(name: "CIGaussianBlur", parameters: ["inputRadius":radius])
+//    }
+//}

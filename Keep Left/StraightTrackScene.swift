@@ -928,6 +928,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             sKLNode.laps += 1
         }
             
+            flashVehicle(thisVehicle: sKLNode)
+//            flashVehicle(thisVehicle: sOtherNode)
+
         switch runStop {   //Wait until vehicles started
         case .stop:
             sKLNode.physicsBody?.velocity.dy = 0  // !!!! TEMPORARY !!!!
@@ -985,6 +988,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         //Note: Avg Speed = speed to drive Avg Distance.
         //      Max Speed = Avg Speed of vehicle that has driven furthest
         //      Min Speed = Avg Speed of vehicle that has driven the least distance
+        //(Note: @ present (24/8/22) avg, max & min the same as all vehicles driven at same speed over same distance.
         sKLAllVehicles[0].distance = sumKL / CGFloat(numVehicles)
         sKLAllVehicles[0].distanceMax = maxSumKL
         sKLAllVehicles[0].distanceMin = minSumKL
@@ -1000,7 +1004,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         sOtherAllVehicles[0].speedAvg = sOtherAllVehicles[0].distance * timeMx
         sOtherAllVehicles[0].speedMax = maxSumOther * timeMx
         sOtherAllVehicles[0].speedMin = minSumOther * timeMx
-
+        
         topLabel.updateLabel(topLabel: true, vehicel: sKLAllVehicles[f8DisplayDat])
         bottomLabel.updateLabel(topLabel: false, vehicel: sOtherAllVehicles[f8DisplayDat])
 
@@ -1029,4 +1033,41 @@ func redoCamera() {
 //    sTrackCamera.setScale(sTrackWidth/straightScene.width)
 ////        camera?.setScale(1/4)
 ////        f8TrackCamera.setScale(f8Scene.height/f8ImageHeight)
+}
+
+//MARK: - Function flashes vehicle when display shows only that data
+func flashVehicle(thisVehicle: Vehicle) {           //Called every 500ms. 'thisVehicle' = sKL...
+    
+    //The code below extracts the vehicle number from its name. Ignores track etc.
+    if let vehNum = Int.parse(from: thisVehicle.name!) {
+        // Do something with this number
+        
+        switch f8DisplayDat {
+        case 1...999999:                //Display shows 1 vehicle only
+            
+            if f8DisplayDat == vehNum {
+                if thisVehicle.alpha == 0 {
+                    thisVehicle.alpha = 1
+                    sOtherAllVehicles[vehNum].alpha = 1
+                    f8KLAllVehicles[vehNum].alpha = 1
+                    f8OtherAllVehicles[vehNum].alpha = 1
+                } else {
+                    thisVehicle.alpha = 0
+                    sOtherAllVehicles[vehNum].alpha = 0
+                    f8KLAllVehicles[vehNum].alpha = 0
+                    f8OtherAllVehicles[vehNum].alpha = 0
+                }
+            } else {
+                thisVehicle.alpha = 1
+                sOtherAllVehicles[vehNum].alpha = 1
+                f8KLAllVehicles[vehNum].alpha = 1
+                f8OtherAllVehicles[vehNum].alpha = 1
+            }
+        default:                        //Display shows 'All Vehicles' (f8DisplayData = 0)
+            thisVehicle.alpha = 1
+            sOtherAllVehicles[vehNum].alpha = 1
+            f8KLAllVehicles[vehNum].alpha = 1
+            f8OtherAllVehicles[vehNum].alpha = 1
+        }
+    }
 }
