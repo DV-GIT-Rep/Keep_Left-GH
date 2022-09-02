@@ -96,6 +96,9 @@ var t2Stats: [String: [Any]] = ["Name": [" "], "Actual Speed": [0.0], "Intended 
 let fBuffVisible = true
 let rBuffVisible = true
 
+//iconColour refers to colour of the back (Select) button. Other icons stored with this colour!
+let iconColour: UIColor = UIColor(red: 0.05, green: 0.2, blue: 0.05, alpha: 1)
+
 //Later delete following 2 lines and StraightTrackScene.swift
 var km1: CGFloat = 1
 var sTrackPortrait = true
@@ -179,7 +182,7 @@ var f8DisplayDat: Int = 0 {
     }
 }
 
-var oneVehicleDisplayTime: CGFloat = 15.0    //Labels will revert to 'All Vehicles' after this many seconds
+var oneVehicleDisplayTime: CGFloat = 30    //Labels will revert to 'All Vehicles' after this many seconds
 
 let fudgeFactor: CGFloat = 0.75     //TEMPORARY!!!  Value is added to radius of fig 8 to offset sideways vehicle movement due to lag
                                     //              Note: will push stationary & low speed vehicles further out!

@@ -16,7 +16,7 @@ class StartStop: SKSpriteNode {
 
         isUserInteractionEnabled = true
         texture = SKTexture(imageNamed: "runIcon")
-        self.xScale = -1
+//        self.xScale = -1        //Was only required when GO icon pointed left
         self.alpha = 1
         
 //        position = CGPoint(x:scene!.view!.bounds.width * 0.4,y:scene!.view!.bounds.height * -0.4)  //In a UIView, 0,0 is the top left corner, so we look to bottom middle

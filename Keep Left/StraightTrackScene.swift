@@ -928,8 +928,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             sKLNode.laps += 1
         }
             
+            //MARK: - Flash vehicle when data displayed for single vehicle only
             flashVehicle(thisVehicle: sKLNode)
-//            flashVehicle(thisVehicle: sOtherNode)
 
         switch runStop {   //Wait until vehicles started
         case .stop:

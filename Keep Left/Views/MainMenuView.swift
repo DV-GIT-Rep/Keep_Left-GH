@@ -56,7 +56,8 @@ struct MainMenuView: View {
             }
             .navigationTitle("Select")
         }
-        .accentColor(Color(UIColor(red: 0.05, green: 0.2, blue: 0.05, alpha: 1)))
+        .accentColor(Color(iconColour))
+//        .accentColor(Color(UIColor(red: 0.05, green: 0.2, blue: 0.05, alpha: 1)))
         .environmentObject(scene)   //Anything inside NavigationView to access SceneModel class
         .environmentObject(model)   //Anything inside NavigationView to access MenuModel class
 //        .environmentObject(ld)      //Modifier to pass source of truth to child views (doesn't require same name!)
