@@ -54,6 +54,9 @@ let y1Mx: CGFloat = 270 / (1.5 * .pi * f8Radius)
 ///Returns y coordinate change between (0,0) and the fig 8 circle centre in metres
 let f8CircleCentre: CGFloat = f8Radius / cos45Deg
 
+///All but 8 LSBs cleared once all vehicles created. Value then dictates which code runs during 'update'
+var gameStage: Int = 1024   //1024 = 100 0000 0000 H
+
 var carXWidth: CGFloat = .zero
 var carXLength: CGFloat = .zero
 var carXRatio: CGFloat = .zero
@@ -182,7 +185,7 @@ var f8DisplayDat: Int = 0 {
     }
 }
 
-var oneVehicleDisplayTime: CGFloat = 30    //Labels will revert to 'All Vehicles' after this many seconds
+var oneVehicleDisplayTime: CGFloat = 60    //Labels will revert to 'All Vehicles' after this many seconds
 
 let fudgeFactor: CGFloat = 0.75     //TEMPORARY!!!  Value is added to radius of fig 8 to offset sideways vehicle movement due to lag
                                     //              Note: will push stationary & low speed vehicles further out!

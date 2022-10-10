@@ -14,8 +14,8 @@
             filePath = "Keep Left/StraightTrackScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "996"
-            endingLineNumber = "996"
+            startingLineNumber = "1020"
+            endingLineNumber = "1020"
             landmarkName = "every500ms()"
             landmarkType = "7">
          </BreakpointContent>
@@ -46,8 +46,8 @@
             filePath = "Keep Left/StraightTrackScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "925"
-            endingLineNumber = "925"
+            startingLineNumber = "948"
+            endingLineNumber = "948"
             landmarkName = "every500ms()"
             landmarkType = "7">
          </BreakpointContent>
@@ -62,9 +62,25 @@
             filePath = "Keep Left/StraightTrackScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1004"
-            endingLineNumber = "1004"
+            startingLineNumber = "1028"
+            endingLineNumber = "1028"
             landmarkName = "every500ms()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "5169D2D0-26A7-46B3-A81A-955DECD02BF8"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Keep Left/Models/NodeData.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "227"
+            endingLineNumber = "227"
+            landmarkName = "findObstacles(t1Vehicle:t2Vehicle:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

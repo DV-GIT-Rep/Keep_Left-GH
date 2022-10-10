@@ -399,6 +399,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //    }
     
     override func update(_ currentTime: TimeInterval) {
+        //ideally occurs every 60ms
         
 //        f8Background.alpha = ((whichScene == .figure8) ? 1.0 : 0)
 
@@ -429,43 +430,49 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             updateOneTime = true
         }
         
-//        let t1Vehicle = sKLAllVehicles   //Straight Track Vehicles
-//        let t2Vehicle = sOtherAllVehicles
-//
-//        //Loop through both arrays simultaneously. Move back 1km when they've travelled 1km!
-//        for (sKLNode, sOtherNode) in zip(t1Vehicle, t2Vehicle) {
-//            if sKLNode.position.y >= 1000 {
-//                //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
-//                sKLNode.position.y = (sKLNode.position.y - 1000)
-//            }
-////            print("sKLNodePos: \(sKLNode.position)")
-//            sKLNode.moveF8Vehicle(sNode: sKLNode, sNodePos: sKLNode.position, meta1: 0, F8YZero: 0)
-//            if sOtherNode.position.y < 0 {
-//                //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
-//                sOtherNode.position.y = (sOtherNode.position.y + 1000)
-//            }
-//            sOtherNode.moveF8Vehicle(sNode: sOtherNode, sNodePos: sOtherNode.position, meta1: 0, F8YZero: 0)
-////            print("X.,\(sKLNode.name!):,\((sKLNode.position.x).dp2),\((sKLNode.position.y).dp2),,\(sOtherNode.name!):,\((sOtherNode.position.x).dp2),\((sOtherNode.position.y).dp2)")
-//        }   //End of 'for' loop
-//
-//        let f81Vehicle = f8KLAllVehicles   //Figure 8 Track Vehicles
-//        let f82Vehicle = f8OtherAllVehicles
-//        let tempScene = f8Scene
-//
-//        //Loop through both arrays simultaneously. Move into new position based on Straight Track Vehicles!
-//        for (vehF8KL, vehF8Other) in zip(f81Vehicle, f82Vehicle) {
-//            if (vehF8KL != nil) && (vehF8Other != nil) {
-//
-////                print("1.,\(vehF8KL.name!):,\((vehF8KL.position.x).dp2),\((vehF8KL.position.y).dp2),,\(vehF8Other.name!):,\((vehF8Other.position.x).dp2),\((vehF8Other.position.y).dp2)")
-////                DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-////                    vehF8Other.moveF8Vehicle(f8Node: vehF8Other, meta1: tempScene.metre1, F8YZero: F8YZero)
-////                    vehF8KL.moveF8Vehicle(f8Node: vehF8KL, meta1: tempScene.metre1, F8YZero: F8YZero)
-////                }
-////                print("2.,\(vehF8KL.name!):,\(vehF8KL.position.x.dp2),\(vehF8KL.position.y.dp2),,\(vehF8Other.name!):,\(vehF8Other.position.x.dp2),\(vehF8Other.position.y.dp2)")
-//            } else {
-//            }
-//        }   //End of 'for' loop
+        //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        //Run on Main Thread!
         
+        if gameStage <= 0xFF {                          //Prevents code from running before vehicles are created
+            var temp1 = sKLAllVehicles.dropFirst()      //Straight Track Vehicles: Ignore 'All Vehicles'
+            var nodeData: NodeData = NodeData()
+            var t1Vehicle: [NodeData] = []
+            
+            for (index, veh1Node) in temp1.enumerated() {
+                nodeData.name = veh1Node.name!      //OR = (index + 1)?
+                nodeData.size = veh1Node.size
+                nodeData.position = veh1Node.position
+                nodeData.lane = veh1Node.lane
+                nodeData.laps = veh1Node.laps
+                nodeData.currentSpeed = veh1Node.physicsBody!.velocity.dy * 3.6      //  ????? x 3.6 for kph?
+                t1Vehicle.append(nodeData)
+            }
+            
+            var temp2 = sOtherAllVehicles.dropFirst()      //Straight Track Vehicles: Ignore 'All Vehicles'
+            //var nodeData: NodeData = NodeData()
+            var t2Vehicle: [NodeData] = []
+            
+            for (index, veh2Node) in temp2.enumerated() {
+                nodeData.name = veh2Node.name!      //OR = (index + 1)?
+                nodeData.size = veh2Node.size
+                nodeData.position = veh2Node.position
+                nodeData.lane = veh2Node.lane
+                nodeData.laps = veh2Node.laps
+                nodeData.currentSpeed = veh2Node.physicsBody!.velocity.dy * 3.6      //  ????? x 3.6 for kph?
+                t2Vehicle.append(nodeData)
+            }
+            
+            Task {
+                var result = await nodeData.findObstacles(t1Vehicle: &t1Vehicle, t2Vehicle: &t2Vehicle)
+                let t1Vehicle = result.t1Vehicle
+                let t2Vehicle = result.t2Vehicle
+            }
+            
+        }
+        
+        //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        
+
     }   //End of override update
     
     //        //The following code can replace the above - it's easier to follow but I suspect
@@ -642,6 +649,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         line1.position.y = (yOffset)
         line1.position.x = (xOffset)
         line1.zPosition = zPos
+//        line1.physicsBody?.isDynamic = false
+//        line1.physicsBody?.collisionBitMask = 0
         
         parent.addChild(line1)
         
@@ -796,6 +805,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             }
         }
         
+        gameStage = gameStage & 0xFF    //Clear all but 8 LSBs when vehicles all exist
+                                        //  - allows processing of vehicle speeds etc.
+
         return
 //        return sKLVehicle
     }
@@ -805,6 +817,10 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
     var spriteClear = false
     var randomPos: CGFloat
     var randomLane: Int
+        
+//        scene?.enumerateChildNodes(withName: "//*") { (node, stop) in
+//            print("\(node.name ?? "none")\t\(node.position.x.dp2)\t\(node.position.y.dp2)")
+//                                   }
     
     repeat {
         randomPos = CGFloat.random(in: 0..<1000)    //Sets random y position in metres (0 - 999.99999 etc)
@@ -822,14 +838,18 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         sOtherVehicle.lane = CGFloat(randomLane)
         
         spriteClear = true
-        
         //        veh.position = CGPoint(x: ((view?.bounds.size.width)! / 2.0) - ((5.85 + centreStrip/2) * sMetre1), y: 400.0 * sMetre1)
         //MARK: - Ensure vehicle doesn't overlap existing vehicle!
-        for sprite in sKLAllVehicles {
+        for sprite in sKLAllVehicles.dropFirst() {
             if (sKLVehicle.intersects(sprite)) {
                 spriteClear = false
+//                print("\(sKLVehicle.name!)\t\(sKLVehicle.position.x.dp2)\t\(sKLVehicle.position.y.dp2)\t\(sprite.name ?? "none")\t\(sprite.position.x.dp2)\t\(sprite.position.y.dp2)")
+                break
+//            } else {
+//                print("\(sKLVehicle.name!)\t\(sKLVehicle.position.x.dp2)\t\(sKLVehicle.position.y.dp2)")
             }
         }
+//        print("\(sKLVehicle.name!)\t\(sKLVehicle.position.y.dp2)\tspriteClear: \(spriteClear)")
     } while !spriteClear
     
     sKLAllVehicles.append(sKLVehicle)
@@ -896,7 +916,10 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             runTimer += 0.5             //Add 500ms to runTimer
         }
 //        print("enableMinSpeed: \(enableMinSpeed)\t\trunTimer: \(runTimer)")
+        
 
+//    t1Vehicle = sKLAllVehicles   //Straight Track Vehicles
+//    t2Vehicle = sOtherAllVehicles
     let t1Vehicle = sKLAllVehicles   //Straight Track Vehicles
     let t2Vehicle = sOtherAllVehicles
     var sumKL: CGFloat = 0
@@ -933,11 +956,12 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
         switch runStop {   //Wait until vehicles started
         case .stop:
-            sKLNode.physicsBody?.velocity.dy = 0  // !!!! TEMPORARY !!!!
+//            sKLNode.physicsBody?.velocity.dy = 0  // !!!! TEMPORARY !!!!
             sOtherNode.physicsBody?.velocity.dy = 0  // !!!! TEMPORARY !!!!
 
         case .run:
-            sKLNode.physicsBody?.velocity.dy = tempSpd  // !!!! TEMPORARY !!!!
+//            sKLAllVehicles[1].preferredSpeed = tempSpd
+//            sKLNode.physicsBody?.velocity.dy = tempSpd  // !!!! TEMPORARY !!!!
             sOtherNode.physicsBody?.velocity.dy = -otherTempSpeed  // !!!! TEMPORARY !!!!
         }
 

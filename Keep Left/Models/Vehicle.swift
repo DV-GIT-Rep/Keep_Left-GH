@@ -13,14 +13,17 @@ class Vehicle: SKSpriteNode, ObservableObject {
     
 //    @Published var txVehicle = [Vehicle]()
     
+    @Published var preferredSpeed: CGFloat  //Vehicle speed without obstacles (kph)
+    @Published var currentSpeed: CGFloat    //Vehicle speed NOW
+    
     @Published var speedKPH: CGFloat
     @Published var km: CGFloat
     @Published var lane: CGFloat
     
     @Published var laps: CGFloat
     @Published var distance: CGFloat        //Distance travelled in km
-    @Published var distanceMax: CGFloat        //Distance travelled in km
-    @Published var distanceMin: CGFloat        //Distance travelled in km
+    @Published var distanceMax: CGFloat     //Distance travelled in km
+    @Published var distanceMin: CGFloat     //Distance travelled in km
 
     @Published var otherTrack: Bool
     
@@ -33,6 +36,13 @@ class Vehicle: SKSpriteNode, ObservableObject {
     @Published var kmAvg: CGFloat     //Distance in km
     @Published var kmMax: CGFloat     //Distance in km
     @Published var kmMin: CGFloat     //Distance in km
+    
+    @Published var gap: CGFloat         //Distance between this vehicle and one in front (same lane!)
+    @Published var otherGap: CGFloat    //Distance between this vehicle and one in front (OTHER lane!)
+    @Published var rearGap: CGFloat     //Distance between this vehicle and one behind (OTHER lane!)
+    
+    @Published var goalSpeed: CGFloat   //Used to temp store immediate goal speed following proximity check
+    @Published var changeTime: CGFloat  //Time in seconds for next SKAction on Straight Track vehicles
 
 //    @Published var indicate: String
 //    @Published var lights: Bool
@@ -40,6 +50,8 @@ class Vehicle: SKSpriteNode, ObservableObject {
     //MARK: - Init
     init(imageName: String) {
         let texture = SKTexture(imageNamed: imageName)
+        preferredSpeed = 0.0
+        currentSpeed = 0.0
         speedKPH = 0.0
         km = 0.0
         lane = 0.0
@@ -55,6 +67,11 @@ class Vehicle: SKSpriteNode, ObservableObject {
         kmAvg = 0.0
         kmMax = 0.0
         kmMin = 0.0
+        gap = 0.0
+        otherGap = 0.0
+        rearGap = 0.0
+        goalSpeed = 0.0     //Overwritten later!
+        changeTime = 1.0    //seconds. Overwritten later!
 
         super.init(texture: texture, color: UIColor.clear, size: texture.size())
 //        super.init(imageName: imageName)
@@ -220,6 +237,8 @@ class Vehicle: SKSpriteNode, ObservableObject {
             let newF8Pos = SKAction.move(to: f8NodePos, duration: aniDuration)
             let newF8Rot = SKAction.rotate(toAngle: f8NodeRot, duration: aniDuration, shortestUnitArc: true)
             let group = SKAction.group([newF8Pos, newF8Rot])
+            
+//            let sss = SKAction.customAction(withDuration: <#T##TimeInterval#>, actionBlock: <#T##(SKNode, CGFloat) -> Void#>)
             
             f8Node.run(group, withKey: "key")
 
