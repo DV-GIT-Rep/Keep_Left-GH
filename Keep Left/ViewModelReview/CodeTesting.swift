@@ -112,24 +112,24 @@ import Foundation
 //    //Loop through Track 1 (KL) first
 //    for (index, veh1Node) in t1Vehicle.enumerated() {
 //        
-//        var indexCopy = index + 1
+//        var nextIndex = index + 1
 //        var past1km = false
 //        
 //        let sameLane = (veh1Node.lane - 0.5)...(veh1Node.lane + 0.5)   //Scan for vehicles within 0.5 lanes either side
-//        let sameLap = (t1Vehicle[indexCopy].position.y - (t1Vehicle[indexCopy].size.height / 2)) - (veh1Node.position.y + (veh1Node.size.height / 2))                             //Vehicle in front on same side of 1km boundary
-//        let lastLap = ((t1Vehicle[indexCopy].position.y + 1000) - (t1Vehicle[indexCopy].size.height / 2)) - (veh1Node.position.y + (veh1Node.size.height / 2))      //Vehicle in front is over the 1km boundary!
+//        let sameLap = (t1Vehicle[nextIndex].position.y - (t1Vehicle[nextIndex].size.height / 2)) - (veh1Node.position.y + (veh1Node.size.height / 2))                             //Vehicle in front on same side of 1km boundary
+//        let lastLap = ((t1Vehicle[nextIndex].position.y + 1000) - (t1Vehicle[nextIndex].size.height / 2)) - (veh1Node.position.y + (veh1Node.size.height / 2))      //Vehicle in front is over the 1km boundary!
 //        
 //        while gap == 0 && otherGap == 0 {
 //            
-//            if indexCopy >= numVehicles {
+//            if nextIndex >= numVehicles {
 //                
-//                indexCopy = 0       //Crossed 1km barrier. Continue search
+//                nextIndex = 0       //Crossed 1km barrier. Continue search
 //                past1km = true      //Flag indicates vehicle in front is beyond 1km boundary
 //                continue            //Skip past else & continue with code below
 //                
 //            } else {
 //                //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
-//                if sameLane.contains(t1Vehicle[indexCopy].lane) {
+//                if sameLane.contains(t1Vehicle[nextIndex].lane) {
 //                    //Both vehicles in same lane
 //                    if gap == 0 {
 //                        gap = (past1km == false) ? sameLap : lastLap
@@ -145,13 +145,13 @@ import Foundation
 //                    }
 //                }       //end lane check
 //                
-//                indexCopy += 1  //Move onto next vehicle
-//                if indexCopy == index {
+//                nextIndex += 1  //Move onto next vehicle
+//                if nextIndex == index {
 //                    if gap == 0 { gap = 1000 }
 //                    if otherGap == 0 { otherGap = 1000 } //NOTE: Don't yet know distance to vehicle behind in other lane!
 //                }    //Continue until spacing for BOTH lanes != 0
 //                
-//            }           //end indexCopy 'if' statement
+//            }           //end nextIndex 'if' statement
 //            
 //        }               //end While
 //        t1Vehicle[index].gap = gap
@@ -164,38 +164,38 @@ import Foundation
 //        //Loop through Track 1 (KL) first
 //        for (index, veh1Node) in t1Vehicle.enumerated() {
 //            
-//            var indexCopy = index + 1
+//            var nextIndex = index + 1
 //            var past1km = false
 //            
-//            let sameLap = (veh1Node.position.y - (veh1Node.size.height / 2)) - (t1Vehicle[indexCopy].position.y + (t1Vehicle[indexCopy].size.height / 2)) //Vehicle in front on same side of 1km boundary
-//            let lastLap = ((veh1Node.position.y + 1000) - (veh1Node.size.height / 2)) - (t1Vehicle[indexCopy].position.y + (t1Vehicle[indexCopy].size.height / 2))    //Vehicle in front is over the 1km boundary!
+//            let sameLap = (veh1Node.position.y - (veh1Node.size.height / 2)) - (t1Vehicle[nextIndex].position.y + (t1Vehicle[nextIndex].size.height / 2)) //Vehicle in front on same side of 1km boundary
+//            let lastLap = ((veh1Node.position.y + 1000) - (veh1Node.size.height / 2)) - (t1Vehicle[nextIndex].position.y + (t1Vehicle[nextIndex].size.height / 2))    //Vehicle in front is over the 1km boundary!
 //            
 //            
 //            while rearGap == 0 {
 //                
-//                if indexCopy >= numVehicles {
+//                if nextIndex >= numVehicles {
 //                    
-//                    indexCopy = 0       //Crossed 1km barrier. Continue search
+//                    nextIndex = 0       //Crossed 1km barrier. Continue search
 //                    past1km = true      //Flag indicates vehicle in front is beyond 1km boundary
 //                    continue            //Skip past else & continue with code below
 //                    
 //                } else {
 //                    //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
-//                    if !sameLane.contains(t1Vehicle[indexCopy].lane) {
+//                    if !sameLane.contains(t1Vehicle[nextIndex].lane) {
 //                        //Both vehicles in different lanes
 //                        rearGap = (past1km == false) ? sameLap : lastLap
 //                        if rearGap == 0 { rearGap = 0.1 }
 //                        //                    veh1Node.rearGap = rearGap
 //                    } else {
 //                        //The two vehicles are in the same lane
-//                        indexCopy += 1  //Move onto next vehicle
-//                        if indexCopy == index {         //All other vehicles checked. rearGap sb 0 here!
+//                        nextIndex += 1  //Move onto next vehicle
+//                        if nextIndex == index {         //All other vehicles checked. rearGap sb 0 here!
 //                            if rearGap == 0 { rearGap = 1000 }
 //                        }    //Continue until spacing for BOTH lanes != 0
 //                        
 //                    }       //end lane check
 //                    
-//                }           //end indexCopy 'if' statement
+//                }           //end nextIndex 'if' statement
 //                
 //                
 //            }               //end while

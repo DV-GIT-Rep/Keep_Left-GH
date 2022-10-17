@@ -106,7 +106,7 @@ class StraightTrackScene: SKScene {
     //        }()
             let sKLVehicle = SKSpriteNode(imageNamed: vehicle + String(fName))
 //            sKLVehicle.name = "Vehicle \(i) Type \(fName)"
-            sKLVehicle.name = "sKLVehicle_\(i)"
+            sKLVehicle.name = "stKL_\(i)"
 //            sKLVehicle.position = CGPoint(x: size.width / 2, y: 300)
             sKLVehicle.scale(to: CGSize(width: 50, height: 110))
             sKLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 50, height: 110))   //Make rectangle same size as sprite!

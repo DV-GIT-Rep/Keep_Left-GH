@@ -13,7 +13,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
     
 //    @Published var txVehicle = [Vehicle]()
     
-    @Published var preferredSpeed: CGFloat  //Vehicle speed without obstacles (kph)
+    open var preferredSpeed: CGFloat  //Vehicle speed without obstacles (kph)
     @Published var currentSpeed: CGFloat    //Vehicle speed NOW
     
     @Published var speedKPH: CGFloat
@@ -144,8 +144,9 @@ class Vehicle: SKSpriteNode, ObservableObject {
         //MARK: - Find name of Straight Track equivalent to Fig 8 Track Vehicle
         //          eg.f8KLVehicle_5 -> sKLVehicle_5 OR f8OtherVehicle_69 -> sOtherVehicle_69
         f8EquivName.remove(at: f8EquivName.startIndex)        //Remove "s" from start of name
-        f8EquivName.insert("8", at: f8EquivName.startIndex)   //Replace "s" with "//f8"
-        f8EquivName.insert("f", at: f8EquivName.startIndex)   //Replace "s" with "//f8"
+        f8EquivName.remove(at: f8EquivName.startIndex)        //Remove "t" from start of name
+        f8EquivName.insert("8", at: f8EquivName.startIndex)   //Replace "st" with "//f8"
+        f8EquivName.insert("f", at: f8EquivName.startIndex)   //Replace "st" with "//f8"
         f8EquivName.insert("/", at: f8EquivName.startIndex)   //Add "/"
         f8EquivName.insert("/", at: f8EquivName.startIndex)   //Add "/"
 
@@ -156,7 +157,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
         var f8NodeRot: CGFloat = 0
         let aniDuration: CGFloat = 0.5  //SAME period as 'every500ms' timer!
         
-        var key = f8Node.name
+        var key = f8Node.name           //rewrite using Int.extractNum?
         key = String(key!.suffix(3))
         key = "key\(key!)"
         

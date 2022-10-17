@@ -444,6 +444,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                 nodeData.position = veh1Node.position
                 nodeData.lane = veh1Node.lane
                 nodeData.laps = veh1Node.laps
+                nodeData.preferredSpeed = veh1Node.preferredSpeed
                 nodeData.currentSpeed = veh1Node.physicsBody!.velocity.dy * 3.6      //  ????? x 3.6 for kph?
                 t1Vehicle.append(nodeData)
             }
@@ -458,16 +459,20 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                 nodeData.position = veh2Node.position
                 nodeData.lane = veh2Node.lane
                 nodeData.laps = veh2Node.laps
+                nodeData.preferredSpeed = veh2Node.preferredSpeed
                 nodeData.currentSpeed = veh2Node.physicsBody!.velocity.dy * 3.6      //  ????? x 3.6 for kph?
                 t2Vehicle.append(nodeData)
             }
             
+            var returnKL: [NodeData] = t1Vehicle
+            var returnOther: [NodeData] = t2Vehicle
             Task {
                 var result = await nodeData.findObstacles(t1Vehicle: &t1Vehicle, t2Vehicle: &t2Vehicle)
-                let t1Vehicle = result.t1Vehicle
-                let t2Vehicle = result.t2Vehicle
-            }
-            
+                returnKL = result.t1Vehicle
+                returnOther = result.t2Vehicle
+
+                updateSpeeds(returnKL: returnKL, returnOther: returnOther)      //Update vehicle speeds
+        }
         }
         
         //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -498,56 +503,56 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //        switch toggleSpeed {
 //        case 0:
 //        for i in 1...numVehicles {
-//            sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//            sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//            sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//            sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
 //        }
 //        case 1:
 //            for i in 1...numVehicles {
-//                sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-////                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour. (NOTE: THE INSTRUCTIONS COMMENTED OUT DON'T CHANGE THE SPEED!)
+//                sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dy = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+////                sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour. (NOTE: THE INSTRUCTIONS COMMENTED OUT DON'T CHANGE THE SPEED!)
 //            }
 //        case 2:
 //            for i in 1...numVehicles {
-//                sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -(0.9 * kph) * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//                sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dy = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//                sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dy = -(0.9 * kph) * multiplier   //1000 = metres in km. 3600 = secs in hour.
 //            }   //$$$$$$$$$$$$$$$     !!! Other lane slowed above to create difference !!!     $$$$$$$$$$$$$$$$$$$$$$$$$$$$
 //        case 3:
 //            for i in 1...numVehicles {
-//                sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-////                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//                sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+////                sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dy = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
 //            }
 //        default:
 //            for i in 1...numVehicles {
-////                sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+////                sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//                sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
 //            }
 //        }
 //
 /*        switch toggleSpeed {
         case 0:
         for i in 1...numVehicles {
-            sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dx = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-            sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dx = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+            sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dx = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+            sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dx = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
         }
         case 1:
             for i in 1...numVehicles {
-                sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dx = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dx = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour. (NOTE: THE INSTRUCTIONS COMMENTED OUT DON'T CHANGE THE SPEED!)
+                sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dx = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//                sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dx = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour. (NOTE: THE INSTRUCTIONS COMMENTED OUT DON'T CHANGE THE SPEED!)
             }
         case 2:
             for i in 1...numVehicles {
-                sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dx = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dx = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+                sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dx = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+                sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dx = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
             }
         case 3:
             for i in 1...numVehicles {
-                sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dx = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dx = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
+                sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dx = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//                sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dx = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
             }
         default:
             for i in 1...numVehicles {
-//                sBackground.childNode(withName: "sKLVehicle_\(i)")?.physicsBody?.velocity.dx = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-                sBackground.childNode(withName: "sOtherVehicle_\(i)")?.physicsBody?.velocity.dx = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+//                sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dx = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
+                sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dx = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
             }
         }   */
         
@@ -723,7 +728,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             let vehSize = sKLVehicle.size
             
             sKLVehicle.zPosition = +50
-            sKLVehicle.name = "sKLVehicle_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
+            sKLVehicle.name = "stKL_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
             sKLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: sKLVehicle.size.width, height: sKLVehicle.size.height + 1))   //Make rectangle same size as sprite + 0.5m front and back!
             sKLVehicle.physicsBody?.friction = 0
             sKLVehicle.physicsBody?.restitution = 0
@@ -740,7 +745,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             f8KLVehicle.size = vehSize
 
             f8KLVehicle.zPosition = 10      //Set starting "altitude" above track and below bridge
-            f8KLVehicle.name = "f8KLVehicle_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
+            f8KLVehicle.name = "f8KL_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
             f8KLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: f8KLVehicle.size.width, height: f8KLVehicle.size.height + 1))   //Make rectangle same size as sprite + 0.5m front and back!
             f8KLVehicle.physicsBody?.friction = 0
             f8KLVehicle.physicsBody?.restitution = 0
@@ -759,7 +764,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             
             sOtherVehicle.otherTrack = true //Flag identifies vehicle as being on the otherTrack!
             sOtherVehicle.zPosition = +50
-            sOtherVehicle.name = "sOtherVehicle_\(i)"  //sOtherVehicle_x -> Straight Track 2, f2Vehicle_x -> Figure 8 Track 2, g2Vehicle_x -> Game Track 2.
+            sOtherVehicle.name = "stOt_\(i)"  //sOtherVehicle_x -> Straight Track 2, f2Vehicle_x -> Figure 8 Track 2, g2Vehicle_x -> Game Track 2.
             sOtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: secSize.width, height: secSize.height + 1))   //Make rectangle same size as sprite + 0.5m front and back!
             sOtherVehicle.physicsBody?.friction = 0
             sOtherVehicle.zRotation = CGFloat(Double.pi)  //rotate 180 degrees //XXXXXXXXXX
@@ -778,7 +783,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
             f8OtherVehicle.otherTrack = true     //Flag identifies vehicle as being on the otherTrack!
             f8OtherVehicle.zPosition = 10       //Set starting "altitude" above track and below bridge
-            f8OtherVehicle.name = "f8OtherVehicle_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
+            f8OtherVehicle.name = "f8Ot_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
             f8OtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: f8OtherVehicle.size.width, height: f8OtherVehicle.size.height + 1))   //Make rectangle same size as sprite + 0.5m front and back!
             f8OtherVehicle.physicsBody?.friction = 0
             f8OtherVehicle.physicsBody?.restitution = 0
@@ -928,21 +933,29 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
     var sumOther: CGFloat = 0
         var maxSumOther: CGFloat = 0
         var minSumOther: CGFloat = 99999999
-        
+        var tempSpd: CGFloat = 0
+
         // !!!! TEMPORARY !!!!
-        let randNo: CGFloat = CGFloat.random(in: 75...145)
+//        print("\ttempSpd\toldNo\tnewNo\trandNo\tranNo\tprfSpd")
+//        print("1.\t\t\(tempSpd)\t\(oldNo)\t\(newNo.dp2.description)\t\t")
+        let randNo: CGFloat = CGFloat.random(in: 100...180)
         newNo = (randNo + (3 * newNo)) / 4
+//        print("2.\t\t\(tempSpd)\t\(oldNo)\t\(newNo.dp2)\t\(randNo.dp2)\t")
         if newNo < oldNo - 1 {
-            oldNo -= 1
+            oldNo -= 4
         } else  if newNo > oldNo + 1 {
-            oldNo += 1
+            oldNo += 4
         }
-        let tempSpd: CGFloat = oldNo / 3.6  // -> km
-        let otherTempSpeed: CGFloat = tempSpd - ((0.6 * (newNo - 85)) / 3.6)
+//        print("3.\t\t\(tempSpd)\t\(oldNo)\t\(newNo.dp2)\t\(randNo.dp2)\t")
+        tempSpd = oldNo  // -> km
+//        print("4.\t\(tempSpd)\t\(oldNo)\t\(newNo.dp2)\t\(randNo.dp2)\t")
+        let otherTempSpeed: CGFloat = tempSpd - (0.6 * (newNo - 85))
+//        print("tempSpd: \(tempSpd)\toldNo: \(oldNo)\tnewNo: \(newNo)")
         
         //MARK: - Set timeMx = hours of vehicle run time to now!
         let timeMx: CGFloat = 3600 / runTimer
         
+        var unitNo: Int = 0
     //Loop through both arrays simultaneously. Move back 1km when they've travelled 1km!
         for (sKLNode, sOtherNode) in zip(t1Vehicle.dropFirst(), t2Vehicle.dropFirst()) {
         if sKLNode.position.y >= 1000 {
@@ -950,19 +963,28 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             sKLNode.position.y = (sKLNode.position.y - 1000)
             sKLNode.laps += 1
         }
+            unitNo += 1
             
             //MARK: - Flash vehicle when data displayed for single vehicle only
             flashVehicle(thisVehicle: sKLNode)
 
         switch runStop {   //Wait until vehicles started
         case .stop:
+            sKLNode.preferredSpeed = 0
 //            sKLNode.physicsBody?.velocity.dy = 0  // !!!! TEMPORARY !!!!
             sOtherNode.physicsBody?.velocity.dy = 0  // !!!! TEMPORARY !!!!
 
         case .run:
-//            sKLAllVehicles[1].preferredSpeed = tempSpd
-//            sKLNode.physicsBody?.velocity.dy = tempSpd  // !!!! TEMPORARY !!!!
-            sOtherNode.physicsBody?.velocity.dy = -otherTempSpeed  // !!!! TEMPORARY !!!!
+            //TEMP!!!
+//            print("5.\t\(tempSpd)\t\(oldNo)\t\(newNo)\t\(randNo)\t")
+//            let ranNo: CGFloat = CGFloat.random(in: 0.8...1.2)
+//            tempSpd = tempSpd
+
+            sKLNode.preferredSpeed = tempSpd + CGFloat(unitNo * 4)
+//            sKLAllVehicles[unitNo].preferredSpeed = tempSpd
+//            sKLNode.physicsBody?.velocity.dy = sKLNode.preferredSpeed  // !!!! TEMPORARY !!!!
+            sOtherNode.physicsBody?.velocity.dy = -otherTempSpeed / 3.6  // !!!! TEMPORARY !!!!
+//            print("6.\t\((tempSpd + CGFloat(unitNo)).dp2)\t\(oldNo)\t\(newNo.dp2)\t\(randNo.dp2)\t\(ranNo.dp2)\t\(sKLNode.preferredSpeed.dp2)\t\(sKLAllVehicles[unitNo].preferredSpeed.dp2)")
         }
 
         sKLNode.distance = (sKLNode.position.y - sKLNode.startPos) / sTrackLength + sKLNode.laps                //Distance travelled in km
@@ -1041,9 +1063,35 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //        vehicle.f8KLLabelDescription.text = (f8DisplayDat == 0) ? "All Vehicles" : "Vehicle \(f8DisplayDat)"    //Display "All Vehicles" or "Vehicle x"
 //
 //        //Figure 8 Vehicles 1st !!!
-//        vehicle.avgSpeed.text = "\(round("vehicle.sKLVehicle_\(f8DisplayDat)."speedAvg) \(kph))"         //
+//        vehicle.avgSpeed.text = "\(round("vehicle.stKL_\(f8DisplayDat)."speedAvg) \(kph))"         //
 //
 //    }
+    
+    @MainActor func updateSpeeds(returnKL: [NodeData], returnOther: [NodeData]) {
+        var speedChange: CGFloat
+        var newTime: CGFloat
+        var newSpeed: CGFloat
+        var action: SKAction
+        var unitNum: Int
+
+        print("\n\tUnit\tprefSpd\tgoalSpd\tcurrSpd\tnewSpd\tchTm\tgap\t\tnewT")
+    for (index, veh1Node) in returnKL.enumerated() {            //index = 0 - (numVehicles - 1)
+        
+        //THIS Vehicle = veh1Node = sKLAllVehicles[unitNum] = returnKL[index]
+
+        unitNum = Int.extractNum(from: veh1Node.name)!  //NOTE: Use [unitNum] for sKLAllVehicles. Use [index] for returnKL!
+        
+        speedChange = (veh1Node.goalSpeed - veh1Node.currentSpeed)
+        newTime = veh1Node.changeTime * 60      //newTime = no of cycles @60Hz in changeTime
+        newSpeed = veh1Node.currentSpeed + (speedChange / newTime)
+        //print("1.\t\(unitNum)\t\t\(veh1Node.preferredSpeed.dp2)\t\(veh1Node.goalSpeed.dp2)\t\(veh1Node.currentSpeed.dp2)\t\(newSpeed.dp2)\t\(veh1Node.changeTime.dp2)\t\(veh1Node.gap.dp2)\t\(newTime.dp2)")
+            sKLAllVehicles[unitNum].physicsBody?.velocity.dy = newSpeed / 3.6
+        
+        print("2.\t\(unitNum)\t\t\(veh1Node.preferredSpeed.dp2)\t\(veh1Node.goalSpeed.dp2)\t\(veh1Node.currentSpeed.dp2)\t\(newSpeed.dp2)\t\(veh1Node.changeTime.dp2)\t\(veh1Node.gap.dp2)\t\(newTime.dp2)")
+
+    }
+
+    }       //end @MainActor func updateSpeeds
 
 }
 
@@ -1063,7 +1111,7 @@ func redoCamera() {
 func flashVehicle(thisVehicle: Vehicle) {           //Called every 500ms. 'thisVehicle' = sKL...
     
     //The code below extracts the vehicle number from its name. Ignores track etc.
-    if let vehNum = Int.parse(from: thisVehicle.name!) {
+    if let vehNum = Int.extractNum(from: thisVehicle.name!) {
         // Do something with this number
         
         switch f8DisplayDat {

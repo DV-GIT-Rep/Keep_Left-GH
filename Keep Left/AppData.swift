@@ -79,7 +79,7 @@ var maxTrucks = trucks.count
 var maxBuses = buses.count
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 18 //28
+var numVehicles = 8 //28
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
 var sOtherAllVehicles: [Vehicle] = []   //Array of vehicles on Other Straight Track
@@ -180,8 +180,8 @@ let bridgeRailWidth: CGFloat = 0.35
 let bridgeWidth: CGFloat = (2 * roadWidth) + f8CentreStrip + (2 * bridgeRailWidth)
 
 var f8DisplayDat: Int = 0 {
-    didSet {
-        print("Change Fig 8 Vehicle Display")   //Load display here: 0 = "All Vehicles", 1 = "Vehicle 1", 2 = "Vehicle 2" etc
+    didSet {            //Code runs whenever value of f8DisplayDat changes
+//        print("Change Fig 8 Vehicle Display")   //Load display here: 0 = "All Vehicles", 1 = "Vehicle 1", 2 = "Vehicle 2" etc
     }
 }
 
@@ -230,8 +230,9 @@ extension CGFloat {
 }
 
 extension Int {
-    ///Extract number from string: if let <var> = Int.parse(from: <String>) { use here }
-    static func parse(from string: String) -> Int? {
+    ///Extract number from string: if let <var> = Int.extractNum(from: <String>) { use here }
+    static func extractNum(from string: String) -> Int? {
         return Int(string.components(separatedBy: CharacterSet.decimalDigits.inverted).joined())
+        //Cld probably hv used Int(String(string.dropFirst(x))) //where x = num of digits to remove
     }
 }
