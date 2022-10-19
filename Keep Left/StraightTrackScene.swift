@@ -225,9 +225,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             sStartStop.position = CGPoint(x: cornerIconX * (f8Scene.metre1 / straightScene.metre1), y: -cornerIconY * (f8Scene.metre1 / straightScene.metre1))
             sStartStop.size = CGSize(width: f8StartStop.size.width * (f8Scene.metre1 / straightScene.metre1), height: f8StartStop.size.height * (f8Scene.metre1 / straightScene.metre1))
             sStartStop.zPosition = 10000000000
-            print("UIScreen: \(UIScreen.main.bounds)")
-            print("UIScreenNative: \(UIScreen.main.nativeBounds)")
-            print("Camera: \(self.camera)!")
+            print("\nUIScreen:\t\t\(UIScreen.main.bounds)")
+            print("UIScreenNative:\t\(UIScreen.main.nativeBounds)\n")
+//            print("Camera: \(self.camera!)")
 
             //MARK: - Create Change View Button
             //Figure 8 Track
@@ -405,7 +405,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
         if updateOneTime == false {
         let orientation = UIDevice.current.orientation    //1: Portrait, 2: UpsideDown, 3: LandscapeLeft, 4: LandscapeRight
-        print("Orientation = \(orientation)")
+//        print("Orientation = \(orientation)")
         switch orientation {
         case .portrait:
             camera?.zRotation = 0
@@ -938,7 +938,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         // !!!! TEMPORARY !!!!
 //        print("\ttempSpd\toldNo\tnewNo\trandNo\tranNo\tprfSpd")
 //        print("1.\t\t\(tempSpd)\t\(oldNo)\t\(newNo.dp2.description)\t\t")
-        let randNo: CGFloat = CGFloat.random(in: 100...180)
+        let randNo: CGFloat = CGFloat.random(in: 50...180)
         newNo = (randNo + (3 * newNo)) / 4
 //        print("2.\t\t\(tempSpd)\t\(oldNo)\t\(newNo.dp2)\t\(randNo.dp2)\t")
         if newNo < oldNo - 1 {
@@ -1074,7 +1074,10 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         var action: SKAction
         var unitNum: Int
 
-        print("\n\tUnit\tprefSpd\tgoalSpd\tcurrSpd\tnewSpd\tchTm\tgap\t\tnewT")
+        let printGoals = false
+        if printGoals {
+            print("\nUnit\tprefSpd\tgoalSpd\tcurrSpd\tnewSpd\tchTm\tgap\t\tnewT")
+        }
     for (index, veh1Node) in returnKL.enumerated() {            //index = 0 - (numVehicles - 1)
         
         //THIS Vehicle = veh1Node = sKLAllVehicles[unitNum] = returnKL[index]
@@ -1087,7 +1090,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         //print("1.\t\(unitNum)\t\t\(veh1Node.preferredSpeed.dp2)\t\(veh1Node.goalSpeed.dp2)\t\(veh1Node.currentSpeed.dp2)\t\(newSpeed.dp2)\t\(veh1Node.changeTime.dp2)\t\(veh1Node.gap.dp2)\t\(newTime.dp2)")
             sKLAllVehicles[unitNum].physicsBody?.velocity.dy = newSpeed / 3.6
         
-        print("2.\t\(unitNum)\t\t\(veh1Node.preferredSpeed.dp2)\t\(veh1Node.goalSpeed.dp2)\t\(veh1Node.currentSpeed.dp2)\t\(newSpeed.dp2)\t\(veh1Node.changeTime.dp2)\t\(veh1Node.gap.dp2)\t\(newTime.dp2)")
+        if printGoals {
+            print("\(unitNum)\t\t\(veh1Node.preferredSpeed.dp2)\t\(veh1Node.goalSpeed.dp2)\t\(veh1Node.currentSpeed.dp2)\t\(newSpeed.dp2)\t\(veh1Node.changeTime.dp2)\t\(veh1Node.gap.dp2)\t\(newTime.dp2)")
+        }
 
     }
 

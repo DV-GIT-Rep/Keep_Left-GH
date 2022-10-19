@@ -58,9 +58,11 @@ struct NodeData {
 
 //        print("\(t1Vehicle[1].position)")
         
-        var gapSpeed: CGFloat = 0
-        var goalSpeed: CGFloat = 0
-        
+        var gapSpeed: CGFloat = 0       //Speed required to catch vehicle in front in 3 secs
+        var goalSpeed: CGFloat = 0      //Lesser of gapSpeed & preferredSpeed (reduced if closer than 3 secs to veh in front)
+        var gapTime: CGFloat = 0        //Time in secs to catch vehicle in front @ current speed
+        var decel: CGFloat = 4          // m/sec2. Typical. Varies!
+
         //########################### rearGap calc loop #######################################
         t1Vehicle.sort(by: {$0.position.y > $1.position.y}) //Sort into positional order, 999.999 - 000
 //        var t1Vehicle: [NodeData] = t1Vehicle
@@ -76,7 +78,7 @@ struct NodeData {
         for (index, veh1Node) in t1Vehicle.enumerated() {
             
             //THIS Vehicle = veh1Node = sKLAllVehicles[unitNumb] = t1Vehicle[index]
-            //NEXT Vehicle = t1Vehicle[nextIndex] = t1Vehicle[index + 1]
+            //NEXT Vehicle = t1Vehicle[nextIndex]
 
             unitNumb = Int.extractNum(from: veh1Node.name)! //NOTE: Use [unitNumb] for sKLAllVehicles. Use [index] OR [nextIndex] for t1Vehicles!
             
@@ -125,11 +127,11 @@ struct NodeData {
 
     t1Vehicle.sort(by: {$0.position.y < $1.position.y}) //Sort into positional order, 000 - 999.999
 
-//    t2Vehicle.sort(by: {$0.position.y < $1.position.y}) //Sort into positional order, 000 - 999.999
+    t2Vehicle.sort(by: {$0.position.y < $1.position.y}) //Sort into positional order, 000 - 999.999
     
     var gap: CGFloat = 0.0      //Distance ahead in THIS lane
     var otherGap: CGFloat = 0.0     //Distance ahead in OTHER lane
-    nextIndex = 0
+//    nextIndex = 0               //Not required - value loaded below!
     past1km = false
 
         //print("\nFront Gap Calcs")
@@ -139,7 +141,7 @@ struct NodeData {
     for (index, veh1Node) in t1Vehicle.enumerated() {
         
         //THIS Vehicle = veh1Node = sKLAllVehicles[unitNumb] = t1Vehicle[index]
-        //NEXT Vehicle = t1Vehicle[nextIndex] = t1Vehicle[index + 1]
+        //NEXT Vehicle = t1Vehicle[nextIndex]
 
         unitNumb = Int.extractNum(from: veh1Node.name)! //NOTE: Use [unitNumb] for sKLAllVehicles. Use [index] OR [nextIndex] for t1Vehicles!
         
@@ -167,8 +169,8 @@ struct NodeData {
                         gap = (past1km == false) ? sameLap : lastLap
                         if gap <= 0 { gap = 0.1 } //Should NEVER happen! (due to self braking)
                         //                    veh1Node.spacing = gap
-                        t1Vehicle[index].frontUnit = t1Vehicle[nextIndex].name
-                        t1Vehicle[index].frontPos = t1Vehicle[nextIndex].position
+                        t1Vehicle[index].frontUnit = t1Vehicle[nextIndex].name      //Save identity of front unit
+                        t1Vehicle[index].frontPos = t1Vehicle[nextIndex].position   //Save position of front unit
                     }
                 } else {
                     //The two vehicles are in different lanes
@@ -196,28 +198,46 @@ struct NodeData {
         //NOTE: ALL values above can read negative IF position differences < vehicle lengths!
         //       (can be changed by using <= instead of == above)
         
-        gapSpeed = gap * 1.2    //Max allowable speed for current gap
+        gapSpeed = (gap * 3.6) / gapVal     //Max allowable speed for current gap. gapVal = 3 secs
         goalSpeed = gapSpeed  //Aim for this speed while in this lane
         
         if gapSpeed > veh1Node.preferredSpeed {
             goalSpeed = veh1Node.preferredSpeed
         }
-        //    else {
-        //        goalSpeed = gapSpeed  //Already = gapSpeed
-        //    }
+            else {          //
+//                goalSpeed = gapSpeed  //Already = gapSpeed
+            }
         
         //Acceleration & deceleration fixed FOR NOW!!!
         var accel: CGFloat = 3    // m per sec2 (use 2?)
 //        var accel: CGFloat = 2    // m per sec2
         //    var truckAccel: CGFloat = 1.0
-        var decel: CGFloat = 4    // m per sec2
+        var decelMax: CGFloat = 6.5 // m/sec2
+        var decelMin: CGFloat = 3.4  // m/sec2
+//        var decel: CGFloat = 4    // m per sec2
         //    var truckDecel: CGFloat = 0.9
         let spdChange = abs(goalSpeed - veh1Node.currentSpeed)
+        gapTime = (gap * 3.6) / veh1Node.currentSpeed   //Time in secs to catch vehicle in front @ current speed
+        
+        //MARK: - Create variable value of decel when gap 1 - 3 secs from vehicle in front
+        if gapTime < (gapVal * 0.33) {
+            decel = decelMax                            //Max decel! Gap < 1 second
+        } else {
+            if gapTime > gapVal {
+                decel = decelMin                        //Min decel! Gap > 3 seconds
+            } else {                                    //Gap 1 - 3 seconds
+                gapTime = gapTime - (gapVal * 0.33)     //Change value from 1-3 to 0-2 (secs for gapVal = 3)
+                gapTime = gapTime / (gapVal * 0.67)     //Convert to ratio of 0-1
+                decel = decelMax - ((decelMax - decelMin) * gapTime)
+            }
+        }
+        
         var changeTime: CGFloat = 1     //Set initial value = 1 second
         //    if sKLAllVehicles[index].currentSpeed >= goalSpeed {
         if veh1Node.currentSpeed >= goalSpeed {
             //Decelerate to goalSpeed which can be preferredSpeed or gapSpeed
             
+            //MARK: - IF GAP << 3 SECS THEN INCREASE DECELERATION!!! NOT YET DONE!!!
             if (spdChange / 3.6) > decel {      //spdChange in kph / 3.6 = m/s
                 changeTime = ((spdChange / 3.6) / decel)
             }   //else { changeTime = 1 }   //already = 1. Slows final deceleration

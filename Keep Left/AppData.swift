@@ -30,6 +30,8 @@ var kph = Metric ? "kph" : "mph"
 ///Returns "Left" or "Right"
 var Left = keepLeft ? "Left" : "Right"
 
+let gapVal: CGFloat = 3     //Time gap in seconds to vehicle in front
+
 ///Returns CGFloat of sin(45deg) as constant. Saves calculation time.
 let sin45Deg = sin(CGFloat(45).degrees())   //Replace calculation by constant
 
@@ -79,7 +81,7 @@ var maxTrucks = trucks.count
 var maxBuses = buses.count
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 8 //28
+var numVehicles = 28 //28
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
 var sOtherAllVehicles: [Vehicle] = []   //Array of vehicles on Other Straight Track

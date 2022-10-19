@@ -295,8 +295,8 @@ class Vehicle: SKSpriteNode, ObservableObject {
         default:
             return
 
-        }
-    }
+        }   //end Switch statement
+    }       //end moveF8Vehicle method
     
 }           //End of Vehicle class
 
