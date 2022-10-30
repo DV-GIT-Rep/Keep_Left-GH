@@ -47,17 +47,18 @@ let piBy2 = CGFloat(2) * .pi
 ///Returns a value of (3 times pi) as a CGFloat
 let piBy3 = CGFloat(3) * .pi
 
-///Returns the x or y distance from origin for a 45' line of length f8Radius (sin45 = cos45)
-let halfDiagonalXY: CGFloat = sin45Deg * f8Radius //x/y length in metres
+///Returns the x or y distance from origin for a 45' line of length F8Radius (sin45 = cos45)
+let halfDiagonalXY: CGFloat = sin45Deg * F8Radius //x/y length in metres
 
 ///Returns a multiplier. Multiply y1Mx by a distance around the circumference to get the angle change
-let y1Mx: CGFloat = 270 / (1.5 * .pi * f8Radius)
+let y1Mx: CGFloat = 270 / (1.5 * .pi * F8Radius)
 
 ///Returns y coordinate change between (0,0) and the fig 8 circle centre in metres
-let f8CircleCentre: CGFloat = f8Radius / cos45Deg
+let f8CircleCentre: CGFloat = F8Radius / cos45Deg
 
 ///All but 8 LSBs cleared once all vehicles created. Value then dictates which code runs during 'update'
-var gameStage: Int = 1024   //1024 = 100 0000 0000 H
+var gameStage: Int = 0xFF   //0xFF = Max value
+//var gameStage: Int = 1024   //1024 = 100 0000 0000 H
 
 var carXWidth: CGFloat = .zero
 var carXLength: CGFloat = .zero
@@ -81,7 +82,7 @@ var maxTrucks = trucks.count
 var maxBuses = buses.count
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 28 //28
+var numVehicles = 25 //28
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
 var sOtherAllVehicles: [Vehicle] = []   //Array of vehicles on Other Straight Track
@@ -114,7 +115,7 @@ var m400: CGFloat = 1
 var fig8TrackPortrait = true
 
 //MARK: - Road Dimensions (metres) used for all views
-let roadLength: CGFloat = 1000.0   //Road length
+let roadLength: CGFloat = 1000.0   //Road length. (USE sTrackLength INSTEAD???)
 let laneWidth: CGFloat = 3.5        //Width of single lane measured between lines
 let lineWidth: CGFloat = 0.2        //Sets width of centre line markings in metres XXX
 let lineLength: CGFloat = 3         //Length of each centre line
@@ -124,7 +125,14 @@ let shoulderWidth: CGFloat = 0.25    //Sets width of bitumen outside of shoulder
 let roadWidth = (laneWidth * 2) + lineWidth + (shoulderLineWidth * 2) + (shoulderWidth * 2)
 let linePeriod: CGFloat = (lineLength + lineGap)
 
-let asphalt: SKColor = SKColor(red: 42/256, green: 41/256, blue: 34/256, alpha: 1)
+//MARK: - Colours of 1st Fig 8 image:
+//                  R       G       B
+//          Grey    168     168     168
+//          Green   142     167     141
+//          Bitumen 104     104     104
+//          
+let asphalt: SKColor = SKColor(red: 42/256, green: 41/256, blue: 34/256, alpha: 1)      //Darker as first proposed
+//let asphalt: SKColor = SKColor(red: 104/256, green: 104/256, blue: 104/256, alpha: 1)   //Lighter as per Fig 8 Track
 
 let numLines: CGFloat = trunc(roadLength / linePeriod)  //Number of centre lines for road length
 
@@ -145,13 +153,20 @@ let runTimerDelay: CGFloat = 12     //Seconds delay before speed is acknowledged
 var enableMinSpeed: Bool = false
 var runStop: runCondition = .stop
 
+let noOfCycles = 0x01       //Calc speeds & f8Pos once every 'noOfCycles' 60ms periods.
+                            //0 - No Delay                  60fps   (smoothest)
+                            //1 - Run every 2nd 60ms cycle  30fps   (good)
+                            //2 - Run every 3rd 60ms cycle  20fps   (a little jumpy)
+                            //3 - Run every 4th 60ms cycle  15fps
+
 //MARK: - These values are for the straight line auto track
 //var sMetre1: CGFloat = 0.0       //Multiply metres by this constant to get display points
 //var sSceneWidth: CGFloat = 0.0  //Straight Track Scene Width in Points
 //var sSceneHeight: CGFloat = 0.0 //Straight Track Scene Height in Points
 //var portrait = true
 let sTrackWidth: CGFloat = 120.0 //Width of straight track scene in metres
-let sTrackLength: CGFloat = 1000.0 //Length of straight track scene in metres
+let sTrackLength: CGFloat = 1008.0 //Length of straight track scene in metres: FUDGED TO FIT FIG 8 IMAGE !!! TEMP !!!
+//let sTrackLength: CGFloat = 1000.0 //Length of straight track scene in metres
 let centreStrip: CGFloat = 4    //Width of centre strip in metres
 
 var sBackgroundColour: UIColor = backgroundColour
@@ -162,12 +177,14 @@ var f8SceneWidth: CGFloat = 0.0     //Figure 8 Track Scene Width in Points
 var f8SceneHeight: CGFloat = 0.0    //Figure 8 Track Scene Height in Points
 var f8ScreenHeight: CGFloat = 400.0    //Figure 8 track screen height (longest axis) in metres
 let f8ScreenWidth: CGFloat = 200.0      //Figure 8 track screen width (shortest axis) in metres
-var f8Radius: CGFloat = sTrackLength / (4 + piBy3)       //Radius of centre of figure 8 curves
-//var f8Radius: CGFloat = 75.0       //Radius of centre of figure 8 curves (see above: ~ 74.489m)
+var F8Radius: CGFloat = sTrackLength / (4 + piBy3)       //Radius of centre of figure 8 curves
+//var F8Radius: CGFloat = 75.0       //Radius of centre of figure 8 curves (see above: ~ 74.489m)
 let f8CentreStrip: CGFloat = 9.5    //Width of centre strip in metres
 
-let closeLane: CGFloat = (f8CentreStrip / 2) + shoulderWidth + shoulderLineWidth + (laneWidth / 2)
-let farLane: CGFloat = closeLane + (laneWidth / 2) + lineWidth + (laneWidth / 2)
+    //CloseLane = distance from centre of median strip to centre of the nearest lane
+let CloseLane: CGFloat = (f8CentreStrip / 2) + shoulderWidth + shoulderLineWidth + (laneWidth / 2)
+    //FarLane = distance from centre of median strip to centre of the farthest lane
+let FarLane: CGFloat = CloseLane + (laneWidth / 2) + lineWidth + (laneWidth / 2)
 
 var f8ScreenRatio: CGFloat = 0  //If height of screen > 2 x width then scale metres from width else use height
 
@@ -189,7 +206,8 @@ var f8DisplayDat: Int = 0 {
 
 var oneVehicleDisplayTime: CGFloat = 60    //Labels will revert to 'All Vehicles' after this many seconds
 
-let fudgeFactor: CGFloat = 0.75     //TEMPORARY!!!  Value is added to radius of fig 8 to offset sideways vehicle movement due to lag
+let fudgeFactor: CGFloat = 0     //TEMPORARY!!!  Don't use!
+//let fudgeFactor: CGFloat = 0.75     //TEMPORARY!!!  Value is added to radius of fig 8 to offset sideways vehicle movement due to lag
                                     //              Note: will push stationary & low speed vehicles further out!
 
 //MARK: - These values are for the game track (one direction only - Vehicle_1 is under User Control!)
@@ -197,7 +215,9 @@ var gMetre1: CGFloat = 0.0         //Multiply metres by this constant to get dis
 var gSceneWidth: CGFloat = 0.0  //Game Track Scene Width in Points
 var gSceneHeight: CGFloat = 0.0 //Game Track Scene Height in Points
 
-let backgroundColour: UIColor = UIColor(red: 0.19, green: 0.38, blue: 0.16, alpha: 1)   //Green
+//let backgroundColour: UIColor = UIColor(red: 0.19, green: 0.38, blue: 0.16, alpha: 1)   //Green
+let backgroundColour: UIColor = UIColor(red: 48.45/255, green: 96.9/255, blue: 40.8/255, alpha: 1)   //Green
+//let backgroundColour: UIColor = UIColor(red: 168/255, green: 168/255, blue: 168/255, alpha: 1)   //Light Grey
 var gBackgroundColour: UIColor = backgroundColour
 
 extension CGFloat {

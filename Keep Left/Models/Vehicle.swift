@@ -161,7 +161,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
         key = String(key!.suffix(3))
         key = "key\(key!)"
         
-        var lanePos: CGFloat = ((farLane - closeLane) * lane + closeLane)
+        var lanePos: CGFloat = ((FarLane - CloseLane) * lane + CloseLane)
         if otherTrack == true {     //If tracks back to front, reverse polarity here!!!
             lanePos = -lanePos
         }
@@ -171,7 +171,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
         
         //MARK: - Calculate position of figure 8 vehicle based on straight track vehicle
         switch currentSNodePos.y {          //NOTE: self = the current vehicle
-        case let y1 where y1 <= f8Radius:
+        case let y1 where y1 <= F8Radius:
             //1st straight stretch 45' from origin up and to right
             
             newF8NodePos.x = (cos45Deg * y1)
@@ -183,7 +183,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
             f8NodeRot = otherTrack ? CGFloat(135).degrees() : -CGFloat(45).degrees()
 
             let f8NodePos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
-            f8Node.zPosition = 10       //Set zPosition lower than bridge (zPos: 15)
+            f8Node.zPosition = 20       //Set zPosition lower than bridge (zPos: 15)
 
             let newF8Pos = SKAction.move(to: f8NodePos, duration: aniDuration)
             let newF8Rot = SKAction.rotate(toAngle: f8NodeRot, duration: aniDuration, shortestUnitArc: true)
@@ -191,16 +191,16 @@ class Vehicle: SKSpriteNode, ObservableObject {
             
             f8Node.run(group, withKey: "key")
 
-        case var y1 where y1 <= (f8Radius + (piBy1p5 * f8Radius)):
+        case var y1 where y1 <= (F8Radius + (piBy1p5 * F8Radius)):
             //1st 3/4 circle heading up and to left
-            y1 = y1 - f8Radius
+            y1 = y1 - F8Radius
             
             var y1Deg: CGFloat = y1 * y1Mx               //Defines angle change from start of 3/4 circle to current position
             y1Deg = y1Deg - 45                  //Start from angle 3 o'clock
             
             newF8NodePos.x = CGFloat(0)         //Sets starting position to circle centre
             newF8NodePos.y = f8CircleCentre
-            let laneRadius: CGFloat = f8Radius - lanePos
+            let laneRadius: CGFloat = F8Radius - lanePos
 
             newF8NodePos.x = newF8NodePos.x + ((laneRadius + fudgeFactor) * cos(CGFloat(y1Deg).degrees()))
             newF8NodePos.y = newF8NodePos.y + ((laneRadius + fudgeFactor) * sin(CGFloat(y1Deg).degrees()))
@@ -217,9 +217,9 @@ class Vehicle: SKSpriteNode, ObservableObject {
             
             f8Node.run(group, withKey: "key")
 
-        case var y1 where y1 <= ((3 * f8Radius) + (piBy1p5 * f8Radius)):
+        case var y1 where y1 <= ((3 * F8Radius) + (piBy1p5 * F8Radius)):
             //2nd straight stretch 45' down to right
-            y1 = y1 - (f8Radius + (piBy1p5 * f8Radius))
+            y1 = y1 - (F8Radius + (piBy1p5 * F8Radius))
             
             newF8NodePos.x = -halfDiagonalXY    //Point 75m diagonally up & to left of origin
             newF8NodePos.y = halfDiagonalXY
@@ -233,7 +233,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
             f8NodeRot = otherTrack ? CGFloat(45).degrees() : -CGFloat(135).degrees()
 
             let f8NodePos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
-            f8Node.zPosition = 20       //Set zPosition higher than bridge (zPos: 15)
+            f8Node.zPosition = 10       //Set zPosition higher than bridge (zPos: 15)
 
             let newF8Pos = SKAction.move(to: f8NodePos, duration: aniDuration)
             let newF8Rot = SKAction.rotate(toAngle: f8NodeRot, duration: aniDuration, shortestUnitArc: true)
@@ -243,16 +243,16 @@ class Vehicle: SKSpriteNode, ObservableObject {
             
             f8Node.run(group, withKey: "key")
 
-        case var y1 where y1 <= ((3 * f8Radius) + (piBy3 * f8Radius)):
+        case var y1 where y1 <= ((3 * F8Radius) + (piBy3 * F8Radius)):
             //2nd 3/4 circle heading down and to left
-            y1 = y1 - ((3 * f8Radius) + (piBy1p5 * f8Radius))
+            y1 = y1 - ((3 * F8Radius) + (piBy1p5 * F8Radius))
             
             var y1Deg: CGFloat = -y1 * y1Mx      //Defines angle change from start of 3/4 circle to current position
             y1Deg = y1Deg + 45                  //Start from angle 3 o'clock
             
             newF8NodePos.x = CGFloat(0)         //Sets starting position to circle centre
             newF8NodePos.y = -f8CircleCentre
-            let laneRadius: CGFloat = f8Radius + lanePos
+            let laneRadius: CGFloat = F8Radius + lanePos
 
             newF8NodePos.x = newF8NodePos.x + ((laneRadius + fudgeFactor) * cos(CGFloat(y1Deg).degrees()))
             newF8NodePos.y = newF8NodePos.y + ((laneRadius + fudgeFactor) * sin(CGFloat(y1Deg).degrees()))
@@ -270,10 +270,10 @@ class Vehicle: SKSpriteNode, ObservableObject {
             f8Node.removeAction(forKey: "key")
             f8Node.run(group, withKey: "key")
 
-        case var y1 where y1 <= ((4 * f8Radius) + (piBy3 * f8Radius)):
+        case var y1 where y1 <= ((4 * F8Radius) + (piBy3 * F8Radius)):
             //3rd straight stretch 45' up & back to origin
-//            y1 = y1 - ((3 * f8Radius) + (piBy3 * f8Radius))
-            y1 = ((4 * f8Radius) + (piBy3 * f8Radius)) - y1    //Changes y1 so 1006.858 (for f8Radius = 75m) = the origin (easier calculation)
+//            y1 = y1 - ((3 * F8Radius) + (piBy3 * F8Radius))
+            y1 = ((4 * F8Radius) + (piBy3 * F8Radius)) - y1    //Changes y1 so 1006.858 (for F8Radius = 75m) = the origin (easier calculation)
             
             newF8NodePos.x = -(cos45Deg * y1)
             newF8NodePos.y = -(sin45Deg * y1)
@@ -284,7 +284,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
             f8NodeRot = otherTrack ? CGFloat(135).degrees() : -CGFloat(45).degrees()
 
             let f8NodePos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
-            f8Node.zPosition = 10       //Set zPosition lower than bridge (zPos: 15)
+            f8Node.zPosition = 20       //Set zPosition lower than bridge (zPos: 15)
 
             let newF8Pos = SKAction.move(to: f8NodePos, duration: aniDuration)
             let newF8Rot = SKAction.rotate(toAngle: f8NodeRot, duration: aniDuration, shortestUnitArc: true)

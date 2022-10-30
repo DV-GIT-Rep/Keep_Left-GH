@@ -27,6 +27,12 @@ struct NodeData {
     var changeTime: CGFloat
     var frontUnit: String       //Name of vehicle in front = 1 - numVehicles
     var frontPos: CGPoint       //Position of vehicle in front
+    var equivF8Name: String
+    var key: String
+    var f8Pos: CGPoint
+    var otherTrack: Bool
+    var f8zPos: CGFloat
+    var f8Rot: CGFloat
 
     init() {
         name = "nil"
@@ -44,6 +50,12 @@ struct NodeData {
         changeTime = 0
         frontUnit = ""
         frontPos = CGPoint(x: 0, y: 0)
+        equivF8Name = ""
+        key = ""
+        f8Pos = CGPoint(x: 0, y: 0)
+        otherTrack = false
+        f8zPos = 10     //Initial zPosition < bridge (which is 15)
+        f8Rot = 0
     }
 
     
@@ -98,7 +110,7 @@ struct NodeData {
                 
             let sameLane = (veh1Node.lane - 0.5)...(veh1Node.lane + 0.5)   //Scan for vehicles within 0.5 lanes either side
             let sameLap = (veh1Node.position.y - (veh1Node.size.height / 2)) - (t1Vehicle[nextIndex].position.y + (t1Vehicle[nextIndex].size.height / 2)) //Vehicle in front on same side of 1km boundary
-            let lastLap = ((veh1Node.position.y + 1000) - (veh1Node.size.height / 2)) - (t1Vehicle[nextIndex].position.y + (t1Vehicle[nextIndex].size.height / 2))    //Vehicle in front is over the 1km boundary!
+            let lastLap = ((veh1Node.position.y + sTrackLength) - (veh1Node.size.height / 2)) - (t1Vehicle[nextIndex].position.y + (t1Vehicle[nextIndex].size.height / 2))    //Vehicle in front is over the 1km boundary!
             
             
                     //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
@@ -160,7 +172,7 @@ struct NodeData {
             
         let sameLane = (veh1Node.lane - 0.5)...(veh1Node.lane + 0.5)   //Scan for vehicles within 0.5 lanes either side
         let sameLap = (t1Vehicle[nextIndex].position.y - (t1Vehicle[nextIndex].size.height / 2)) - (veh1Node.position.y + (veh1Node.size.height / 2))                             //Vehicle in front on same side of 1km boundary
-        let lastLap = ((t1Vehicle[nextIndex].position.y + 1000) - (t1Vehicle[nextIndex].size.height / 2)) - (veh1Node.position.y + (veh1Node.size.height / 2))      //Vehicle in front is over the 1km boundary!
+        let lastLap = ((t1Vehicle[nextIndex].position.y + sTrackLength) - (t1Vehicle[nextIndex].size.height / 2)) - (veh1Node.position.y + (veh1Node.size.height / 2))      //Vehicle in front is over the 1km boundary!
         
                 //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
                 if sameLane.contains(t1Vehicle[nextIndex].lane) {
@@ -221,7 +233,7 @@ struct NodeData {
         
         //MARK: - Create variable value of decel when gap 1 - 3 secs from vehicle in front
         if gapTime < (gapVal * 0.33) {
-            decel = decelMax                            //Max decel! Gap < 1 second
+            decel = decelMax + 1                        //Max decel! Gap < 1 second. (+1 is TEMPORARY!!!)
         } else {
             if gapTime > gapVal {
                 decel = decelMin                        //Min decel! Gap > 3 seconds
@@ -237,7 +249,7 @@ struct NodeData {
         if veh1Node.currentSpeed >= goalSpeed {
             //Decelerate to goalSpeed which can be preferredSpeed or gapSpeed
             
-            //MARK: - IF GAP << 3 SECS THEN INCREASE DECELERATION!!! NOT YET DONE!!!
+            //MARK: - IF GAP << 3 SECS THEN INCREASE DECELERATION!!! See above
             if (spdChange / 3.6) > decel {      //spdChange in kph / 3.6 = m/s
                 changeTime = ((spdChange / 3.6) / decel)
             }   //else { changeTime = 1 }   //already = 1. Slows final deceleration
@@ -264,6 +276,165 @@ struct NodeData {
     }           //end 2nd for loop
     
     return (t1Vehicle, t2Vehicle)
-}
+}       //End findObstacles method
+
+    //This method calculates the position of vehicles on the Fig 8 Track from equiv positions on Straight Track
+    //Make the method below part of the NodeData Struct
+    func findF8Pos(t1Veh: inout [NodeData]) async -> ([NodeData]) {         //Note: t1Veh has stKL_0 or stOt_0 removed!
+        
+        var f8EquivName: String = ""
+        
+        for (indx, t1Node) in t1Veh.enumerated() {
+
+        //MARK: - Find name of Fig 8 Track equivalent to Straight Track Vehicle
+        //          eg.stKL_8 -> f8KL_8 OR stOT_35 -> f8Ot_35
+            f8EquivName = String(t1Node.name.dropFirst(2))        //Remove 'st' from start of name
+            f8EquivName.insert(contentsOf: "//f8", at: f8EquivName.startIndex)
+            t1Veh[indx].equivF8Name = f8EquivName
+        
+    //    guard let f8Node = childNode(withName: f8EquivName) else {
+    //        return
+    //    }
+        
+            //May? need following ??
+            var lanePos: CGFloat = ((FarLane - CloseLane) * (1 - t1Node.lane) + CloseLane)
+            if t1Node.otherTrack == true {     //If tracks back to front, reverse polarity here!!! Swaps Fig 8 vehicles from one
+                                                //track to the other AND swaps left/right lanes. Doesn't affect Straight Track!
+            lanePos = -lanePos
+        }
+        
+        var newF8NodePos = t1Node.f8Pos         //???
+        var currentSNodePos = t1Node.position   //???
+        
+        //MARK: - Calculate position of figure 8 vehicle based on straight track vehicle
+        switch t1Node.position.y {
+        case let y1 where y1 <= F8Radius:
+            //1st straight stretch 45' from origin dn and to right
+            //Origin = (0,0) so move immediately
+            newF8NodePos.x = 0 + (cos45Deg * y1)
+            newF8NodePos.y = 0 - (sin45Deg * y1)
+            
+            newF8NodePos.x = newF8NodePos.x + (cos45Deg * lanePos)
+            newF8NodePos.y = newF8NodePos.y + (sin45Deg * lanePos)
+
+            t1Veh[indx].f8Rot = t1Node.otherTrack ? CGFloat(45).degrees() : -CGFloat(135).degrees()
+
+            t1Veh[indx].f8Pos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
+            t1Veh[indx].f8zPos = 10       //Set zPosition lower than bridge (zPos: 15)
+
+//            let newF8Pos = SKAction.move(to: f8NodePos, duration: actionTimeF8)
+//            let newF8Rot = SKAction.rotate(toAngle: f8NodeRot, duration: actionTimeF8, shortestUnitArc: true)
+//            let group = SKAction.group([newF8Pos, newF8Rot])
+//    
+//            f8Node.run(group, withKey: "key")
+//
+        case var y1 where y1 <= (F8Radius + (piBy1p5 * F8Radius)):
+            //1st 3/4 circle heading down and to left
+            y1 = y1 - F8Radius
+            
+            var y1Deg: CGFloat = -y1 * y1Mx      //Defines angle change from start of 3/4 circle to current position
+            y1Deg = y1Deg + 45                  //Start from angle 3 o'clock
+            
+            newF8NodePos.x = CGFloat(0)         //Sets starting position to circle centre
+            newF8NodePos.y = -f8CircleCentre - fudgeFactor  //If fudgeFactor used, need to move centre of circle!
+            let laneRadius: CGFloat = F8Radius + lanePos
+
+            newF8NodePos.x = newF8NodePos.x + ((laneRadius + fudgeFactor) * cos(CGFloat(y1Deg).degrees()))
+            newF8NodePos.y = newF8NodePos.y + ((laneRadius + fudgeFactor) * sin(CGFloat(y1Deg).degrees()))
+                
+            t1Veh[indx].f8Pos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
+
+            if t1Node.otherTrack == false { y1Deg = y1Deg - 180}    //Turns vehicle 180 degrees
+            if y1Deg < -180 { y1Deg = y1Deg + 360 }  //Resolves node spinning problem
+            t1Veh[indx].f8Rot = y1Deg.degrees()
+
+    //        let newF8Pos = SKAction.move(to: f8NodePos, duration: actionTimeF8)
+    //        let newF8Rot = SKAction.rotate(toAngle: f8NodeRot, duration: actionTimeF8, shortestUnitArc: true)
+    //        let group = SKAction.group([newF8Pos, newF8Rot])
+    //
+    //        f8Node.run(group, withKey: "key")
+
+        case var y1 where y1 <= ((3 * F8Radius) + (piBy1p5 * F8Radius)):
+            //2nd straight stretch 45' up to right
+            y1 = y1 - (F8Radius + (piBy1p5 * F8Radius))
+
+            newF8NodePos.x = -halfDiagonalXY    //Point 75m diagonally down & to left of origin
+            newF8NodePos.y = -halfDiagonalXY
+
+            newF8NodePos.x = newF8NodePos.x + (cos45Deg * y1)
+            newF8NodePos.y = newF8NodePos.y + (sin45Deg * y1)
+
+            newF8NodePos.x = newF8NodePos.x - (cos45Deg * lanePos)
+            newF8NodePos.y = newF8NodePos.y + (sin45Deg * lanePos)
+
+            t1Veh[indx].f8Rot = t1Node.otherTrack ? CGFloat(135).degrees() : -CGFloat(45).degrees()
+
+            t1Veh[indx].f8Pos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
+            t1Veh[indx].f8zPos = 20       //Set zPosition higher than bridge (zPos: 15)
+
+    //        let newF8Pos = SKAction.move(to: f8NodePos, duration: actionTimeF8)
+    //        let newF8Rot = SKAction.rotate(toAngle: f8NodeRot, duration: actionTimeF8, shortestUnitArc: true)
+    //        let group = SKAction.group([newF8Pos, newF8Rot])
+    //
+    //        f8Node.run(group, withKey: "key")
+
+        case var y1 where y1 <= ((3 * F8Radius) + (piBy3 * F8Radius)):
+            //2nd 3/4 circle heading up and to left
+            y1 = y1 - ((3 * F8Radius) + (piBy1p5 * F8Radius))
+            
+            var y1Deg: CGFloat = y1 * y1Mx      //Defines angle change from start of 3/4 circle to current position
+            y1Deg = y1Deg - 45                  //Start from angle 3 o'clock
+            
+            newF8NodePos.x = CGFloat(0)         //Sets starting position to circle centre
+            newF8NodePos.y = f8CircleCentre + fudgeFactor  //If fudgeFactor used, need to move centre of circle!
+            let laneRadius: CGFloat = F8Radius - lanePos
+
+            newF8NodePos.x = newF8NodePos.x + ((laneRadius + fudgeFactor) * cos(CGFloat(y1Deg).degrees()))
+            newF8NodePos.y = newF8NodePos.y + ((laneRadius + fudgeFactor) * sin(CGFloat(y1Deg).degrees()))
+
+            t1Veh[indx].f8Pos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
+
+            if t1Node.otherTrack == true { y1Deg = y1Deg + 180}    //Turns vehicle 180 degrees
+            if y1Deg > 180 { y1Deg = y1Deg - 360 }  //Resolves node spinning problem
+            t1Veh[indx].f8Rot = y1Deg.degrees()
+
+    //        let newF8Pos = SKAction.move(to: f8NodePos, duration: actionTimeF8)
+    //        let newF8Rot = SKAction.rotate(toAngle: f8NodeRot, duration: actionTimeF8, shortestUnitArc: true)
+    //        let group = SKAction.group([newF8Pos, newF8Rot])
+    //
+    //        f8Node.removeAction(forKey: "key")
+    //        f8Node.run(group, withKey: "key")
+
+        case var y1 where y1 <= ((4 * F8Radius) + (piBy3 * F8Radius)):
+            //3rd & final straight stretch 45' down & back to origin
+    //            y1 = y1 - ((3 * F8Radius) + (piBy3 * F8Radius))
+            y1 = ((4 * F8Radius) + (piBy3 * F8Radius)) - y1    //Changes y1 so 1006.858 (for F8Radius = 75m) = the origin (easier calculation)
+            
+            newF8NodePos.x = -(cos45Deg * y1)
+            newF8NodePos.y = (sin45Deg * y1)
+            
+            newF8NodePos.x = newF8NodePos.x + (cos45Deg * lanePos)
+            newF8NodePos.y = newF8NodePos.y + (sin45Deg * lanePos)
+
+            t1Veh[indx].f8Rot = t1Node.otherTrack ? CGFloat(45).degrees() : -CGFloat(135).degrees()
+
+            t1Veh[indx].f8Pos = CGPoint(x: newF8NodePos.x, y: newF8NodePos.y)
+            t1Veh[indx].f8zPos = 10       //Set zPosition lower than bridge (zPos: 15)
+
+    //        let newF8Pos = SKAction.move(to: f8NodePos, duration: actionTimeF8)
+    //        let newF8Rot = SKAction.rotate(toAngle: f8NodeRot, duration: actionTimeF8, shortestUnitArc: true)
+    //        let group = SKAction.group([newF8Pos, newF8Rot])
+    //
+    //        f8Node.run(group, withKey: "key")
+
+        default:
+            break
+
+        }           //end Switch statement
+            
+        }           //End t1Node 'for' loop
+
+        return t1Veh
+    }           //end findF8Pos method
 
 }       //end of struct NodeData
