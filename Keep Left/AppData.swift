@@ -82,7 +82,7 @@ var maxTrucks = trucks.count
 var maxBuses = buses.count
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 25 //28
+var numVehicles = 24 //28
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
 var sOtherAllVehicles: [Vehicle] = []   //Array of vehicles on Other Straight Track
@@ -219,6 +219,20 @@ var gSceneHeight: CGFloat = 0.0 //Game Track Scene Height in Points
 let backgroundColour: UIColor = UIColor(red: 48.45/255, green: 96.9/255, blue: 40.8/255, alpha: 1)   //Green
 //let backgroundColour: UIColor = UIColor(red: 168/255, green: 168/255, blue: 168/255, alpha: 1)   //Light Grey
 var gBackgroundColour: UIColor = backgroundColour
+
+//MARK: - These values are stats for 'AllVehicles'
+var klDistance0: CGFloat = 0
+var klDistanceMax0: CGFloat = 0
+var klDistanceMin0: CGFloat = 0
+var oDistance0: CGFloat = 0
+var oDistanceMax0: CGFloat = 0
+var oDistanceMin0: CGFloat = 0
+var klSpeedAvg0: CGFloat = 0
+var klSpeedMax0: CGFloat = 0
+var klSpeedMin0: CGFloat = 99999999
+var oSpeedAvg0: CGFloat = 0
+var oSpeedMax0: CGFloat = 0
+var oSpeedMin0: CGFloat = 99999999
 
 extension CGFloat {
     ///Formats number as string with maximum of 2 decimal places

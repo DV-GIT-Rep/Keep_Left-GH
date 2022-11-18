@@ -45,11 +45,13 @@ class LabelData: SKLabelNode, ObservableObject {
     @Published var maxDistance = SKLabelNode(fontNamed: "Helvetica Neue Light")
     @Published var minDistance = SKLabelNode(fontNamed: "Helvetica Neue Light")
 
+    let subTitleColour: SKColor = SKColor(red: 0.15, green: 0.3, blue: 0.15, alpha: 1)      //"All vehicles" or "Vehicle x"
+
     //MARK: - Add Keep Left labelNode
     public func createTrackLabels(labelParent: SKNode, topLabel: Bool) {
         
         let titleColour: SKColor = SKColor(red: 0, green: 0.12, blue: 0, alpha: 1)              //"Keep Left" or "Keep Right"
-        let subTitleColour: SKColor = SKColor(red: 0.15, green: 0.3, blue: 0.15, alpha: 1)      //"All vehicles" or "Vehicle x"
+//        let subTitleColour: SKColor = SKColor(red: 0.15, green: 0.3, blue: 0.15, alpha: 1)      //"All vehicles" or "Vehicle x"
         let spdTitleColour: SKColor = SKColor(red: 0, green: 0.12, blue: 0, alpha: 1)           //"Avg Spd", "Avg Distance" & data
         let spdSubTitleColour: SKColor = SKColor(red: 0.26, green: 0.4, blue: 0.26, alpha: 1)   //"Min" & "Max" text & data
         
@@ -70,7 +72,7 @@ class LabelData: SKLabelNode, ObservableObject {
     //    var f8KLLabelDescription = SKLabelNode(text: "All Vehicles")
     f8KLLabelDescription.fontSize = 8.6
 //    f8KLLabelDescription.fontName = "Chalkduster"
-    f8KLLabelDescription.fontColor = subTitleColour
+//    f8KLLabelDescription.fontColor = subTitleColour
     //            f8KLLabelDescription.zPosition = 0
     f8KLLabelDescription.horizontalAlignmentMode = .center
     f8KLLabelDescription.position = CGPoint(x: 0, y: 0.13 * f8CircleCentre)
@@ -80,8 +82,9 @@ class LabelData: SKLabelNode, ObservableObject {
         avgSpdDesc.text = "Avg Speed"
     avgSpdDesc.fontSize = 7.8
 //    avgSpdDesc.fontName = "Helvetica Neue Medium"
-    avgSpdDesc.fontColor = spdTitleColour
-    //            avgSpdDesc.zPosition = 0
+//    avgSpdDesc.fontColor = spdTitleColour
+        avgSpdDesc.fontColor = UIColor(displayP3Red: 0.85, green: 0.9, blue: 0.7, alpha: 1)
+//            avgSpdDesc.zPosition = 0
     avgSpdDesc.horizontalAlignmentMode = .right
     avgSpdDesc.position = CGPoint(x: -0.01 * f8CircleCentre, y: 0.025 * f8CircleCentre)
         labelParent.addChild(avgSpdDesc)
@@ -107,7 +110,8 @@ class LabelData: SKLabelNode, ObservableObject {
 //    var avgDistanceDesc = SKLabelNode(text: "Avg \(Km)")
     avgDistanceDesc.fontSize = 7.8
 //    avgDistanceDesc.fontName = "Helvetica Neue Medium"
-    avgDistanceDesc.fontColor = spdTitleColour
+//    avgDistanceDesc.fontColor = spdTitleColour
+        avgDistanceDesc.fontColor = UIColor(displayP3Red: 0.85, green: 0.9, blue: 0.7, alpha: 1)
     //            avgDistanceDesc.zPosition = 0
     avgDistanceDesc.horizontalAlignmentMode = .right
     avgDistanceDesc.position = CGPoint(x: -0.01 * f8CircleCentre, y: -0.23 * f8CircleCentre)
@@ -145,7 +149,8 @@ class LabelData: SKLabelNode, ObservableObject {
 //    var avgSpd = SKLabelNode(text: "\(round(avgSpeed)) \(kph)")
     avgSpd.fontSize = 7.8
 //    avgSpd.fontName = "Helvetica Neue Medium"
-    avgSpd.fontColor = spdTitleColour
+//    avgSpd.fontColor = spdTitleColour
+        avgSpd.fontColor = UIColor(displayP3Red: 0.6, green: 1, blue: 0.67, alpha: 1)
     //            avgSpd.zPosition = 0
     avgSpd.horizontalAlignmentMode = .left
     avgSpd.position = CGPoint(x: -0.005 * f8CircleCentre, y: 0.025 * f8CircleCentre)
@@ -173,7 +178,8 @@ class LabelData: SKLabelNode, ObservableObject {
 //    var avgDistance = SKLabelNode(text: "\((sKLAllVehicles[17].distance + 103.0).dp2)")
     avgDistance.fontSize = 7.8
     avgDistance.fontName = "Helvetica Neue Medium"
-    avgDistance.fontColor = spdTitleColour
+//    avgDistance.fontColor = spdTitleColour
+        avgDistance.fontColor = UIColor(displayP3Red: 0.6, green: 1, blue: 0.67, alpha: 1)
     //            avgDistance.zPosition = 0
     avgDistance.horizontalAlignmentMode = .left
     avgDistance.position = CGPoint(x: -0.005 * f8CircleCentre, y: -0.23 * f8CircleCentre)
@@ -201,15 +207,19 @@ class LabelData: SKLabelNode, ObservableObject {
 
     }
     
-    func updateLabel(topLabel: Bool, vehicel: Vehicle) {
+    func updateLabel(topLabel: Bool, vehicel: NodeData) {
         f8KLLabelTitle.text = topLabel ? "\(kLTitle)" : "Std Track"
         f8KLLabelDescription.text = f8DisplayDat == 0 ? "All Vehicles" : "Vehicle \(f8DisplayDat)"
+        f8KLLabelDescription.fontColor = f8DisplayDat == 0 ? subTitleColour : UIColor(displayP3Red: 0.98, green: 1, blue: 0.84, alpha: 1)
         avgDistanceDesc.text = f8DisplayDat == 0 ? "Avg \(Km)" : "Total \(Km)"
         maxDistanceDesc.text = f8DisplayDat == 0 ? "Max \(Km)" : ""
         minDistanceDesc.text = f8DisplayDat == 0 ? "Min \(Km)" : topLabel ? "Honda" : ""
         avgSpd.text = f8DisplayDat == 0 ? "\(Int(vehicel.speedAvg)) \(kph)" : "\(Int(vehicel.speedAvg)) \(kph)"
         maxSpd.text = f8DisplayDat == 0 ? "\(Int(vehicel.speedMax)) \(kph)" : "\(Int(vehicel.speedMax)) \(kph)"
         minSpd.text = f8DisplayDat == 0 ? "\(vehicel.speedMin < 500 ? Int(vehicel.speedMin) : Int(vehicel.speedAvg)) \(kph)" : "\(vehicel.speedMin < 500 ? Int(vehicel.speedMin) : Int(vehicel.speedAvg)) \(kph)"
+//        avgSpd.text = f8DisplayDat == 0 ? "\(Int(vehicel.speedAvg)) \(kph)" : "\(Int(vehicel.speedAvg)) \(kph)"
+//        maxSpd.text = f8DisplayDat == 0 ? "\(Int(vehicel.speedMax)) \(kph)" : "\(Int(vehicel.speedMax)) \(kph)"
+//        minSpd.text = f8DisplayDat == 0 ? "\(vehicel.speedMin < 500 ? Int(vehicel.speedMin) : Int(vehicel.speedAvg)) \(kph)" : "\(vehicel.speedMin < 500 ? Int(vehicel.speedMin) : Int(vehicel.speedAvg)) \(kph)"
         avgDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distance).varDP)" : "\(abs(vehicel.distance).varDP)"
         maxDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distanceMax).varDP)" : ""
         minDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distanceMin).varDP)" : topLabel ? "S2000" : ""
