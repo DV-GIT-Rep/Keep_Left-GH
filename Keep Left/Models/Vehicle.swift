@@ -39,7 +39,8 @@ class Vehicle: SKSpriteNode, ObservableObject {
     
     @Published var gap: CGFloat         //Distance between this vehicle and one in front (same lane!)
     @Published var otherGap: CGFloat    //Distance between this vehicle and one in front (OTHER lane!)
-    @Published var rearGap: CGFloat     //Distance between this vehicle and one behind (OTHER lane!)
+    @Published var oRearGap: CGFloat    //Distance between this vehicle and one behind (OTHER lane!)
+    @Published var rearGap: CGFloat     //Distance between this vehicle and one behind (same lane!)
     
     @Published var goalSpeed: CGFloat   //Used to temp store immediate goal speed following proximity check
     @Published var changeTime: CGFloat  //Time in seconds for next SKAction on Straight Track vehicles
@@ -69,6 +70,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
         kmMin = 0.0
         gap = 0.0
         otherGap = 0.0
+        oRearGap = 0.0
         rearGap = 0.0
         goalSpeed = 0.0     //Overwritten later!
         changeTime = 1.0    //seconds. Overwritten later!

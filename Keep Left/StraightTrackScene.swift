@@ -441,6 +441,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                 let noVehTest: Int = 0x40   //Test Flag
                 var testNo: Int
 
+            //gameStage bit 40H set indicates below is in progress
+            //          bits 1 & 0 indicate stage: 10 -> 01 -> 00 -> 11
             testNo = (gameStage & noOfCycles)   //Only interested in 2 LSBs gameStage
                 if testNo != 0 {
                     gameStage -= 1      //Decrement gameStage
