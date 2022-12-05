@@ -438,19 +438,21 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         if gameStage < 0xFF {           //Prevents code from running before vehicles are created.
                                         //MSB cleared when vehicles created ie. #7FH -> gameStage
             
+            if gameStage < 0x40 {
+                
                 let noVehTest: Int = 0x40   //Test Flag
                 var testNo: Int
 
             //gameStage bit 40H set indicates below is in progress
             //          bits 1 & 0 indicate stage: 10 -> 01 -> 00 -> 11
             testNo = (gameStage & noOfCycles)   //Only interested in 2 LSBs gameStage
+                                                //Result = 00, 01, 10 or 11
                 if testNo != 0 {
-                    gameStage -= 1      //Decrement gameStage
+                    gameStage -= 1      //Decrement gameStage only when > 0
                 } else {
                     gameStage = gameStage | noOfCycles      //Set 2 LSBs
-                    
-                    if gameStage < 0x40 {
-                        
+                }   //End else
+            
                     gameStage = gameStage | noVehTest       //Set 2nd MSB. Don't clear until all below done!
 
                     
@@ -504,15 +506,14 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                     Task {
                         let doT2: Int = 1
                         if (gameStage & doT2) == 0 {
-                            
                             //Keep Left Track (Track 1)  = gameStage bit 0 = 0
-                            var result = await nodeData.findObstacles(t1Vehicle: &t1Vehicle, t2Vehicle: &t2Vehicle)
-                            returnKL = result.t1Vehicle
-                            returnOther = result.t2Vehicle
+                            var result = await nodeData.findObstacles(tVehicle: &t1Vehicle)
+                            returnKL = result
+//                            returnOther = result.t2Vehicle
+
+//                        print("1. Max: \(returnKL[1].speedMax)\tAvg: \(returnKL[1].speedAvg)\tMin: \(returnKL[1].speedMin)")
                             
-                            //                        print("1. Max: \(returnKL[1].speedMax)\tAvg: \(returnKL[1].speedAvg)\tMin: \(returnKL[1].speedMin)")
-                            
-                            updateSpeeds(returnKL: returnKL, returnOther: returnOther)      //Update vehicle speeds
+                            updateSpeeds(retVeh: result, allVeh: &sKLAllVehicles)      //Update vehicle speeds
                             
                             //NOT in Vehicle order! Arranged by Y Position!
                             //Sort back into Vehicle No order. Note [0] is missing
@@ -535,7 +536,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             //                        print("2.\tMax: \(f8T1Spots[1].speedMax)\tAvg: \(f8T1Spots[1].speedAvg)\tMin: \(f8T1Spots[1].speedMin)")
                             
                             //Once every 500-600ms sufficient for display calcs below
-                            var rtnKL = await nodeData.calcAvgData(t1Veh: &f8T1Spots)
+//                            var rtnKL = await nodeData.calcAvgData(t1Veh: &f8T1Spots)
+                            var rtnKL = await nodeData.calcAvgData(t1Veh: &returnKL)
                             //                        //Sort back into Vehicle No order. Note [0] is missing
                             //                        rtnKL.sort {
                             //                            $0.name.localizedStandardCompare($1.name) == .orderedAscending
@@ -576,76 +578,77 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             //                        topLabel.updateLabel(topLabel: true, vehicel: sKLAllVehicles[f8DisplayDat])
                             
                         } else {
-                            //Other Track (Track 2) = gameStage bit 0 = 1
-                            var result = await nodeData.findObstacles(t1Vehicle: &t1Vehicle, t2Vehicle: &t2Vehicle)
-                            returnKL = result.t1Vehicle
-                            returnOther = result.t2Vehicle
-                            
-                            //                        print("1. Max: \(returnKL[1].speedMax)\tAvg: \(returnKL[1].speedAvg)\tMin: \(returnKL[1].speedMin)")
-                            
-                            updateSpeeds(returnKL: returnKL, returnOther: returnOther)      //Update vehicle speeds
-                            
-                            //NOT in Vehicle order! Arranged by Y Position!
-                            //Sort back into Vehicle No order. Note [0] is missing
-                            returnKL.sort {
-                                $0.name.localizedStandardCompare($1.name) == .orderedAscending
-                            }                               //'lacalizedStandardCompare' ensures 21 sorted AFTER 3
-                            returnKL.insert(returnKL[2], at: 0)   //Copy dummy into position [0] (All Vehicles).
-                            returnKL[0].name = "All Vehicles"
-                            
-                            //                        print("2.\t\(returnKL[1].speedMax.dp2)\t\(returnKL[1].speedMin.dp2)")
-                            //                        print("1.\tMax: \(returnKL[1].speedMax)\tAvg: \(returnKL[1].speedAvg)\tMin: \(returnKL[1].speedMin)")
-                            
-                            var f8T1Spots = await nodeData.findF8Pos(t1Veh: &returnKL)
-                            
-                            //                        print("3.\t\(f8T1Spots[1].speedMax.dp2)\t\(f8T1Spots[1].speedMin.dp2)")
-                            //
-                            updateF8T1Spots(t1Vehicle: f8T1Spots)
-                            
-                            //                        print("3a.\t\(f8T1Spots[1].speedMax.dp2)\t\(f8T1Spots[1].speedMin.dp2)")
-                            //                        print("2.\tMax: \(f8T1Spots[1].speedMax)\tAvg: \(f8T1Spots[1].speedAvg)\tMin: \(f8T1Spots[1].speedMin)")
-                            
-                            //Once every 500-600ms sufficient for display calcs below
-                            var rtnKL = await nodeData.calcAvgData(t1Veh: &f8T1Spots)
-                            //                        //Sort back into Vehicle No order. Note [0] is missing
-                            //                        rtnKL.sort {
-                            //                            $0.name.localizedStandardCompare($1.name) == .orderedAscending
-                            //                        }                               //'lacalizedStandardCompare' ensures 21 sorted AFTER 3
-                            //                        rtnKL.insert(rtnKL[2], at: 0)   //Copy dummy into position [0] (All Vehicles).
-                            //                        rtnKL[0].name = "All Vehicles"
-                            //                        print("Start")
-                            
-                            //                        print("4.\t\(rtnKL[1].speedMax.dp2)\t\(rtnKL[1].speedMin.dp2)")
-                            //
-                            for i in 1..<rtnKL.count {
-                                //                            print("name:   \(String(rtnKL[i].name))")
-                                sKLAllVehicles[i].speedMax = rtnKL[i].speedMax
-                                sKLAllVehicles[i].speedMin = rtnKL[i].speedMin
-                            }
-                            
-                            rtnKL[0].distance = klDistance0
-                            rtnKL[0].distanceMax = klDistanceMax0
-                            rtnKL[0].distanceMin = klDistanceMin0
-                            rtnKL[0].speedAvg = klSpeedAvg0
-                            rtnKL[0].speedMax = klSpeedMax0
-                            rtnKL[0].speedMin = klSpeedMin0
-                            
-                            //                        print("5.\t\(rtnKL[1].speedMax.dp2)\t\(rtnKL[1].speedMin.dp2)")
-                            //                        print("3.\tMax: \(rtnKL[1].speedMax)\tAvg: \(rtnKL[1].speedAvg)\tMin: \(rtnKL[1].speedMin)")
-                            
-                            //                        //Other Track - May use separate routine???
-                            //                        sOtherAllVehicles[0].distance = oDistance0
-                            //                        sOtherAllVehicles[0].distanceMax = oDistanceMax0
-                            //                        sOtherAllVehicles[0].distanceMin = oDistanceMin0
-                            //                        sOtherAllVehicles[0].speedAvg = oSpeedAvg0
-                            //                        sOtherAllVehicles[0].speedMax = oSpeedMax0
-                            //                        sOtherAllVehicles[0].speedMin = oSpeedMin0
-                            //                        print("f8DisplayDat: \(f8DisplayDat)\tAvg Speed: \(rtnKL[f8DisplayDat].speedAvg.dp2)")
-                            
-                            topLabel.updateLabel(topLabel: true, vehicel: rtnKL[f8DisplayDat])  //rtnKL has no element 0!
-                            bottomLabel.updateLabel(topLabel: false, vehicel: rtnKL[f8DisplayDat])  //TEMP! Same data as Top Label!!!
-                            //                        topLabel.updateLabel(topLabel: true, vehicel: sKLAllVehicles[f8DisplayDat])
-
+//                            //Other Track (Track 2) = gameStage bit 0 = 1
+//                            
+//                            var result = await nodeData.findObstacles(tVehicle: &t2Vehicle)
+//                            returnKL = result
+////                            returnOther = result.t2Vehicle
+//                            
+//                            //                        print("1. Max: \(returnKL[1].speedMax)\tAvg: \(returnKL[1].speedAvg)\tMin: \(returnKL[1].speedMin)")
+//                            
+//                            updateSpeeds(returnKL: returnKL, returnOther: returnOther)      //Update vehicle speeds
+//                            
+//                            //NOT in Vehicle order! Arranged by Y Position!
+//                            //Sort back into Vehicle No order. Note [0] is missing
+//                            returnKL.sort {
+//                                $0.name.localizedStandardCompare($1.name) == .orderedAscending
+//                            }                               //'lacalizedStandardCompare' ensures 21 sorted AFTER 3
+//                            returnKL.insert(returnKL[2], at: 0)   //Copy dummy into position [0] (All Vehicles).
+//                            returnKL[0].name = "All Vehicles"
+//                            
+//                            //                        print("2.\t\(returnKL[1].speedMax.dp2)\t\(returnKL[1].speedMin.dp2)")
+//                            //                        print("1.\tMax: \(returnKL[1].speedMax)\tAvg: \(returnKL[1].speedAvg)\tMin: \(returnKL[1].speedMin)")
+//                            
+//                            var f8T1Spots = await nodeData.findF8Pos(t1Veh: &returnKL)
+//                            
+//                            //                        print("3.\t\(f8T1Spots[1].speedMax.dp2)\t\(f8T1Spots[1].speedMin.dp2)")
+//                            //
+//                            updateF8T1Spots(t1Vehicle: f8T1Spots)
+//                            
+//                            //                        print("3a.\t\(f8T1Spots[1].speedMax.dp2)\t\(f8T1Spots[1].speedMin.dp2)")
+//                            //                        print("2.\tMax: \(f8T1Spots[1].speedMax)\tAvg: \(f8T1Spots[1].speedAvg)\tMin: \(f8T1Spots[1].speedMin)")
+//                            
+//                            //Once every 500-600ms sufficient for display calcs below
+//                            var rtnKL = await nodeData.calcAvgData(t1Veh: &f8T1Spots)
+//                            //                        //Sort back into Vehicle No order. Note [0] is missing
+//                            //                        rtnKL.sort {
+//                            //                            $0.name.localizedStandardCompare($1.name) == .orderedAscending
+//                            //                        }                               //'lacalizedStandardCompare' ensures 21 sorted AFTER 3
+//                            //                        rtnKL.insert(rtnKL[2], at: 0)   //Copy dummy into position [0] (All Vehicles).
+//                            //                        rtnKL[0].name = "All Vehicles"
+//                            //                        print("Start")
+//                            
+//                            //                        print("4.\t\(rtnKL[1].speedMax.dp2)\t\(rtnKL[1].speedMin.dp2)")
+//                            //
+//                            for i in 1..<rtnKL.count {
+//                                //                            print("name:   \(String(rtnKL[i].name))")
+//                                sKLAllVehicles[i].speedMax = rtnKL[i].speedMax
+//                                sKLAllVehicles[i].speedMin = rtnKL[i].speedMin
+//                            }
+//                            
+//                            rtnKL[0].distance = klDistance0
+//                            rtnKL[0].distanceMax = klDistanceMax0
+//                            rtnKL[0].distanceMin = klDistanceMin0
+//                            rtnKL[0].speedAvg = klSpeedAvg0
+//                            rtnKL[0].speedMax = klSpeedMax0
+//                            rtnKL[0].speedMin = klSpeedMin0
+//                            
+//                            //                        print("5.\t\(rtnKL[1].speedMax.dp2)\t\(rtnKL[1].speedMin.dp2)")
+//                            //                        print("3.\tMax: \(rtnKL[1].speedMax)\tAvg: \(rtnKL[1].speedAvg)\tMin: \(rtnKL[1].speedMin)")
+//                            
+//                            //                        //Other Track - May use separate routine???
+//                            //                        sOtherAllVehicles[0].distance = oDistance0
+//                            //                        sOtherAllVehicles[0].distanceMax = oDistanceMax0
+//                            //                        sOtherAllVehicles[0].distanceMin = oDistanceMin0
+//                            //                        sOtherAllVehicles[0].speedAvg = oSpeedAvg0
+//                            //                        sOtherAllVehicles[0].speedMax = oSpeedMax0
+//                            //                        sOtherAllVehicles[0].speedMin = oSpeedMin0
+//                            //                        print("f8DisplayDat: \(f8DisplayDat)\tAvg Speed: \(rtnKL[f8DisplayDat].speedAvg.dp2)")
+//                            
+//                            topLabel.updateLabel(topLabel: true, vehicel: rtnKL[f8DisplayDat])  //rtnKL has no element 0!
+//                            bottomLabel.updateLabel(topLabel: false, vehicel: rtnKL[f8DisplayDat])  //TEMP! Same data as Top Label!!!
+//                            //                        topLabel.updateLabel(topLabel: true, vehicel: sKLAllVehicles[f8DisplayDat])
+//
                         }   //Both tracks done
 
                     }       //End Task
@@ -654,8 +657,6 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         
                     }       //End gameStage < 0x3F
                     
-                }   //End else
-            
         }           //End gameStage < 0xFF
         
         //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -1253,7 +1254,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //    }
     
     //MARK: - Update speed of vehicles on Straight Track, braking for obstacles
-    @MainActor func updateSpeeds(returnKL: [NodeData], returnOther: [NodeData]) {
+    @MainActor func updateSpeeds(retVeh: [NodeData], allVeh: inout [Vehicle]) {
         var speedChange: CGFloat
         var newTime: CGFloat
         var newSpeed: CGFloat
@@ -1264,26 +1265,26 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         if printGoals {
             print("\nUnit\tprefSpd\tgoalSpd\tcurrSpd\tnewSpd\tchTm\tgap\t\tnewT")
         }
-    for (index, veh1Node) in returnKL.enumerated() {            //index = 0 - (numVehicles - 1)
+    for (index, vehNode) in retVeh.enumerated() {            //index = 0 - (numVehicles - 1)
         
-        //THIS Vehicle = veh1Node = sKLAllVehicles[unitNum] = returnKL[index]
+        //THIS Vehicle = vehNode = sKLAllVehicles[unitNum] = retVeh[index]
 
-        unitNum = Int.extractNum(from: veh1Node.name)!  //NOTE: Use [unitNum] for sKLAllVehicles. Use [index] for returnKL!
+        unitNum = Int.extractNum(from: vehNode.name)!  //NOTE: Use [unitNum] for sKLAllVehicles. Use [index] for retVeh!
         
-        speedChange = (veh1Node.goalSpeed - veh1Node.currentSpeed)
-        newTime = veh1Node.changeTime * (60 / (CGFloat(noOfCycles) + 1))     //newTime = no of cycles @60/30/20Hz in changeTime
-        newSpeed = veh1Node.currentSpeed + (speedChange / newTime)
-        //print("1.\t\(unitNum)\t\t\(veh1Node.preferredSpeed.dp2)\t\(veh1Node.goalSpeed.dp2)\t\(veh1Node.currentSpeed.dp2)\t\(newSpeed.dp2)\t\(veh1Node.changeTime.dp2)\t\(veh1Node.gap.dp2)\t\(newTime.dp2)")
-        sKLAllVehicles[unitNum].physicsBody?.velocity.dy = newSpeed / 3.6
+        speedChange = (vehNode.goalSpeed - vehNode.currentSpeed)
+        newTime = vehNode.changeTime * (60 / (CGFloat(noOfCycles) + 1))     //newTime = no of cycles @60/30/20Hz in changeTime
+        newSpeed = vehNode.currentSpeed + (speedChange / newTime)
+        //print("1.\t\(unitNum)\t\t\(vehNode.preferredSpeed.dp2)\t\(vehNode.goalSpeed.dp2)\t\(vehNode.currentSpeed.dp2)\t\(newSpeed.dp2)\t\(vehNode.changeTime.dp2)\t\(vehNode.gap.dp2)\t\(newTime.dp2)")
+        allVeh[unitNum].physicsBody?.velocity.dy = newSpeed / 3.6
         
-        if veh1Node.lane == 0 {         //Reinforce xPos when in centre of lane - sKLVehicle
-            sKLAllVehicles[unitNum].position.x = -((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2))
-        } else if veh1Node.lane == 1 {
-            sKLAllVehicles[unitNum].position.x = -((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2))
+        if vehNode.lane == 0 {         //Reinforce xPos when in centre of lane - sKLVehicle
+            allVeh[unitNum].position.x = -((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2))
+        } else if vehNode.lane == 1 {
+            allVeh[unitNum].position.x = -((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2))
         }
 
         if printGoals {
-            print("\(unitNum)\t\t\(veh1Node.preferredSpeed.dp2)\t\(veh1Node.goalSpeed.dp2)\t\(veh1Node.currentSpeed.dp2)\t\(newSpeed.dp2)\t\(veh1Node.changeTime.dp2)\t\(veh1Node.gap.dp2)\t\(newTime.dp2)")
+            print("\(unitNum)\t\t\(vehNode.preferredSpeed.dp2)\t\(vehNode.goalSpeed.dp2)\t\(vehNode.currentSpeed.dp2)\t\(newSpeed.dp2)\t\(vehNode.changeTime.dp2)\t\(vehNode.gap.dp2)\t\(newTime.dp2)")
         }
     }
     }       //end @MainActor func updateSpeeds

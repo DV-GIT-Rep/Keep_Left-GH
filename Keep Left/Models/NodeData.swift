@@ -87,14 +87,14 @@ struct NodeData {
     }
     
     
-    //    mutating func findObstacles(t1Vehicle: inout [NodeData]) async -> (t1Vehicle: [NodeData], t2Vehicle: [NodeData]) {
-    func findObstacles(t1Vehicle: inout [NodeData], t2Vehicle: inout [NodeData]) async -> (t1Vehicle: [NodeData], t2Vehicle: [NodeData]) {
+    //    mutating func findObstacles(tVehicle: inout [NodeData]) async -> (tVehicle: [NodeData], t2Vehicle: [NodeData]) {
+    func findObstacles(tVehicle: inout [NodeData]) async -> ([NodeData]) {
         //Create copy of vehicles for calculating proximity to other vehicles
         //  Do calculations on background thread
         //
-        //    var t1Vehicle = sKLAllVehicles.map{ $0.copy() }      //Straight Track Vehicles: Ignore 'All Vehicles'
-        //    var t1Vehicle = sKLAllVehicles.dropFirst()
-        //    t1Vehicle.sort(by: {$0.position.y < $1.position.y}) //Sort into positional order, 000 - 999.999
+        //    var tVehicle = sKLAllVehicles.map{ $0.copy() }      //Straight Track Vehicles: Ignore 'All Vehicles'
+        //    var tVehicle = sKLAllVehicles.dropFirst()
+        //    tVehicle.sort(by: {$0.position.y < $1.position.y}) //Sort into positional order, 000 - 999.999
         
         var gapSpeed: CGFloat = 0       //Speed required to catch vehicle in front in 3 secs
         var goalSpeed: CGFloat = 0      //Lesser of gapSpeed & preferredSpeed (reduced if closer than 3 secs to veh in front)
@@ -102,7 +102,7 @@ struct NodeData {
         var decel: CGFloat = 4          // m/sec2. Typical. Varies!
         
         //########################### RearGap calc loop #######################################
-        t1Vehicle.sort(by: {$0.position.y > $1.position.y}) //Sort into positional order, 999.999 - 000
+        tVehicle.sort(by: {$0.position.y > $1.position.y}) //Sort into positional order, 999.999 - 000
         
         var unitNumb: Int
         var rearGap: CGFloat = 0.0      //Distance behind in this lane
@@ -112,12 +112,12 @@ struct NodeData {
         
         //Loop through arrays to confirm distance to vehicle behind in the other lane
         //Loop through Track 1 (KL) first
-        for (index, vehNode) in t1Vehicle.enumerated() {
+        for (index, vehNode) in tVehicle.enumerated() {
             
-            //THIS Vehicle = vehNode = sKLAllVehicles[unitNumb] = t1Vehicle[index]
-            //NEXT Vehicle = t1Vehicle[nextIndex]
+            //THIS Vehicle = vehNode = sKLAllVehicles[unitNumb] = tVehicle[index]
+            //NEXT Vehicle = tVehicle[nextIndex]
             
-            unitNumb = Int.extractNum(from: vehNode.name)! //NOTE: Use [unitNumb] for sKLAllVehicles. Use [index] OR [nextIndex] for t1Vehicles!
+            unitNumb = Int.extractNum(from: vehNode.name)! //NOTE: Use [unitNumb] for sKLAllVehicles. Use [index] OR [nextIndex] for tVehicles!
             
             nextIndex = index
             
@@ -133,19 +133,19 @@ struct NodeData {
                 }           //end nextIndex 'if' statement
                 
                 let sameLane = (vehNode.lane - 0.5)...(vehNode.lane + 0.5)   //Scan for vehicles within 0.5 lanes either side
-                let sameLap = (vehNode.position.y - (vehNode.size.height / 2)) - (t1Vehicle[nextIndex].position.y + (t1Vehicle[nextIndex].size.height / 2)) //Vehicle in front on same side of 1km boundary
-                let lastLap = ((vehNode.position.y + sTrackLength) - (vehNode.size.height / 2)) - (t1Vehicle[nextIndex].position.y + (t1Vehicle[nextIndex].size.height / 2))    //Vehicle in front is over the 1km boundary!
+                let sameLap = (vehNode.position.y - (vehNode.size.height / 2)) - (tVehicle[nextIndex].position.y + (tVehicle[nextIndex].size.height / 2)) //Vehicle in front on same side of 1km boundary
+                let lastLap = ((vehNode.position.y + sTrackLength) - (vehNode.size.height / 2)) - (tVehicle[nextIndex].position.y + (tVehicle[nextIndex].size.height / 2))    //Vehicle in front is over the 1km boundary!
                 
                 
                 //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
-                if sameLane.contains(t1Vehicle[nextIndex].lane) {
+                if sameLane.contains(tVehicle[nextIndex].lane) {
                     //Both vehicles in same lane
                     if rearGap == 0 {
                         rearGap = (past1km == false) ? sameLap : lastLap
                         if rearGap <= 0 { rearGap = 0.1 } //Should NEVER happen! (due to self braking)
                         //                    vehNode.spacing = gap
-                        t1Vehicle[index].rearUnit = t1Vehicle[nextIndex].name      //Save identity of rear unit (NOT Required?)
-                        t1Vehicle[index].rearPos = t1Vehicle[nextIndex].position   //Save position of rear unit (NOT Required?)
+                        tVehicle[index].rearUnit = tVehicle[nextIndex].name      //Save identity of rear unit (NOT Required?)
+                        tVehicle[index].rearPos = tVehicle[nextIndex].position   //Save position of rear unit (NOT Required?)
                     }
                 } else {
                     //The two vehicles are in different lanes
@@ -153,13 +153,13 @@ struct NodeData {
                         oRearGap = (past1km == false) ? sameLap : lastLap
                         if oRearGap <= 0 { oRearGap = 0.1 } //Could prevent -ve values by using <= here
                         //                    vehNode.oRearGap = oRearGap
-                        t1Vehicle[index].oRearSpd = t1Vehicle[nextIndex].currentSpeed   //Save identity of rear unit (NOT Required?)
+                        tVehicle[index].oRearSpd = tVehicle[nextIndex].currentSpeed   //Save identity of rear unit (NOT Required?)
                     }
                 }       //end lane check
                 
 //                //@@@@@@@@@@@@ Old Lane Check - Start @@@@@@@
 //                //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
-//                if !sameLane.contains(t1Vehicle[nextIndex].lane) {
+//                if !sameLane.contains(tVehicle[nextIndex].lane) {
 //                    //Both vehicles in different lanes
 //                    oRearGap = (past1km == false) ? sameLap : lastLap
 //                    if oRearGap <= 0 { oRearGap = 0.1 }
@@ -176,8 +176,8 @@ struct NodeData {
 
             }               //end while
             
-            t1Vehicle[index].rearGap = rearGap      // same as vehNode.rearGap
-            t1Vehicle[index].oRearGap = oRearGap    // same as vehNode.oRearGap
+            tVehicle[index].rearGap = rearGap      // same as vehNode.rearGap
+            tVehicle[index].oRearGap = oRearGap    // same as vehNode.oRearGap
             past1km = false
             rearGap = 0
             oRearGap = 0
@@ -185,9 +185,9 @@ struct NodeData {
         }               //end 1st for loop
         //########################### end RearGap calc loop #######################################
         
-        t1Vehicle.sort(by: {$0.position.y < $1.position.y}) //Sort into positional order, 000 - 999.999
+        tVehicle.sort(by: {$0.position.y < $1.position.y}) //Sort into positional order, 000 - 999.999
         
-        t2Vehicle.sort(by: {$0.position.y < $1.position.y}) //Sort into positional order, 000 - 999.999
+//        t2Vehicle.sort(by: {$0.position.y < $1.position.y}) //Sort into positional order, 000 - 999.999
         
         var gap: CGFloat = 0.0      //Distance ahead in THIS lane
         var otherGap: CGFloat = 0.0     //Distance ahead in OTHER lane
@@ -196,12 +196,12 @@ struct NodeData {
         
         //Loop through arrays to confirm distance to vehicle in front
         //Loop through Track 1 (KL) first
-        for (index, vehNode) in t1Vehicle.enumerated() {
+        for (index, vehNode) in tVehicle.enumerated() {
             
-            //THIS Vehicle = vehNode = sKLAllVehicles[unitNumb] = t1Vehicle[index]
-            //NEXT Vehicle = t1Vehicle[nextIndex]
+            //THIS Vehicle = vehNode = sKLAllVehicles[unitNumb] = tVehicle[index]
+            //NEXT Vehicle = tVehicle[nextIndex]
             
-            unitNumb = Int.extractNum(from: vehNode.name)! //NOTE: Use [unitNumb] for sKLAllVehicles. Use [index] OR [nextIndex] for t1Vehicles!
+            unitNumb = Int.extractNum(from: vehNode.name)! //NOTE: Use [unitNumb] for sKLAllVehicles. Use [index] OR [nextIndex] for tVehicles!
             
             nextIndex = index
             
@@ -217,19 +217,19 @@ struct NodeData {
                 }           //end nextIndex 'if' statement
                 
                 let sameLane = (vehNode.lane - 0.5)...(vehNode.lane + 0.5)   //Scan for vehicles within 0.5 lanes either side
-                let sameLap = (t1Vehicle[nextIndex].position.y - (t1Vehicle[nextIndex].size.height / 2)) - (vehNode.position.y + (vehNode.size.height / 2))                             //Vehicle in front on same side of 1km boundary
-                let lastLap = ((t1Vehicle[nextIndex].position.y + sTrackLength) - (t1Vehicle[nextIndex].size.height / 2)) - (vehNode.position.y + (vehNode.size.height / 2))      //Vehicle in front is over the 1km boundary!
+                let sameLap = (tVehicle[nextIndex].position.y - (tVehicle[nextIndex].size.height / 2)) - (vehNode.position.y + (vehNode.size.height / 2))                             //Vehicle in front on same side of 1km boundary
+                let lastLap = ((tVehicle[nextIndex].position.y + sTrackLength) - (tVehicle[nextIndex].size.height / 2)) - (vehNode.position.y + (vehNode.size.height / 2))      //Vehicle in front is over the 1km boundary!
                 
                 //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
-                if sameLane.contains(t1Vehicle[nextIndex].lane) {
+                if sameLane.contains(tVehicle[nextIndex].lane) {
                     //Both vehicles in same lane
                     if gap == 0 {
                         gap = (past1km == false) ? sameLap : lastLap
                         if gap <= 0 { gap = 0.1 } //Should NEVER happen! (due to self braking)
                         //                    vehNode.spacing = gap
-                        t1Vehicle[index].frontUnit = t1Vehicle[nextIndex].name      //Save identity of front unit
-                        t1Vehicle[index].frontPos = t1Vehicle[nextIndex].position   //Save position of front unit
-                        t1Vehicle[index].frontSpd = t1Vehicle[nextIndex].currentSpeed   //Save identity of rear unit (NOT Required?)
+                        tVehicle[index].frontUnit = tVehicle[nextIndex].name      //Save identity of front unit
+                        tVehicle[index].frontPos = tVehicle[nextIndex].position   //Save position of front unit
+                        tVehicle[index].frontSpd = tVehicle[nextIndex].currentSpeed   //Save identity of rear unit (NOT Required?)
                     }
                 } else {
                     //The two vehicles are in different lanes
@@ -237,14 +237,14 @@ struct NodeData {
                         otherGap = (past1km == false) ? sameLap : lastLap
                         if otherGap <= 0 { otherGap = 0.1 } //Could prevent -ve values by using <= here
                         //                    vehNode.otherGap = otherGap
-                        t1Vehicle[index].oFrontSpd = t1Vehicle[nextIndex].currentSpeed   //Save identity of rear unit (NOT Required?)
+                        tVehicle[index].oFrontSpd = tVehicle[nextIndex].currentSpeed   //Save identity of rear unit (NOT Required?)
                     }
                 }       //end lane check
                 
             }               //end While
             
-            t1Vehicle[index].gap = gap              // same as vehNode.gap
-            t1Vehicle[index].otherGap = otherGap    // same as vehNode.otherGap
+            tVehicle[index].gap = gap              // same as vehNode.gap
+            tVehicle[index].otherGap = otherGap    // same as vehNode.otherGap
             
             //MARK: - At this point spacing = distance to vehicle in front(gap: same lane, otherGap: other lane)
             //MARK:   oRearGap = distance of first vehicle behind & in other lane.
@@ -303,8 +303,8 @@ struct NodeData {
             }
             
             //MARK: - aim for 'goalSpeed' after 'changeTime' seconds
-            t1Vehicle[index].goalSpeed = goalSpeed   //Store ready for SKAction
-            t1Vehicle[index].changeTime = changeTime //Store run time for next SKAction
+            tVehicle[index].goalSpeed = goalSpeed   //Store ready for SKAction
+            tVehicle[index].changeTime = changeTime //Store run time for next SKAction
             
             past1km = false
             gap = 0
@@ -312,7 +312,8 @@ struct NodeData {
             
         }           //end 2nd for loop
         
-        return (t1Vehicle, t2Vehicle)
+//        return (tVehicle, t2Vehicle)
+        return tVehicle
     }       //End findObstacles method
     
     //This method calculates the position of vehicles on the Fig 8 Track from equiv positions on Straight Track
@@ -483,7 +484,7 @@ struct NodeData {
 //        print("3y.\tMax: \(t1Veh[1].distanceMax.dp2)\tAvg: \(t1Veh[1].distance.dp2)\tMin: \(t1Veh[1].distanceMin.dp2)")
 
 //        var t1Vehicle = sKLAllVehicles   //Straight Track Vehicles
-        var t2Veh = sOtherAllVehicles       //TEMP!!!
+//        var t2Veh = sOtherAllVehicles       //TEMP!!!
         
         var sumKL: CGFloat = 0
         var maxSumKL: CGFloat = 0

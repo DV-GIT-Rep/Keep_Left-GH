@@ -153,7 +153,7 @@ let runTimerDelay: CGFloat = 12     //Seconds delay before speed is acknowledged
 var enableMinSpeed: Bool = false
 var runStop: runCondition = .stop
 
-let noOfCycles = 0x01       //Calc speeds & f8Pos once every 'noOfCycles' 60ms periods.
+let noOfCycles = 0x03       //Calc speeds & f8Pos once every 'noOfCycles' 60ms periods.
                             //0 - No Delay                  60fps   (smoothest)
                             //1 - Run every 2nd 60ms cycle  30fps   (good)
                             //2 - Run every 3rd 60ms cycle  20fps   (a little jumpy)
