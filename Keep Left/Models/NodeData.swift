@@ -500,6 +500,8 @@ struct NodeData {
         //MARK: - Set timeMx = hours of vehicle run time to now!
         let timeMx: CGFloat = 3600 / runTimer
         
+        var yPos: CGFloat = 0
+        var yStrtPos: CGFloat = 0
         var unitNo: Int = 0
         var uNum: Int = 0
         //Loop through both arrays simultaneously. Move back 1km when they've travelled 1km!
@@ -508,6 +510,12 @@ struct NodeData {
 //        for (var sKLNode, var sOtherNode) in zip(t1Veh, t2Veh) {
             if innDex == 0 {continue}       //Skip loop for element[0] = All Vehicles
 
+            yPos = sKLNode.otherTrack ? (sTrackLength - t1Veh[innDex].position.y) : t1Veh[innDex].position.y
+            yStrtPos = sKLNode.otherTrack ? (sTrackLength - t1Veh[innDex].startPos) : t1Veh[innDex].startPos
+//            if sKLNode.otherTrack == false {
+//                let yPos =
+//            }
+            
 //          //Check below elsewhere!
 //            if sKLNode.position.y >= sTrackLength {
 //                //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
@@ -525,7 +533,8 @@ struct NodeData {
 //            flashVehicle(thisVehicle: sKLNode)
             
 //            print("1.\t\(t1Veh[innDex].speedMax.dp2)\t\(t1Veh[innDex].speedMin.dp2)")
-            t1Veh[innDex].distance = (t1Veh[innDex].position.y - t1Veh[innDex].startPos) / sTrackLength + t1Veh[innDex].laps                //Distance travelled in km
+            t1Veh[innDex].distance = (t1Veh[innDex].position.y - yStrtPos) / sTrackLength + t1Veh[innDex].laps                //Distance travelled in km
+//            t1Veh[innDex].distance = (yPos - yStrtPos) / sTrackLength + t1Veh[innDex].laps                //Distance travelled in km
 
             if firstThru == true {                  //Ensures initial reading > max possible speed
                 t1Veh[innDex].speedMin = 900

@@ -610,12 +610,18 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                                 sOtherAllVehicles[i].speedMin = rtnVeh[i].speedMin
                             }
                             
-                            rtnVeh[0].distance = oDistance0
-                            rtnVeh[0].distanceMax = oDistanceMax0
-                            rtnVeh[0].distanceMin = oDistanceMin0
-                            rtnVeh[0].speedAvg = oSpeedAvg0
-                            rtnVeh[0].speedMax = oSpeedMax0
-                            rtnVeh[0].speedMin = oSpeedMin0
+                            rtnVeh[0].distance = klDistance0
+                            rtnVeh[0].distanceMax = klDistanceMax0
+                            rtnVeh[0].distanceMin = klDistanceMin0
+                            rtnVeh[0].speedAvg = klSpeedAvg0
+                            rtnVeh[0].speedMax = klSpeedMax0
+                            rtnVeh[0].speedMin = klSpeedMin0
+//                            rtnVeh[0].distance = oDistance0
+//                            rtnVeh[0].distanceMax = oDistanceMax0
+//                            rtnVeh[0].distanceMin = oDistanceMin0
+//                            rtnVeh[0].speedAvg = oSpeedAvg0
+//                            rtnVeh[0].speedMax = oSpeedMax0
+//                            rtnVeh[0].speedMin = oSpeedMin0
                             
                             //                        //Other Track - May use separate routine???
                             //                        sOtherAllVehicles[0].distance = oDistance0
@@ -1180,22 +1186,20 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             sOtherNode.laps += 1
         }
             
-        sOtherNode.distance = (sOtherNode.startPos - sOtherNode.position.y) / sTrackLength + sOtherNode.laps    //Distance travelled in km
-//        sOtherNode.moveF8Vehicle(sNode: sOtherNode, sNodePos: sOtherNode.position, meta1: 0, F8YZero: 0)    //Reposition figure 8 Other vehicles
-        
-            sOtherNode.speedAvg = sOtherNode.distance * timeMx                  //Average speed for vehicle
-            sOtherNode.speedMax = max(sOtherNode.speedMax, sOtherNode.speedAvg) //Max avg speed for vehicle
-            if enableMinSpeed == true {
-                sOtherNode.speedMin = min(sOtherNode.speedMin, sOtherNode.speedAvg)
-            }           //Min avg speed for vehicle. Ignores acceleration period.
+//        sOtherNode.distance = (sOtherNode.startPos - sOtherNode.position.y) / sTrackLength + sOtherNode.laps    //Distance travelled in km
+//
+//            sOtherNode.speedAvg = sOtherNode.distance * timeMx                  //Average speed for vehicle
+//            sOtherNode.speedMax = max(sOtherNode.speedMax, sOtherNode.speedAvg) //Max avg speed for vehicle
+//            if enableMinSpeed == true {
+//                sOtherNode.speedMin = min(sOtherNode.speedMin, sOtherNode.speedAvg)
+//            }           //Min avg speed for vehicle. Ignores acceleration period.
+//
+//            sumOther += sOtherNode.distance   //Total distance
+//            maxSumOther = max(maxSumOther, sOtherNode.distance)
+//            minSumOther = min(minSumOther, sOtherNode.distance)
 
-            sumOther += sOtherNode.distance   //Total distance
-            maxSumOther = max(maxSumOther, sOtherNode.distance)
-            minSumOther = min(minSumOther, sOtherNode.distance)
-
-//        updateF8Labels()
-        
     }   //End of 'for' loop
+
         firstThru = false       //NEVER = true again !!!
         
         //MARK: - Calculate distances & speeds for 'All Vehicles'
@@ -1211,13 +1215,13 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //        sKLAllVehicles[0].speedMax = maxSumKL * timeMx
 //        sKLAllVehicles[0].speedMin = minSumKL * timeMx
 
-        sOtherAllVehicles[0].distance = sumOther / CGFloat(numVehicles)
-        sOtherAllVehicles[0].distanceMax = maxSumOther
-        sOtherAllVehicles[0].distanceMin = minSumOther
-
-        sOtherAllVehicles[0].speedAvg = sOtherAllVehicles[0].distance * timeMx
-        sOtherAllVehicles[0].speedMax = maxSumOther * timeMx
-        sOtherAllVehicles[0].speedMin = minSumOther * timeMx
+//        sOtherAllVehicles[0].distance = sumOther / CGFloat(numVehicles)
+//        sOtherAllVehicles[0].distanceMax = maxSumOther
+//        sOtherAllVehicles[0].distanceMin = minSumOther
+//
+//        sOtherAllVehicles[0].speedAvg = sOtherAllVehicles[0].distance * timeMx
+//        sOtherAllVehicles[0].speedMax = maxSumOther * timeMx
+//        sOtherAllVehicles[0].speedMin = minSumOther * timeMx
         
 //        topLabel.updateLabel(topLabel: true, vehicel: sKLAllVehicles[f8DisplayDat])
 //        bottomLabel.updateLabel(topLabel: false, vehicel: sOtherAllVehicles[f8DisplayDat])
@@ -1268,7 +1272,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             }
         } else {
             switch runStop {
-            case .run: allVeh[unitNum].physicsBody?.velocity.dy = -(25 + (speedChange / newTime))
+            case .run: allVeh[unitNum].physicsBody?.velocity.dy = -(36 + (speedChange / newTime))
             default: allVeh[unitNum].physicsBody?.velocity.dy = -(0)
             }
             if vehNode.lane == 0 {         //Reinforce xPos when in centre of lane - sKLVehicle
