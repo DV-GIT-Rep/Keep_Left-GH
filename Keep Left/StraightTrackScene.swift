@@ -484,7 +484,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                     for (index, veh2Node) in temp2.enumerated() {
                         nodeData.name = veh2Node.name!      //OR = (index + 1)?
                         nodeData.size = veh2Node.size
-                        nodeData.position = veh2Node.position
+                        nodeData.position.x = (1 - veh2Node.position.x)
+                        nodeData.position.y = (sTrackLength - veh2Node.position.y)
                         nodeData.lane = veh2Node.lane
                         nodeData.laps = veh2Node.laps
                         nodeData.preferredSpeed = veh2Node.preferredSpeed
@@ -1267,7 +1268,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             }
         } else {
             switch runStop {
-            case .run: allVeh[unitNum].physicsBody?.velocity.dy = -(150 / 3.6)
+            case .run: allVeh[unitNum].physicsBody?.velocity.dy = -(25 + (speedChange / newTime))
             default: allVeh[unitNum].physicsBody?.velocity.dy = -(0)
             }
             if vehNode.lane == 0 {         //Reinforce xPos when in centre of lane - sKLVehicle

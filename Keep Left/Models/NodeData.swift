@@ -336,9 +336,11 @@ struct NodeData {
             //    }
             
             //May? need following ??
+            var y1 = t1Node.position.y
             var lanePos: CGFloat = ((FarLane - CloseLane) * (1 - t1Node.lane) + CloseLane)
             if t1Node.otherTrack == true {     //If tracks back to front, reverse polarity here!!! Swaps Fig 8 vehicles from one
                 //track to the other AND swaps left/right lanes. Doesn't affect Straight Track!
+                y1 = sTrackLength - t1Node.position.y
                 lanePos = -lanePos
             }
             
@@ -346,7 +348,7 @@ struct NodeData {
             var currentSNodePos = t1Node.position   //???
             
             //MARK: - Calculate position of figure 8 vehicle based on straight track vehicle
-            switch t1Node.position.y {
+            switch y1 {
             case let y1 where y1 <= F8Radius:
                 //1st straight stretch 45' from origin dn and to right
                 //Origin = (0,0) so move immediately
