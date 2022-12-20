@@ -239,6 +239,10 @@ extension CGFloat {
     var dp2: String {
         return String(format: "%.2f", self)
     }
+    ///Formats number as string with maximum of 1 decimal place
+    var dp1: String {
+        return String(format: "%.1f", self)
+    }
 }
 
 extension CGFloat {

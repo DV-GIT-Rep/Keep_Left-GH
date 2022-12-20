@@ -62,7 +62,7 @@ struct NodeData {
         preferredSpeed = 0
         currentSpeed = 0
         goalSpeed = 0
-        changeTime = 0
+        changeTime = 1.0
         frontUnit = ""
         frontPos = CGPoint(x: 0, y: 0)
         frontSpd = 0
@@ -102,7 +102,7 @@ struct NodeData {
         var decel: CGFloat = 4          // m/sec2. Typical. Varies!
         
         //########################### RearGap calc loop #######################################
-        tVehicle.sort(by: {$0.position.y > $1.position.y}) //Sort into positional order, 999.999 - 000
+        tVehicle.sort(by: keepLeft ? {$0.position.y > $1.position.y} : {$0.position.y <= $1.position.y}) //Sort into positional order, 999.999 - 000
         
         var unitNumb: Int
         var rearGap: CGFloat = 0.0      //Distance behind in this lane
@@ -185,7 +185,7 @@ struct NodeData {
         }               //end 1st for loop
         //########################### end RearGap calc loop #######################################
         
-        tVehicle.sort(by: {$0.position.y < $1.position.y}) //Sort into positional order, 000 - 999.999
+        tVehicle.sort(by: keepLeft ? {$0.position.y < $1.position.y} : {$0.position.y >= $1.position.y}) //Sort into positional order, 000 - 999.999
         
 //        t2Vehicle.sort(by: {$0.position.y < $1.position.y}) //Sort into positional order, 000 - 999.999
         
@@ -515,6 +515,9 @@ struct NodeData {
             
             unitNo += 1
             
+//            print("\(t1Veh[innDex].otherTrack == false ? "KL" : "Ot")\t\(innDex)\tfGap: \(t1Veh[innDex].gap.dp1)\tofGp: \(t1Veh[innDex].otherGap.dp1)\trGap: \(t1Veh[innDex].rearGap.dp1)\torGap: \(t1Veh[innDex].oRearGap.dp1)")
+
+
 //            //Check below elsewhere!
 //            //MARK: - Flash vehicle when data displayed for single vehicle only
 //            flashVehicle(thisVehicle: sKLNode)
