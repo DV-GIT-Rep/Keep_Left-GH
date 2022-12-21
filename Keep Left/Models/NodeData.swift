@@ -48,6 +48,8 @@ struct NodeData {
     var speedMin: CGFloat
     var speedMax: CGFloat
     
+    var reachedSpd: Bool     //Set for each vehicle when it reaches speed. Cleared when vehicles stopped.
+    
     init() {
         name = " "
         position = CGPoint(x: 0, y: 0)
@@ -82,8 +84,10 @@ struct NodeData {
         distanceMin = 0
         distanceMax = 0
         speedAvg = 0
-        speedMin = 99999999
+        speedMin = 999999       //Set to >500 to start
         speedMax = 0
+        
+        reachedSpd = false
     }
     
     
@@ -284,9 +288,17 @@ struct NodeData {
                 }
             }
             
+            if ignoreSpd == true {
+                tVehicle[index].reachedSpd = false           //ignoreSpd set when off plus 2 secs (runTimerDelay)
+            }
+            
             var changeTime: CGFloat = 1     //Set initial value = 1 second
             if vehNode.currentSpeed >= goalSpeed {
                 //Decelerate to goalSpeed which can be preferredSpeed or gapSpeed
+                
+                if ignoreSpd == false {
+                    tVehicle[index].reachedSpd = true           //This vehicle is now up to speed.
+                }
                 
                 //MARK: - IF GAP << 3 SECS THEN INCREASE DECELERATION!!! See above
                 if (spdChange / 3.6) > decel {      //spdChange in kph / 3.6 = m/s
@@ -309,6 +321,12 @@ struct NodeData {
             past1km = false
             gap = 0
             otherGap = 0
+            
+//            if tVehicle[index].otherTrack == false {
+//                print("kVeh \(index):\tReached Speed?: \(tVehicle[index].reachedSpd)")
+//            } else {
+//                print("oVeh \(index):\tReached Speed?: \(tVehicle[index].reachedSpd)")
+//            }
             
         }           //end 2nd for loop
         
@@ -543,9 +561,15 @@ struct NodeData {
             
             t1Veh[innDex].speedAvg = t1Veh[innDex].distance * timeMx                //Average speed for vehicle
             t1Veh[innDex].speedMax = max(t1Veh[innDex].speedMax, t1Veh[innDex].speedAvg)  //Max avg speed for vehicle
-            if enableMinSpeed == true {         //Currently 12secs? Later wait for vehicles up to speed
+//            if enableMinSpeed == true {         //Currently 12secs? Later wait for vehicles up to speed
+            if t1Veh[innDex].reachedSpd == true {         //Wait for individual vehicles up to speed
                 t1Veh[innDex].speedMin = min(t1Veh[innDex].speedMin, t1Veh[innDex].speedAvg)
             }           //Min avg speed for vehicle. Ignores acceleration period.
+//            if t1Veh[innDex].otherTrack == true {
+//                print("oVeh \(innDex) spdMin: \(t1Veh[innDex].speedMin.dp1)\t\(t1Veh[innDex].otherTrack)\t\(enableMinSpeed)")
+//            } else {
+//                print("kVeh \(innDex) spdMin: \(t1Veh[innDex].speedMin.dp1)\t\(t1Veh[innDex].otherTrack)\t\(enableMinSpeed)")
+//            }
             
             sumKL += t1Veh[innDex].distance                   //All veh's: Total distance for all summed
             maxSumKL = max(maxSumKL, t1Veh[innDex].distance)  //Max distance by a single vehicle NOW

@@ -149,9 +149,10 @@ enum runCondition {
     case stop, run
 }
 var runTimer: CGFloat = 0.5         //Timer increments once/sec (+0.5 every 500ms) when runStop != .stop
-let runTimerDelay: CGFloat = 12     //Seconds delay before speed is acknowledged
-var enableMinSpeed: Bool = false
+let runTimerDelay: CGFloat = 2     //Seconds delay before speed can be acknowledged
+var enableMinSpeed: Bool = false    //Minimum speed is only calculated after this flag is set
 var runStop: runCondition = .stop
+var ignoreSpd: Bool = true          //Ignore speed for minSpd until this flag is set 'runTimerDelay' after vehicles run.
 
 let noOfCycles = 0x03       //Calc speeds & f8Pos once every 'noOfCycles' 60ms periods.
                             //0 - No Delay                  60fps   (smoothest)
