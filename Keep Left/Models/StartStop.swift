@@ -55,7 +55,7 @@ class StartStop: SKSpriteNode {
 
             removeAction(forKey: "delayRun")    //Disable delay to prevent runTimerEnabled setting!
             enableMinSpeed = false          //Stop runTimer while vehicles stationary
-            print("runTimer Disabled !!!")
+//            print("runTimer Disabled !!!")
 
         }
     }

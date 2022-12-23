@@ -48,6 +48,10 @@ struct NodeData {
     var speedMin: CGFloat
     var speedMax: CGFloat
     
+    var sumKL: CGFloat
+    var maxSumKL: CGFloat
+    var minSumKL: CGFloat
+
     var reachedSpd: Bool     //Set for each vehicle when it reaches speed. Cleared when vehicles stopped.
     
     init() {
@@ -87,6 +91,10 @@ struct NodeData {
         speedMin = 999999       //Set to >500 to start
         speedMax = 0
         
+        sumKL = 0               //Used to calculate distance in km for ALL vehicles.
+        maxSumKL = 0            //Used to hold the MAX distance ANY vehicle on THIS track has travelled.
+        minSumKL = 99999999     //Used to hold the MIN distance ANY vehicle on THIS track has travelled.
+
         reachedSpd = false
     }
     
@@ -506,9 +514,15 @@ struct NodeData {
 //        var t1Vehicle = sKLAllVehicles   //Straight Track Vehicles
 //        var t2Veh = sOtherAllVehicles       //TEMP!!!
         
-        var sumKL: CGFloat = 0
-        var maxSumKL: CGFloat = 0
-        var minSumKL: CGFloat = 99999999
+        t1Veh[0].sumKL = 0
+        t1Veh[0].maxSumKL = 0
+        t1Veh[0].minSumKL = 99999
+        
+//        if runStop == .stop {
+//            maxSumKL = 0
+//            minSumKL = 99999999
+//        }
+//        
 //        var sumOther: CGFloat = 0         //Other Track - May use separate routine???
 //        var maxSumOther: CGFloat = 0
 //        var minSumOther: CGFloat = 99999999
@@ -541,7 +555,7 @@ struct NodeData {
 //                sKLNode.laps += 1
 //            }
             
-            unitNo += 1
+//            unitNo += 1
             
 //            print("\(t1Veh[innDex].otherTrack == false ? "KL" : "Ot")\t\(innDex)\tfGap: \(t1Veh[innDex].gap.dp1)\tofGp: \(t1Veh[innDex].otherGap.dp1)\trGap: \(t1Veh[innDex].rearGap.dp1)\torGap: \(t1Veh[innDex].oRearGap.dp1)")
 
@@ -561,8 +575,8 @@ struct NodeData {
             
             t1Veh[innDex].speedAvg = t1Veh[innDex].distance * timeMx                //Average speed for vehicle
             t1Veh[innDex].speedMax = max(t1Veh[innDex].speedMax, t1Veh[innDex].speedAvg)  //Max avg speed for vehicle
-//            if enableMinSpeed == true {         //Currently 12secs? Later wait for vehicles up to speed
-            if t1Veh[innDex].reachedSpd == true {         //Wait for individual vehicles up to speed
+            if enableMinSpeed == true {         //Wait for ALL vehicles up to speed
+//            if t1Veh[innDex].reachedSpd == true {         //Wait for individual vehicles up to speed
                 t1Veh[innDex].speedMin = min(t1Veh[innDex].speedMin, t1Veh[innDex].speedAvg)
             }           //Min avg speed for vehicle. Ignores acceleration period.
 //            if t1Veh[innDex].otherTrack == true {
@@ -570,11 +584,12 @@ struct NodeData {
 //            } else {
 //                print("kVeh \(innDex) spdMin: \(t1Veh[innDex].speedMin.dp1)\t\(t1Veh[innDex].otherTrack)\t\(enableMinSpeed)")
 //            }
-            
-            sumKL += t1Veh[innDex].distance                   //All veh's: Total distance for all summed
-            maxSumKL = max(maxSumKL, t1Veh[innDex].distance)  //Max distance by a single vehicle NOW
-            minSumKL = min(minSumKL, t1Veh[innDex].distance)  //Min distance for a single vehicle NOW
-            
+//            print("b4:\tMin: \(t1Veh[0].minSumKL.dp2)\tAvg: \(((t1Veh[0].sumKL) / CGFloat(numVehicles)).dp2)\tMax: \(t1Veh[0].maxSumKL.dp2)")
+            t1Veh[0].sumKL += t1Veh[innDex].distance                   //All veh's: Total distance for all summed
+            t1Veh[0].maxSumKL = max(t1Veh[0].maxSumKL, t1Veh[innDex].distance)  //Max distance by a single vehicle NOW
+            t1Veh[0].minSumKL = min(t1Veh[0].minSumKL, t1Veh[innDex].distance)  //Min distance for a single vehicle NOW
+//            print("af:\tMin: \(t1Veh[0].minSumKL.dp2)\tAvg: \(((t1Veh[0].sumKL) / CGFloat(numVehicles)).dp2)\tMax: \(t1Veh[0].maxSumKL.dp2)\n")
+
 //            print("2.\t\(t1Veh[innDex].speedMax.dp2)\t\(t1Veh[innDex].speedMin.dp2)")
 
 //            print("3a.\tMax: \(t1Veh[1].speedMax.dp2)\tAvg: \(t1Veh[1].speedAvg.dp2)\tMin: \(t1Veh[1].speedMin.dp2)")
@@ -615,13 +630,13 @@ struct NodeData {
         //      Max Speed = Avg Speed of vehicle that has driven furthest
         //      Min Speed = Avg Speed of vehicle that has driven the least distance
         //(Note: @ present (24/8/22) avg, max & min the same as all vehicles driven at same speed over same distance.
-        klDistance0 = sumKL / CGFloat(numVehicles)
-        klDistanceMax0 = maxSumKL
-        klDistanceMin0 = minSumKL
+        klDistance0 = t1Veh[0].sumKL / CGFloat(numVehicles)
+        klDistanceMax0 = t1Veh[0].maxSumKL
+        klDistanceMin0 = t1Veh[0].minSumKL
         
         klSpeedAvg0 = klDistance0 * timeMx
-        klSpeedMax0 = maxSumKL * timeMx
-        klSpeedMin0 = minSumKL * timeMx
+        klSpeedMax0 = t1Veh[0].maxSumKL * timeMx
+        klSpeedMin0 = t1Veh[0].minSumKL * timeMx
         
 //        //Other Track - May use separate routine???
 //        oDistance0 = sumOther / CGFloat(numVehicles)

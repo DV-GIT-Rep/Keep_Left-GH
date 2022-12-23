@@ -173,6 +173,11 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             f8TrackCamera.setScale(f8Scale)
 //            f8TrackCamera.setScale(0.2 * f8BackgroundHeight/straightScene.height) //Camera Scale - mx by 0.5 temporary !!!   XXXXXXXXXXXXXXX
             
+            let f8BackShade = SKShapeNode(circleOfRadius: 10000)
+            f8BackShade.fillColor = f8BackgroundColour
+            f8BackShade.zPosition = -1
+            f8Background.addChild(f8BackShade)
+            
 //            f8TrackCamera.position = CGPoint(x: 0, y: 0)
             sTrackCamera.position = CGPoint(x: 0, y: 0 + 500)
             sTrackCamera.setScale(sTrackWidth/straightScene.width)
@@ -456,50 +461,58 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                     gameStage = gameStage | noVehTest       //Set 2nd MSB. Don't clear until all below done!
 
                     
-                    var temp1 = sKLAllVehicles.dropFirst()      //Straight Track Vehicles: Ignore 'All Vehicles'
+                    var temp1 = sKLAllVehicles      //Straight Track Vehicles.
                     var nodeData: NodeData = NodeData()
-                    var t1Vehicle: [NodeData] = []
+                    var t1xVehicle: [NodeData] = []
                     
                     for (index, veh1Node) in temp1.enumerated() {
-                        nodeData.name = veh1Node.name!      //OR = (index + 1)?
-                        nodeData.size = veh1Node.size
-                        nodeData.position = veh1Node.position
-                        nodeData.lane = veh1Node.lane
-                        nodeData.laps = veh1Node.laps
-                        nodeData.preferredSpeed = veh1Node.preferredSpeed
-                        nodeData.currentSpeed = abs(veh1Node.physicsBody!.velocity.dy * 3.6)      //  ????? x 3.6 for kph?
-                        nodeData.otherTrack = veh1Node.otherTrack
-                        nodeData.startPos = veh1Node.startPos
-                        nodeData.speedMax = veh1Node.speedMax
-                        nodeData.speedMin = veh1Node.speedMin
-                        nodeData.reachedSpd = veh1Node.reachedSpd
-                        //                nodeData.f8zPos = veh1Node.f8zPos
-                        //                nodeData.equivF8Name = not needed here!
-                        t1Vehicle.append(nodeData)
+                        if index != 0 {       //Skip loop for element[0] = All Vehicles
+                            
+                            nodeData.name = veh1Node.name!      //OR = (index + 1)?
+                            nodeData.size = veh1Node.size
+                            nodeData.position = veh1Node.position
+                            nodeData.lane = veh1Node.lane
+                            nodeData.laps = veh1Node.laps
+                            nodeData.preferredSpeed = veh1Node.preferredSpeed
+                            nodeData.currentSpeed = abs(veh1Node.physicsBody!.velocity.dy * 3.6)      //  ????? x 3.6 for kph?
+                            nodeData.otherTrack = veh1Node.otherTrack
+                            nodeData.startPos = veh1Node.startPos
+                            nodeData.speedMax = veh1Node.speedMax
+                            nodeData.speedMin = veh1Node.speedMin
+                            nodeData.reachedSpd = veh1Node.reachedSpd
+                            //                nodeData.f8zPos = veh1Node.f8zPos
+                            //                nodeData.equivF8Name = not needed here!
+                        }
+                        t1xVehicle.append(nodeData)
                     }
+                var t1Vehicle = Array(t1xVehicle.dropFirst())       //Ignore 'All Vehicles'
                     
-                    var temp2 = sOtherAllVehicles.dropFirst()      //Straight Track Vehicles: Ignore 'All Vehicles'
+                    var temp2 = sOtherAllVehicles           //Straight Track Vehicles: Ignore 'All Vehicles'
                     //var nodeData: NodeData = NodeData()
-                    var t2Vehicle: [NodeData] = []
+                    var t2xVehicle: [NodeData] = []
                     
                     for (index, veh2Node) in temp2.enumerated() {
-                        nodeData.name = veh2Node.name!      //OR = (index + 1)?
-                        nodeData.size = veh2Node.size
-                        nodeData.position.x = (1 - veh2Node.position.x)
-                        nodeData.position.y = (sTrackLength - veh2Node.position.y)
-                        nodeData.lane = veh2Node.lane
-                        nodeData.laps = veh2Node.laps
-                        nodeData.preferredSpeed = veh2Node.preferredSpeed
-                        nodeData.currentSpeed = abs(veh2Node.physicsBody!.velocity.dy * 3.6)      //  ????? x 3.6 for kph?
-                        nodeData.otherTrack = veh2Node.otherTrack
-                        nodeData.startPos = veh2Node.startPos
-                        nodeData.speedMax = veh2Node.speedMax
-                        nodeData.speedMin = veh2Node.speedMin
-                        nodeData.reachedSpd = veh2Node.reachedSpd
-                        //                nodeData.equivF8Name = not needed here!
-                        t2Vehicle.append(nodeData)
+                        if index != 0 {       //Skip loop for element[0] = All Vehicles
+                            
+                            nodeData.name = veh2Node.name!      //OR = (index + 1)?
+                            nodeData.size = veh2Node.size
+                            nodeData.position.x = (1 - veh2Node.position.x)
+                            nodeData.position.y = (sTrackLength - veh2Node.position.y)
+                            nodeData.lane = veh2Node.lane
+                            nodeData.laps = veh2Node.laps
+                            nodeData.preferredSpeed = veh2Node.preferredSpeed
+                            nodeData.currentSpeed = abs(veh2Node.physicsBody!.velocity.dy * 3.6)      //  ????? x 3.6 for kph?
+                            nodeData.otherTrack = veh2Node.otherTrack
+                            nodeData.startPos = veh2Node.startPos
+                            nodeData.speedMax = veh2Node.speedMax
+                            nodeData.speedMin = veh2Node.speedMin
+                            nodeData.reachedSpd = veh2Node.reachedSpd
+                            //                nodeData.equivF8Name = not needed here!
+                        }
+                        t2xVehicle.append(nodeData)
                     }
-                        
+                var t2Vehicle = Array(t2xVehicle.dropFirst())       //Ignore 'All Vehicles'
+
 //                        print("\n1.\t\(sKLAllVehicles[1].speedMax.dp2)\t\(sKLAllVehicles[1].speedMin.dp2)")
 //
                     
@@ -531,7 +544,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             returnV.sort {
                                 $0.name.localizedStandardCompare($1.name) == .orderedAscending
                             }                               //'lacalizedStandardCompare' ensures 21 sorted AFTER 3
-                            returnV.insert(returnV[2], at: 0)   //Copy dummy into position [0] (All Vehicles).
+                            returnV.insert(t1xVehicle[0], at: 0)   //Copy All Vehicles into position [0].
                             returnV[0].name = "All Vehicles"
                             
                             
@@ -576,10 +589,18 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             rtnVeh[0].distance = klDistance0
                             rtnVeh[0].distanceMax = klDistanceMax0
                             rtnVeh[0].distanceMin = klDistanceMin0
-                            rtnVeh[0].speedAvg = klSpeedAvg0
-                            rtnVeh[0].speedMax = klSpeedMax0
-                            rtnVeh[0].speedMin = klSpeedMin0
-                            
+//                            sKLAllVehicles[0].speedAvg = (sKLAllVehicles[0].speedAvg + klSpeedAvg0) / 2
+                            sKLAllVehicles[0].speedAvg = klSpeedAvg0
+                            rtnVeh[0].speedAvg = sKLAllVehicles[0].speedAvg
+                            sKLAllVehicles[0].speedMax = max(sKLAllVehicles[0].speedMax, klSpeedMax0)
+                            rtnVeh[0].speedMax = sKLAllVehicles[0].speedMax
+                            if (sOtherAllVehicles[0].speedMin < 500) || enableMinSpeed == true {         //Wait for ALL vehicles up to speed
+                                sKLAllVehicles[0].speedMin = min(sKLAllVehicles[0].speedMin, klSpeedMin0)
+                                rtnVeh[0].speedMin = sKLAllVehicles[0].speedMin
+                            } else {
+                                rtnVeh[0].speedMin = klSpeedMin0
+                            }
+
                             topLabel.updateLabel(topLabel: true, vehicel: rtnVeh[f8DisplayDat])  //rtnVeh has no element 0!
                             
                         } else {
@@ -597,7 +618,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             returnV.sort {
                                 $0.name.localizedStandardCompare($1.name) == .orderedAscending
                             }                               //'lacalizedStandardCompare' ensures 21 sorted AFTER 3
-                            returnV.insert(returnV[2], at: 0)   //Copy dummy into position [0] (All Vehicles).
+                            returnV.insert(t2xVehicle[0], at: 0)   //Copy All Vehicles into position [0].
                             returnV[0].name = "All Vehicles"
                             
                             
@@ -629,6 +650,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
                             }
                             
+//                            print("b4:\tMin: \(sOtherAllVehicles[0].speedMin.dp2)\tAvg: \((sOtherAllVehicles[0].speedAvg.dp2))\tMax: \(sOtherAllVehicles[0].speedMax.dp2)\tenableMinSpeed: \(enableMinSpeed)")
                             //MARK: - Calculate distances & speeds for 'All Vehicles'
                             //Note: Avg Speed = speed to drive Avg Distance.
                             //      Max Speed = Avg Speed of vehicle that has driven furthest
@@ -636,24 +658,19 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             rtnVeh[0].distance = klDistance0
                             rtnVeh[0].distanceMax = klDistanceMax0
                             rtnVeh[0].distanceMin = klDistanceMin0
-                            rtnVeh[0].speedAvg = klSpeedAvg0
-                            rtnVeh[0].speedMax = klSpeedMax0
-                            rtnVeh[0].speedMin = klSpeedMin0
-//                            rtnVeh[0].distance = oDistance0
-//                            rtnVeh[0].distanceMax = oDistanceMax0
-//                            rtnVeh[0].distanceMin = oDistanceMin0
-//                            rtnVeh[0].speedAvg = oSpeedAvg0
-//                            rtnVeh[0].speedMax = oSpeedMax0
-//                            rtnVeh[0].speedMin = oSpeedMin0
+//                            sOtherAllVehicles[0].speedAvg = (sOtherAllVehicles[0].speedAvg + klSpeedAvg0) / 2
+                            sOtherAllVehicles[0].speedAvg = klSpeedAvg0
+                            rtnVeh[0].speedAvg = sOtherAllVehicles[0].speedAvg
+                            sOtherAllVehicles[0].speedMax = max(sOtherAllVehicles[0].speedMax, klSpeedMax0)
+                            rtnVeh[0].speedMax = sOtherAllVehicles[0].speedMax
+                            if (sOtherAllVehicles[0].speedMin < 500) || enableMinSpeed == true {         //Wait for ALL vehicles up to speed
+                                sOtherAllVehicles[0].speedMin = min(sOtherAllVehicles[0].speedMin, klSpeedMin0)
+                                rtnVeh[0].speedMin = sOtherAllVehicles[0].speedMin
+                            } else {
+                                rtnVeh[0].speedMin = klSpeedMin0
+                            }
                             
-                            //                        //Other Track - May use separate routine???
-                            //                        sOtherAllVehicles[0].distance = oDistance0
-                            //                        sOtherAllVehicles[0].distanceMax = oDistanceMax0
-                            //                        sOtherAllVehicles[0].distanceMin = oDistanceMin0
-                            //                        sOtherAllVehicles[0].speedAvg = oSpeedAvg0
-                            //                        sOtherAllVehicles[0].speedMax = oSpeedMax0
-                            //                        sOtherAllVehicles[0].speedMin = oSpeedMin0
-                            //                        print("f8DisplayDat: \(f8DisplayDat)\tAvg Speed: \(rtnVeh[f8DisplayDat].speedAvg.dp2)")
+//                            print("af:\tMin: \(sOtherAllVehicles[0].speedMin.dp2)\tAvg: \((sOtherAllVehicles[0].speedAvg.dp2))\tMax: \(sOtherAllVehicles[0].speedMax.dp2)\tenableMinSpeed: \(enableMinSpeed)")
                             
 //                            topLabel.updateLabel(topLabel: true, vehicel: rtnVeh[f8DisplayDat])  //rtnVeh has no element 0!
                             bottomLabel.updateLabel(topLabel: false, vehicel: rtnVeh[f8DisplayDat])  //TEMP! Same data as Top Label!!!
@@ -1153,8 +1170,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
         case .run:
 
-            sKLNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 2.7
-            sOtherNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 0.8
+//            sKLNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 2.7
+            sKLNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 3.5
+            sOtherNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 0.6
         }
 
     }   //End of 'for' loop

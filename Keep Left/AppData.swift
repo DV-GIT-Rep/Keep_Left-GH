@@ -151,6 +151,7 @@ enum runCondition {
 var runTimer: CGFloat = 0.5         //Timer increments once/sec (+0.5 every 500ms) when runStop != .stop
 let runTimerDelay: CGFloat = 2     //Seconds delay before speed can be acknowledged
 var enableMinSpeed: Bool = false    //Minimum speed is only calculated after this flag is set
+///runStop has 2 possible values, .stop & .run
 var runStop: runCondition = .stop
 var ignoreSpd: Bool = true          //Ignore speed for minSpd until this flag is set 'runTimerDelay' after vehicles run.
 
@@ -189,7 +190,7 @@ let FarLane: CGFloat = CloseLane + (laneWidth / 2) + lineWidth + (laneWidth / 2)
 
 var f8ScreenRatio: CGFloat = 0  //If height of screen > 2 x width then scale metres from width else use height
 
-var f8BackgroundColour: UIColor = backgroundColour
+var f8BackgroundColour: UIColor = UIColor(red: 168/255, green: 168/255, blue: 168/255, alpha: 1)
 
 let f8ImageWidth: CGFloat = 2406
 let f8ImageHeight: CGFloat = 4096
@@ -243,6 +244,10 @@ extension CGFloat {
     ///Formats number as string with maximum of 1 decimal place
     var dp1: String {
         return String(format: "%.1f", self)
+    }
+    ///Formats number as string with maximum of 0 decimal places
+    var dp0: String {
+        return String(format: "%.0f", self)
     }
 }
 
