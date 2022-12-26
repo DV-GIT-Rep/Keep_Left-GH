@@ -153,7 +153,7 @@ let runTimerDelay: CGFloat = 2     //Seconds delay before speed can be acknowled
 var enableMinSpeed: Bool = false    //Minimum speed is only calculated after this flag is set
 ///runStop has 2 possible values, .stop & .run
 var runStop: runCondition = .stop
-var ignoreSpd: Bool = true          //Ignore speed for minSpd until this flag is set 'runTimerDelay' after vehicles run.
+var ignoreSpd: Bool = true          //ignoreSpd set when vehicles stopped. Reset when started plus 2 secs (runTimerDelay)
 
 let noOfCycles = 0x03       //Calc speeds & f8Pos once every 'noOfCycles' 60ms periods.
                             //0 - No Delay                  60fps   (smoothest)
@@ -285,3 +285,6 @@ extension Int {
 
 var randNo: CGFloat = 120
 var randUnitNo: Int = 1
+
+var allAtSpeed1: Bool = false
+var allAtSpeed2: Bool = false

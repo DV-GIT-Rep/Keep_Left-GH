@@ -323,15 +323,15 @@ struct NodeData {
             }
             
             if ignoreSpd == true {
-                tVehicle[index].reachedSpd = false           //ignoreSpd set when off plus 2 secs (runTimerDelay)
+                tVehicle[index].reachedSpd = false           //ignoreSpd set when vehicles stopped. Reset when started plus 2 secs (runTimerDelay)
             }
             
             var changeTime: CGFloat = 1     //Set initial value = 1 second
             if vehNode.currentSpeed >= goalSpeed {
                 //Decelerate to goalSpeed which can be preferredSpeed or gapSpeed
                 
-                if ignoreSpd == false {
-                    tVehicle[index].reachedSpd = true           //This vehicle is now up to speed.
+                if ignoreSpd == false {                     //ignoreSpd set when vehicles stopped. Reset when started plus 2 secs (runTimerDelay)
+                    tVehicle[index].reachedSpd = true       //This vehicle is now up to speed.
                 }
                 
                 //MARK: - IF GAP << 3 SECS THEN INCREASE DECELERATION!!! See above
@@ -691,6 +691,8 @@ struct NodeData {
         for (indx, vehc) in teeVeh.enumerated() {
             if indx == 0 {continue}       //Skip loop for element[0] = All Vehicles
             
+            var oRearLength = teeVeh[Int(vehc.rearUnit.dropFirst(5))!].size.height  //Length of oRear vehicle in metres
+            
             let approachRange = (vehc.preferredSpeed * 3.1) / 3.6      //3.1 secs
             let encroachRange = (vehc.currentSpeed * 1) / 3.6        //1 sec
             //            let okRange = (vehc.oRearSpd * 2.1) / 3.6                //oRear < 1.1 secs behind
@@ -707,7 +709,8 @@ struct NodeData {
                 if vehc.frontSpd <= (vehc.currentSpeed + 2) {      //+ 2kph?
                     if vehc.gap < approachRange {
                         if vehc.otherGap > encroachRange {
-                            if vehc.oRearGap > okRange {
+//                            if vehc.oRearGap > okRange {
+                            if vehc.oRearGap > (vehc.size.height / 2) + (oRearLength / 2) + 2 {  //Total combined vehicle length + 2 metres
 //                                if vehc.oFrontSpd <= vehc.frontSpd {
 //                                    return teeVeh
 //                                }
@@ -728,7 +731,8 @@ struct NodeData {
             if vehc.lane == 1 {
                 if vehc.oFrontSpd > vehc.preferredSpeed {
                     if vehc.otherGap > encroachRange {
-                        if vehc.oRearGap > okRange {
+//                        if vehc.oRearGap > okRange {
+                        if vehc.oRearGap > (vehc.size.height / 2) + (oRearLength / 2) + 2 {  //Total combined vehicle length + 2 metres
                             teeVeh[indx].lane = 0
                             //                            sKLAllVehicles[indx].lane = 0
                             return teeVeh
@@ -738,7 +742,8 @@ struct NodeData {
                 
                 //                if vehc.otherGap > (approachRange + 12) {         //2 being an extra 2 metres
                 if vehc.otherGap > approachRange {         //2 being an extra 2 metres
-                    if vehc.oRearGap > okRange {
+//                    if vehc.oRearGap > okRange {
+                    if vehc.oRearGap > (vehc.size.height / 2) + (oRearLength / 2) + 2 {  //Total combined vehicle length + 2 metres
                         teeVeh[indx].lane = 0
                         return teeVeh
                     }
@@ -746,7 +751,8 @@ struct NodeData {
                 
                 if vehc.gap < vehc.otherGap {
                     if vehc.frontSpd <= (oFrontSpd + 0.5) {
-                        if oRearGap > okRange {
+//                        if oRearGap > okRange {
+                        if vehc.oRearGap > (vehc.size.height / 2) + (oRearLength / 2) + 2 {  //Total combined vehicle length + 2 metres
                             teeVeh[indx].lane = 0
                             return teeVeh
                         }

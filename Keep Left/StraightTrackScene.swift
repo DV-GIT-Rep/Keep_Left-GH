@@ -518,8 +518,6 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                     
 //                    var returnKL: [NodeData] = t1Vehicle        //Define here to ensure these persist throughout 'Task'
 //                    var returnOther: [NodeData] = t2Vehicle
-                var allAtSpeed: Bool
-                allAtSpeed = true
 //                if runStop == .run {
 //                    allAtSpeed = true           //Flag cleared if ANY vehicle not yet up to speed!
 //                } else {
@@ -531,6 +529,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         if (gameStage & doT2) == 0 {
                             //***************  1. findObstacles + updateSpeeds  ***************
                             //Keep Left Track (Track 1)  = gameStage bit 0 = 0
+                            allAtSpeed1 = true
+                            
                             var ret1urn: [NodeData] = t1Vehicle        //Used for both Track 1 & Track 2
                             var result = await nodeData.findObstacles(tVehicle: &t1Vehicle)
                             ret1urn = result
@@ -583,7 +583,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                                     sKLAllVehicles[i].lane = rtnT1Veh[i].lane //for some reason locks up if this enabled from start?
                                 }
                                 
-                                if rtnT1Veh[i].reachedSpd == false { allAtSpeed = false } //Flag cleared if ANY vehicle NOT up to speed
+                                if rtnT1Veh[i].reachedSpd == false { allAtSpeed1 = false } //Flag cleared if ANY vehicle NOT up to speed
                                 
                                 //If vehicle crosses 1km boundary then subtract tracklength from the y position.
                                 if sKLAllVehicles[i].position.y >= sTrackLength {
@@ -618,6 +618,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         } else {
                             //***************  1. findObstacles + updateSpeeds  ***************
                             //Keep Left Track (Track 1)  = gameStage bit 0 = 0
+                            allAtSpeed2 = true
+                            
                             var ret2urn: [NodeData] = t1Vehicle        //Used for both Track 1 & Track 2
                             var result = await nodeData.findObstacles(tVehicle: &t2Vehicle)
                             ret2urn = result
@@ -656,7 +658,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                                 sOtherAllVehicles[i].speedMin = rtnT2Veh[i].speedMin
                                 
                                 sOtherAllVehicles[i].reachedSpd = rtnT2Veh[i].reachedSpd
-                                if rtnT2Veh[i].reachedSpd == false { allAtSpeed = false } //Flag cleared if ANY vehicle NOT up to speed
+                                if rtnT2Veh[i].reachedSpd == false { allAtSpeed2 = false } //Flag cleared if ANY vehicle NOT up to speed
                                 
                                 //If vehicle crosses 1km boundary then add tracklength to the y position.
                                 if sOtherAllVehicles[i].position.y < 0 {
@@ -695,7 +697,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         }   //Both tracks done
                         
 //                        print("\nallAtSpd: \(allAtSpeed)\tignoreSpd: \(ignoreSpd)")
-                        if allAtSpeed == true && ignoreSpd == false {
+                        //ignoreSpd set when vehicles stopped. Reset when started plus 2 secs (runTimerDelay)
+                        //allAtSpeed1 set when ALL KL Track vehicles up to speed. allAtSpeed2 set when ALL Other Track vehicles up to speed.
+                        if allAtSpeed1 == true && allAtSpeed2 == true && ignoreSpd == false {
                             enableMinSpeed = true       //NOTE: Now each vehicle calculates its min Spd once it's reached speed itself.
 //                            print("!!! Run Timer Enabled !!!\n")
                         }
