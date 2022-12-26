@@ -82,7 +82,7 @@ var maxTrucks = trucks.count
 var maxBuses = buses.count
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 24 //28
+var numVehicles = 28 //28
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
 var sOtherAllVehicles: [Vehicle] = []   //Array of vehicles on Other Straight Track
@@ -282,3 +282,6 @@ extension Int {
         //Cld probably hv used Int(String(string.dropFirst(x))) //where x = num of digits to remove
     }
 }
+
+var randNo: CGFloat = 120
+var randUnitNo: Int = 1

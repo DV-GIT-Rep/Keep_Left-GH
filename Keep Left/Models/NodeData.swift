@@ -51,7 +51,7 @@ struct NodeData {
     var sumKL: CGFloat
     var maxSumKL: CGFloat
     var minSumKL: CGFloat
-
+    
     var reachedSpd: Bool     //Set for each vehicle when it reaches speed. Cleared when vehicles stopped.
     
     init() {
@@ -94,7 +94,7 @@ struct NodeData {
         sumKL = 0               //Used to calculate distance in km for ALL vehicles.
         maxSumKL = 0            //Used to hold the MAX distance ANY vehicle on THIS track has travelled.
         minSumKL = 99999999     //Used to hold the MIN distance ANY vehicle on THIS track has travelled.
-
+        
         reachedSpd = false
     }
     
@@ -121,6 +121,7 @@ struct NodeData {
         var oRearGap: CGFloat = 0.0     //Distance behind in OTHER lane
         var nextIndex: Int = 0
         var past1km = false
+        let midLanes = 0.2...0.8
         
         //Loop through arrays to confirm distance to vehicle behind in the other lane
         //Loop through Track 1 (KL) first
@@ -144,7 +145,8 @@ struct NodeData {
                     
                 }           //end nextIndex 'if' statement
                 
-                let sameLane = (vehNode.lane - 0.5)...(vehNode.lane + 0.5)   //Scan for vehicles within 0.5 lanes either side
+                let sameLane = (vehNode.lane - 0.8)...(vehNode.lane + 0.8)   //Scan for vehicles within 0.8 lanes either side
+                //                let sameLane = (vehNode.lane - 0.5) < 0 ? 0...(vehNode.lane + 0.5) : (vehNode.lane + 0.5) <= 1 ? (vehNode.lane - 0.5)...(vehNode.lane + 0.5) : (vehNode.lane - 0.5)...1   //Scan for vehicles within 0.5 lanes either side
                 let sameLap = (vehNode.position.y - (vehNode.size.height / 2)) - (tVehicle[nextIndex].position.y + (tVehicle[nextIndex].size.height / 2)) //Vehicle in front on same side of 1km boundary
                 let lastLap = ((vehNode.position.y + sTrackLength) - (vehNode.size.height / 2)) - (tVehicle[nextIndex].position.y + (tVehicle[nextIndex].size.height / 2))    //Vehicle in front is over the 1km boundary!
                 
@@ -159,33 +161,42 @@ struct NodeData {
                         tVehicle[index].rearUnit = tVehicle[nextIndex].name      //Save identity of rear unit (NOT Required?)
                         tVehicle[index].rearPos = tVehicle[nextIndex].position   //Save position of rear unit (NOT Required?)
                     }
+                    if midLanes.contains(tVehicle[nextIndex].lane) {
+                        //If this vehicle is mid-lane, set oRearGap = rearGap
+                        if oRearGap == 0 {
+                            oRearGap = (past1km == false) ? sameLap : lastLap
+                            if oRearGap <= 0 { oRearGap = 0.1 } //Could prevent -ve values by using <= here
+                            //                    vehNode.oRearGap = oRearGap
+                            tVehicle[index].oRearSpd = tVehicle[nextIndex].currentSpeed   //Save speed of oRear unit
+                        }
+                    }
                 } else {
                     //The two vehicles are in different lanes
                     if oRearGap == 0 {
                         oRearGap = (past1km == false) ? sameLap : lastLap
                         if oRearGap <= 0 { oRearGap = 0.1 } //Could prevent -ve values by using <= here
                         //                    vehNode.oRearGap = oRearGap
-                        tVehicle[index].oRearSpd = tVehicle[nextIndex].currentSpeed   //Save identity of rear unit (NOT Required?)
+                        tVehicle[index].oRearSpd = tVehicle[nextIndex].currentSpeed   //Save speed of oRear unit
                     }
                 }       //end lane check
                 
-//                //@@@@@@@@@@@@ Old Lane Check - Start @@@@@@@
-//                //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
-//                if !sameLane.contains(tVehicle[nextIndex].lane) {
-//                    //Both vehicles in different lanes
-//                    oRearGap = (past1km == false) ? sameLap : lastLap
-//                    if oRearGap <= 0 { oRearGap = 0.1 }
-//                    //                    vehNode.oRearGap = oRearGap
-//                    //                    } else {
-//                    //                        //The two vehicles are in the same lane
-//                    //                        nextIndex += 1  //Move onto next vehicle
-//                    //                        if nextIndex == index {         //All other vehicles checked. oRearGap sb 0 here!
-//                    //                            if oRearGap == 0 { oRearGap = 1000 }
-//                    //                        }    //Continue until spacing for BOTH lanes != 0
-//
-//                }       //end lane check
-//                //@@@@@@@@@@@@ Old Lane Check - End   @@@@@@@
-
+                //                //@@@@@@@@@@@@ Old Lane Check - Start @@@@@@@
+                //                //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
+                //                if !sameLane.contains(tVehicle[nextIndex].lane) {
+                //                    //Both vehicles in different lanes
+                //                    oRearGap = (past1km == false) ? sameLap : lastLap
+                //                    if oRearGap <= 0 { oRearGap = 0.1 }
+                //                    //                    vehNode.oRearGap = oRearGap
+                //                    //                    } else {
+                //                    //                        //The two vehicles are in the same lane
+                //                    //                        nextIndex += 1  //Move onto next vehicle
+                //                    //                        if nextIndex == index {         //All other vehicles checked. oRearGap sb 0 here!
+                //                    //                            if oRearGap == 0 { oRearGap = 1000 }
+                //                    //                        }    //Continue until spacing for BOTH lanes != 0
+                //
+                //                }       //end lane check
+                //                //@@@@@@@@@@@@ Old Lane Check - End   @@@@@@@
+                
             }               //end while
             
             tVehicle[index].rearGap = rearGap      // same as vehNode.rearGap
@@ -199,7 +210,7 @@ struct NodeData {
         
         tVehicle.sort(by: keepLeft ? {$0.position.y < $1.position.y} : {$0.position.y >= $1.position.y}) //Sort into positional order, 000 - 999.999
         
-//        t2Vehicle.sort(by: {$0.position.y < $1.position.y}) //Sort into positional order, 000 - 999.999
+        //        t2Vehicle.sort(by: {$0.position.y < $1.position.y}) //Sort into positional order, 000 - 999.999
         
         var gap: CGFloat = 0.0      //Distance ahead in THIS lane
         var otherGap: CGFloat = 0.0     //Distance ahead in OTHER lane
@@ -228,7 +239,8 @@ struct NodeData {
                     
                 }           //end nextIndex 'if' statement
                 
-                let sameLane = (vehNode.lane - 0.5)...(vehNode.lane + 0.5)   //Scan for vehicles within 0.5 lanes either side
+                let sameLane = (vehNode.lane - 0.8)...(vehNode.lane + 0.8)   //Scan for vehicles within 0.8 lanes either side
+                //                let sameLane = (vehNode.lane - 0.5) < 0 ? 0...(vehNode.lane + 0.5) : (vehNode.lane + 0.5) <= 1 ? (vehNode.lane - 0.5)...(vehNode.lane + 0.5) : (vehNode.lane - 0.5)...1   //Scan for vehicles within 0.5 lanes either side
                 let sameLap = (tVehicle[nextIndex].position.y - (tVehicle[nextIndex].size.height / 2)) - (vehNode.position.y + (vehNode.size.height / 2))                             //Vehicle in front on same side of 1km boundary
                 let lastLap = ((tVehicle[nextIndex].position.y + sTrackLength) - (tVehicle[nextIndex].size.height / 2)) - (vehNode.position.y + (vehNode.size.height / 2))      //Vehicle in front is over the 1km boundary!
                 
@@ -241,7 +253,16 @@ struct NodeData {
                         //                    vehNode.spacing = gap
                         tVehicle[index].frontUnit = tVehicle[nextIndex].name      //Save identity of front unit
                         tVehicle[index].frontPos = tVehicle[nextIndex].position   //Save position of front unit
-                        tVehicle[index].frontSpd = tVehicle[nextIndex].currentSpeed   //Save identity of rear unit (NOT Required?)
+                        tVehicle[index].frontSpd = tVehicle[nextIndex].currentSpeed   //Save speed of front unit
+                    }
+                    if midLanes.contains(tVehicle[nextIndex].lane) {
+                        //If this vehicle is mid-lane, set otherGap = gap
+                        if otherGap == 0 {
+                            otherGap = (past1km == false) ? sameLap : lastLap
+                            if otherGap <= 0 { otherGap = 0.1 } //Could prevent -ve values by using <= here
+                            //                    vehNode.otherGap = otherGap
+                            tVehicle[index].oFrontSpd = tVehicle[nextIndex].currentSpeed   //Save speed of oFront unit
+                        }
                     }
                 } else {
                     //The two vehicles are in different lanes
@@ -249,7 +270,7 @@ struct NodeData {
                         otherGap = (past1km == false) ? sameLap : lastLap
                         if otherGap <= 0 { otherGap = 0.1 } //Could prevent -ve values by using <= here
                         //                    vehNode.otherGap = otherGap
-                        tVehicle[index].oFrontSpd = tVehicle[nextIndex].currentSpeed   //Save identity of rear unit (NOT Required?)
+                        tVehicle[index].oFrontSpd = tVehicle[nextIndex].currentSpeed   //Save speed of oFront unit
                     }
                 }       //end lane check
                 
@@ -264,14 +285,19 @@ struct NodeData {
             //       (Has been changed by using <= instead of == above)
             
             gapSpeed = (gap * 3.6) / gapVal     //Max allowable speed for current gap. gapVal = 3 secs
-            goalSpeed = gapSpeed  //Aim for this speed while in this lane
+            goalSpeed = gapSpeed
             
-            if gapSpeed > vehNode.preferredSpeed {
+            if (vehNode.currentSpeed < vehNode.frontSpd) {
+                goalSpeed = vehNode.currentSpeed        //Travelling slower than vehicle in front - maintain speed
+                if goalSpeed < gapSpeed {
+                    goalSpeed = gapSpeed  //Aim for this speed while in this lane
+                }
+            }
+            
+            if goalSpeed > vehNode.preferredSpeed {
                 goalSpeed = vehNode.preferredSpeed
             }
-            else {          //
-                //                goalSpeed = gapSpeed  //Already = gapSpeed
-            }
+            //Aim for this speed while in this lane
             
             //Acceleration & deceleration fixed FOR NOW!!!
             var accel: CGFloat = 4.5    // m per sec2 (use 2?)
@@ -330,15 +356,15 @@ struct NodeData {
             gap = 0
             otherGap = 0
             
-//            if tVehicle[index].otherTrack == false {
-//                print("kVeh \(index):\tReached Speed?: \(tVehicle[index].reachedSpd)")
-//            } else {
-//                print("oVeh \(index):\tReached Speed?: \(tVehicle[index].reachedSpd)")
-//            }
+            //            if tVehicle[index].otherTrack == false {
+            //                print("kVeh \(index):\tReached Speed?: \(tVehicle[index].reachedSpd)")
+            //            } else {
+            //                print("oVeh \(index):\tReached Speed?: \(tVehicle[index].reachedSpd)")
+            //            }
             
         }           //end 2nd for loop
         
-//        return (tVehicle, t2Vehicle)
+        //        return (tVehicle, t2Vehicle)
         return tVehicle
     }       //End findObstacles method
     
@@ -350,7 +376,7 @@ struct NodeData {
         
         for (indx, t1Node) in t1Veh.enumerated() {
             if indx == 0 {continue}         //Skip loop for element[0] = All Vehicles
-
+            
             //MARK: - Find name of Fig 8 Track equivalent to Straight Track Vehicle
             //          eg.stKL_8 -> f8KL_8 OR stOT_35 -> f8Ot_35
             f8EquivName = String(t1Node.name.dropFirst(2))        //Remove 'st' from start of name
@@ -506,28 +532,28 @@ struct NodeData {
     
     //MARK: - Method below is to calculate display values. Once every 500-600ms sufficient.
     //Note element[0] (All Vehicles) already removed!
-    func calcAvgData(t1Veh: inout [NodeData]) async -> ([NodeData]) {
+    func calcAvgData(t1xVeh: inout [NodeData]) async -> ([NodeData]) {
         
-//        print("3x.\tMax: \(t1Veh[1].speedMax.dp2)\tAvg: \(t1Veh[1].speedAvg.dp2)\tMin: \(t1Veh[1].speedMin.dp2)")
-//        print("3y.\tMax: \(t1Veh[1].distanceMax.dp2)\tAvg: \(t1Veh[1].distance.dp2)\tMin: \(t1Veh[1].distanceMin.dp2)")
-
-//        var t1Vehicle = sKLAllVehicles   //Straight Track Vehicles
-//        var t2Veh = sOtherAllVehicles       //TEMP!!!
+        //        print("3x.\tMax: \(t1Veh[1].speedMax.dp2)\tAvg: \(t1Veh[1].speedAvg.dp2)\tMin: \(t1Veh[1].speedMin.dp2)")
+        //        print("3y.\tMax: \(t1Veh[1].distanceMax.dp2)\tAvg: \(t1Veh[1].distance.dp2)\tMin: \(t1Veh[1].distanceMin.dp2)")
         
-        t1Veh[0].sumKL = 0
-        t1Veh[0].maxSumKL = 0
-        t1Veh[0].minSumKL = 99999
+        //        var t1Vehicle = sKLAllVehicles   //Straight Track Vehicles
+        //        var t2Veh = sOtherAllVehicles       //TEMP!!!
         
-//        if runStop == .stop {
-//            maxSumKL = 0
-//            minSumKL = 99999999
-//        }
-//        
-//        var sumOther: CGFloat = 0         //Other Track - May use separate routine???
-//        var maxSumOther: CGFloat = 0
-//        var minSumOther: CGFloat = 99999999
+        t1xVeh[0].sumKL = 0
+        t1xVeh[0].maxSumKL = 0
+        t1xVeh[0].minSumKL = 99999
         
-//        var tempSpd: CGFloat = 0          //Needed?
+        //        if runStop == .stop {
+        //            maxSumKL = 0
+        //            minSumKL = 99999999
+        //        }
+        //
+        //        var sumOther: CGFloat = 0         //Other Track - May use separate routine???
+        //        var maxSumOther: CGFloat = 0
+        //        var minSumOther: CGFloat = 99999999
+        
+        //        var tempSpd: CGFloat = 0          //Needed?
         
         //MARK: - Set timeMx = hours of vehicle run time to now!
         let timeMx: CGFloat = 3600 / runTimer
@@ -538,91 +564,91 @@ struct NodeData {
         var uNum: Int = 0
         //Loop through both arrays simultaneously. Move back 1km when they've travelled 1km!
         //IF OTHER TRACK RUN SEPARATELY THIS MAY CHANGE! NOTE TOO THAT ARRAYS NOT IN ORDER!
-        for (innDex, sKLNode) in t1Veh.enumerated() {
-//        for (var sKLNode, var sOtherNode) in zip(t1Veh, t2Veh) {
+        for (innDex, sKLNode) in t1xVeh.enumerated() {
+            //        for (var sKLNode, var sOtherNode) in zip(t1Veh, t2Veh) {
             if innDex == 0 {continue}       //Skip loop for element[0] = All Vehicles
-
-            yPos = sKLNode.otherTrack ? (sTrackLength - t1Veh[innDex].position.y) : t1Veh[innDex].position.y
-            yStrtPos = sKLNode.otherTrack ? (sTrackLength - t1Veh[innDex].startPos) : t1Veh[innDex].startPos
-//            if sKLNode.otherTrack == false {
-//                let yPos =
-//            }
             
-//          //Check below elsewhere!
-//            if sKLNode.position.y >= sTrackLength {
-//                //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
-//                sKLNode.position.y = (sKLNode.position.y - sTrackLength)
-//                sKLNode.laps += 1
-//            }
+            yPos = sKLNode.otherTrack ? (sTrackLength - t1xVeh[innDex].position.y) : t1xVeh[innDex].position.y
+            yStrtPos = sKLNode.otherTrack ? (sTrackLength - t1xVeh[innDex].startPos) : t1xVeh[innDex].startPos
+            //            if sKLNode.otherTrack == false {
+            //                let yPos =
+            //            }
             
-//            unitNo += 1
+            //          //Check below elsewhere!
+            //            if sKLNode.position.y >= sTrackLength {
+            //                //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
+            //                sKLNode.position.y = (sKLNode.position.y - sTrackLength)
+            //                sKLNode.laps += 1
+            //            }
             
-//            print("\(t1Veh[innDex].otherTrack == false ? "KL" : "Ot")\t\(innDex)\tfGap: \(t1Veh[innDex].gap.dp1)\tofGp: \(t1Veh[innDex].otherGap.dp1)\trGap: \(t1Veh[innDex].rearGap.dp1)\torGap: \(t1Veh[innDex].oRearGap.dp1)")
-
-
-//            //Check below elsewhere!
-//            //MARK: - Flash vehicle when data displayed for single vehicle only
-//            flashVehicle(thisVehicle: sKLNode)
+            //            unitNo += 1
             
-//            print("1.\t\(t1Veh[innDex].speedMax.dp2)\t\(t1Veh[innDex].speedMin.dp2)")
-            t1Veh[innDex].distance = (t1Veh[innDex].position.y - yStrtPos) / sTrackLength + t1Veh[innDex].laps                //Distance travelled in km
-//            t1Veh[innDex].distance = (yPos - yStrtPos) / sTrackLength + t1Veh[innDex].laps                //Distance travelled in km
-
+            //            print("\(t1Veh[innDex].otherTrack == false ? "KL" : "Ot")\t\(innDex)\tfGap: \(t1Veh[innDex].gap.dp1)\tofGp: \(t1Veh[innDex].otherGap.dp1)\trGap: \(t1Veh[innDex].rearGap.dp1)\torGap: \(t1Veh[innDex].oRearGap.dp1)")
+            
+            
+            //            //Check below elsewhere!
+            //            //MARK: - Flash vehicle when data displayed for single vehicle only
+            //            flashVehicle(thisVehicle: sKLNode)
+            
+            //            print("1.\t\(t1Veh[innDex].speedMax.dp2)\t\(t1Veh[innDex].speedMin.dp2)")
+            t1xVeh[innDex].distance = (t1xVeh[innDex].position.y - yStrtPos) / sTrackLength + t1xVeh[innDex].laps                //Distance travelled in km
+            //            t1xVeh[innDex].distance = (yPos - yStrtPos) / sTrackLength + t1Veh[innDex].laps                //Distance travelled in km
+            
             if firstThru == true {                  //Ensures initial reading > max possible speed
-                t1Veh[innDex].speedMin = 900
-//                sOtherNode.speedMin = 900
+                t1xVeh[innDex].speedMin = 900
+                //                sOtherNode.speedMin = 900
             }
             
-            t1Veh[innDex].speedAvg = t1Veh[innDex].distance * timeMx                //Average speed for vehicle
-            t1Veh[innDex].speedMax = max(t1Veh[innDex].speedMax, t1Veh[innDex].speedAvg)  //Max avg speed for vehicle
+            t1xVeh[innDex].speedAvg = t1xVeh[innDex].distance * timeMx                //Average speed for vehicle
+            t1xVeh[innDex].speedMax = max(t1xVeh[innDex].speedMax, t1xVeh[innDex].speedAvg)  //Max avg speed for vehicle
             if enableMinSpeed == true {         //Wait for ALL vehicles up to speed
-//            if t1Veh[innDex].reachedSpd == true {         //Wait for individual vehicles up to speed
-                t1Veh[innDex].speedMin = min(t1Veh[innDex].speedMin, t1Veh[innDex].speedAvg)
+                //            if t1Veh[innDex].reachedSpd == true {         //Wait for individual vehicles up to speed
+                t1xVeh[innDex].speedMin = min(t1xVeh[innDex].speedMin, t1xVeh[innDex].speedAvg)
             }           //Min avg speed for vehicle. Ignores acceleration period.
-//            if t1Veh[innDex].otherTrack == true {
-//                print("oVeh \(innDex) spdMin: \(t1Veh[innDex].speedMin.dp1)\t\(t1Veh[innDex].otherTrack)\t\(enableMinSpeed)")
-//            } else {
-//                print("kVeh \(innDex) spdMin: \(t1Veh[innDex].speedMin.dp1)\t\(t1Veh[innDex].otherTrack)\t\(enableMinSpeed)")
-//            }
-//            print("b4:\tMin: \(t1Veh[0].minSumKL.dp2)\tAvg: \(((t1Veh[0].sumKL) / CGFloat(numVehicles)).dp2)\tMax: \(t1Veh[0].maxSumKL.dp2)")
-            t1Veh[0].sumKL += t1Veh[innDex].distance                   //All veh's: Total distance for all summed
-            t1Veh[0].maxSumKL = max(t1Veh[0].maxSumKL, t1Veh[innDex].distance)  //Max distance by a single vehicle NOW
-            t1Veh[0].minSumKL = min(t1Veh[0].minSumKL, t1Veh[innDex].distance)  //Min distance for a single vehicle NOW
-//            print("af:\tMin: \(t1Veh[0].minSumKL.dp2)\tAvg: \(((t1Veh[0].sumKL) / CGFloat(numVehicles)).dp2)\tMax: \(t1Veh[0].maxSumKL.dp2)\n")
-
-//            print("2.\t\(t1Veh[innDex].speedMax.dp2)\t\(t1Veh[innDex].speedMin.dp2)")
-
-//            print("3a.\tMax: \(t1Veh[1].speedMax.dp2)\tAvg: \(t1Veh[1].speedAvg.dp2)\tMin: \(t1Veh[1].speedMin.dp2)")
-//            print("3b.\tMax: \(t1Veh[1].distanceMax.dp2)\tAvg: \(t1Veh[1].distance.dp2)\tMin: \(t1Veh[1].distanceMin.dp2)")
-
-//            //Check below elsewhere!
-//            if sOtherNode.position.y < 0 {
-//                //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
-//                sOtherNode.position.y = (sOtherNode.position.y + sTrackLength)
-//                sOtherNode.laps += 1
-//            }
+            //            if t1Veh[innDex].otherTrack == true {
+            //                print("oVeh \(innDex) spdMin: \(t1Veh[innDex].speedMin.dp1)\t\(t1Veh[innDex].otherTrack)\t\(enableMinSpeed)")
+            //            } else {
+            //                print("kVeh \(innDex) spdMin: \(t1Veh[innDex].speedMin.dp1)\t\(t1Veh[innDex].otherTrack)\t\(enableMinSpeed)")
+            //            }
+            //            print("b4:\tMin: \(t1Veh[0].minSumKL.dp2)\tAvg: \(((t1Veh[0].sumKL) / CGFloat(numVehicles)).dp2)\tMax: \(t1Veh[0].maxSumKL.dp2)")
+            t1xVeh[0].sumKL += t1xVeh[innDex].distance                   //All veh's: Total distance for all summed
+            t1xVeh[0].maxSumKL = max(t1xVeh[0].maxSumKL, t1xVeh[innDex].distance)  //Max distance by a single vehicle NOW
+            t1xVeh[0].minSumKL = min(t1xVeh[0].minSumKL, t1xVeh[innDex].distance)  //Min distance for a single vehicle NOW
+            //            print("af:\tMin: \(t1Veh[0].minSumKL.dp2)\tAvg: \(((t1Veh[0].sumKL) / CGFloat(numVehicles)).dp2)\tMax: \(t1Veh[0].maxSumKL.dp2)\n")
             
-//            //Other Track - May use separate routine???
-//            sOtherNode.distance = (sOtherNode.startPos - sOtherNode.position.y) / sTrackLength + sOtherNode.laps    //Distance travelled in km
-//
-//            sOtherNode.speedAvg = sOtherNode.distance * timeMx                  //Average speed for vehicle
-//            sOtherNode.speedMax = max(sOtherNode.speedMax, sOtherNode.speedAvg) //Max avg speed for vehicle
-//            if enableMinSpeed == true {
-//                sOtherNode.speedMin = min(sOtherNode.speedMin, sOtherNode.speedAvg)
-//            }           //Min avg speed for vehicle. Ignores acceleration period.
-//
-//            sumOther += sOtherNode.distance   //Total distance
-//            maxSumOther = max(maxSumOther, sOtherNode.distance)
-//            minSumOther = min(minSumOther, sOtherNode.distance)
+            //            print("2.\t\(t1Veh[innDex].speedMax.dp2)\t\(t1Veh[innDex].speedMin.dp2)")
             
-//            uNum = Int.extractNum(from: sKLNode.name)!  //Find current unit number
-//            t1Veh[uNum] = sKLNode                     //t1Veh[0] (All Vehicles) has been removed
+            //            print("3a.\tMax: \(t1Veh[1].speedMax.dp2)\tAvg: \(t1Veh[1].speedAvg.dp2)\tMin: \(t1Veh[1].speedMin.dp2)")
+            //            print("3b.\tMax: \(t1Veh[1].distanceMax.dp2)\tAvg: \(t1Veh[1].distance.dp2)\tMin: \(t1Veh[1].distanceMin.dp2)")
             
-//            print("Spd\t1\(t1Veh[unitNo].name)\tMax: \(t1Veh[unitNo].speedMax.dp2)\tAvg: \(t1Veh[unitNo].speedAvg.dp2)\tMin: \(t1Veh[unitNo].speedMin.dp2)\ttimeX: \(timeMx.dp2)")
-//            print("Dis\t1\(t1Veh[unitNo].name)\tMax: \(t1Veh[unitNo].distanceMax.dp2)\tAvg: \(t1Veh[unitNo].distance.dp2)\tMin: \(t1Veh[unitNo].distanceMin.dp2)")
-
+            //            //Check below elsewhere!
+            //            if sOtherNode.position.y < 0 {
+            //                //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
+            //                sOtherNode.position.y = (sOtherNode.position.y + sTrackLength)
+            //                sOtherNode.laps += 1
+            //            }
+            
+            //            //Other Track - May use separate routine???
+            //            sOtherNode.distance = (sOtherNode.startPos - sOtherNode.position.y) / sTrackLength + sOtherNode.laps    //Distance travelled in km
+            //
+            //            sOtherNode.speedAvg = sOtherNode.distance * timeMx                  //Average speed for vehicle
+            //            sOtherNode.speedMax = max(sOtherNode.speedMax, sOtherNode.speedAvg) //Max avg speed for vehicle
+            //            if enableMinSpeed == true {
+            //                sOtherNode.speedMin = min(sOtherNode.speedMin, sOtherNode.speedAvg)
+            //            }           //Min avg speed for vehicle. Ignores acceleration period.
+            //
+            //            sumOther += sOtherNode.distance   //Total distance
+            //            maxSumOther = max(maxSumOther, sOtherNode.distance)
+            //            minSumOther = min(minSumOther, sOtherNode.distance)
+            
+            //            uNum = Int.extractNum(from: sKLNode.name)!  //Find current unit number
+            //            t1Veh[uNum] = sKLNode                     //t1Veh[0] (All Vehicles) has been removed
+            
+            //            print("Spd\t1\(t1Veh[unitNo].name)\tMax: \(t1Veh[unitNo].speedMax.dp2)\tAvg: \(t1Veh[unitNo].speedAvg.dp2)\tMin: \(t1Veh[unitNo].speedMin.dp2)\ttimeX: \(timeMx.dp2)")
+            //            print("Dis\t1\(t1Veh[unitNo].name)\tMax: \(t1Veh[unitNo].distanceMax.dp2)\tAvg: \(t1Veh[unitNo].distance.dp2)\tMin: \(t1Veh[unitNo].distanceMin.dp2)")
+            
         }   //End of 'for' loop
-
+        
         firstThru = false       //NEVER = true again !!!
         
         //MARK: - Calculate distances & speeds for 'All Vehicles'
@@ -630,30 +656,110 @@ struct NodeData {
         //      Max Speed = Avg Speed of vehicle that has driven furthest
         //      Min Speed = Avg Speed of vehicle that has driven the least distance
         //(Note: @ present (24/8/22) avg, max & min the same as all vehicles driven at same speed over same distance.
-        klDistance0 = t1Veh[0].sumKL / CGFloat(numVehicles)
-        klDistanceMax0 = t1Veh[0].maxSumKL
-        klDistanceMin0 = t1Veh[0].minSumKL
         
-        klSpeedAvg0 = klDistance0 * timeMx
-        klSpeedMax0 = t1Veh[0].maxSumKL * timeMx
-        klSpeedMin0 = t1Veh[0].minSumKL * timeMx
+        if t1xVeh[1].otherTrack == false {
+            
+            //Keep Left Track
+            klDistance0 = t1xVeh[0].sumKL / CGFloat(numVehicles)
+            klDistanceMax0 = t1xVeh[0].maxSumKL
+            klDistanceMin0 = t1xVeh[0].minSumKL
         
-//        //Other Track - May use separate routine???
-//        oDistance0 = sumOther / CGFloat(numVehicles)
-//        oDistanceMax0 = maxSumOther
-//        oDistanceMin0 = minSumOther
-//
-//        oSpeedAvg0 = oDistance0 * timeMx
-//        oSpeedMax0 = maxSumOther * timeMx
-//        oSpeedMin0 = minSumOther * timeMx
+            klSpeedAvg0 = klDistance0 * timeMx
+            klSpeedMax0 = t1xVeh[0].maxSumKL * timeMx
+            klSpeedMin0 = t1xVeh[0].minSumKL * timeMx
         
-//        topLabel.updateLabel(topLabel: true, vehicel: sKLAllVehicles[f8DisplayDat])
-//        bottomLabel.updateLabel(topLabel: false, vehicel: sOtherAllVehicles[f8DisplayDat])
-        
-//        print("3a.\tMax: \(t1Veh[1].speedMax.dp2)\tAvg: \(t1Veh[1].speedAvg.dp2)\tMin: \(t1Veh[1].speedMin.dp2)")
+        } else {
 
-    return t1Veh
-}       //end calcAvgData
+            //Other Track
+            oDistance0 = t1xVeh[0].sumKL / CGFloat(numVehicles)
+            oDistanceMax0 = t1xVeh[0].maxSumKL
+            oDistanceMin0 = t1xVeh[0].minSumKL
+            
+            oSpeedAvg0 = oDistance0 * timeMx
+            oSpeedMax0 = t1xVeh[0].maxSumKL * timeMx
+            oSpeedMin0 = t1xVeh[0].minSumKL * timeMx
 
+    }
 
+        return t1xVeh
+    }       //end calcAvgData
+    
+    
+    func goLeft(teeVeh: inout [NodeData]) async -> ([NodeData]) {
+        //    func goLeft(teeVeh: inout [NodeData]) -> ([NodeData]) {
+        
+        for (indx, vehc) in teeVeh.enumerated() {
+            if indx == 0 {continue}       //Skip loop for element[0] = All Vehicles
+            
+            let approachRange = (vehc.preferredSpeed * 3.1) / 3.6      //3.1 secs
+            let encroachRange = (vehc.currentSpeed * 1) / 3.6        //1 sec
+            //            let okRange = (vehc.oRearSpd * 2.1) / 3.6                //oRear < 1.1 secs behind
+            let okRange = (vehc.currentSpeed * 0.8) / 3.6                //oRear < 0.5 secs behind
+            
+            if vehc.currentSpeed < 3 {                            //Stop near stationary vehicles from changing lanes if they don't want to go faster
+                if vehc.preferredSpeed < 2.5 {
+                    return teeVeh
+                }
+            }
+            
+            if vehc.lane == 0 {
+                //                if vehc.frontSpd < (vehc.currentSpeed + 0.5) {      //+ 0.5kph?
+                if vehc.frontSpd <= (vehc.currentSpeed + 2) {      //+ 2kph?
+                    if vehc.gap < approachRange {
+                        if vehc.otherGap > encroachRange {
+                            if vehc.oRearGap > okRange {
+//                                if vehc.oFrontSpd <= vehc.frontSpd {
+//                                    return teeVeh
+//                                }
+                                //Overtake
+                                teeVeh[indx].lane = 1
+                                return teeVeh
+                            } else {
+                                if (vehc.oRearGap > (okRange / 1.2)) && (oRearSpd <= vehc.currentSpeed) {
+                                    //Overtake
+                                    teeVeh[indx].lane = 1
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if vehc.lane == 1 {
+                if vehc.oFrontSpd > vehc.preferredSpeed {
+                    if vehc.otherGap > encroachRange {
+                        if vehc.oRearGap > okRange {
+                            teeVeh[indx].lane = 0
+                            //                            sKLAllVehicles[indx].lane = 0
+                            return teeVeh
+                        }
+                    }
+                }
+                
+                //                if vehc.otherGap > (approachRange + 12) {         //2 being an extra 2 metres
+                if vehc.otherGap > approachRange {         //2 being an extra 2 metres
+                    if vehc.oRearGap > okRange {
+                        teeVeh[indx].lane = 0
+                        return teeVeh
+                    }
+                }
+                
+                if vehc.gap < vehc.otherGap {
+                    if vehc.frontSpd <= (oFrontSpd + 0.5) {
+                        if oRearGap > okRange {
+                            teeVeh[indx].lane = 0
+                            return teeVeh
+                        }
+                    }
+                }
+                
+            }           //end if lane == 1
+            
+        }
+        
+        return teeVeh
+    }
+    
 }       //end of struct NodeData
+
+//gapSpeed = (gap * 3.6) / gapVal     //Max allowable speed for current gap. gapVal = 3 secs
