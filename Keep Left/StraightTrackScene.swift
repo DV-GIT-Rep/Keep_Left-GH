@@ -164,7 +164,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             let f8BackgroundWidth = f8BackgroundHeight/f8ImageAspect    //Assumes track image height = 400m !!!
             f8Background.makeBackground(size: CGSize(width: f8BackgroundWidth, height: f8BackgroundHeight), image: "Fig 8 Track", zPos: 0)
             f8Background.position = CGPoint(x: 0, y: 500 * straightScene.metre1)
-            f8Background.xScale = -1
+//            f8Background.xScale = -1
             f8Background.name = "f8Background"
             F8YZero = f8Background.position.y
             addChild(f8Background)
@@ -256,14 +256,14 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             bridge.position = CGPoint(x: 0, y: 0)
             bridge.zPosition = 15       //Set "altitude" of bridge
             bridge.maskNode = SKSpriteNode(color: .red, size: CGSize(width: bridgeWidth, height: bridgeWidth))
-            bridge.zRotation = CGFloat(45).degrees()        //Create cropping mask
+            bridge.zRotation = -CGFloat(135).degrees()        //Create cropping mask
 
             let bridgeCrop = SKSpriteNode(imageNamed: "Fig 8 Track")    //Set bridgeCrop equiv to f8Background
             bridgeCrop.xScale = -1
             bridgeCrop.size = f8Background.size
             bridgeCrop.position = CGPoint(x: 0, y: 0)
             bridgeCrop.name = "bridge"
-            bridgeCrop.zRotation = -CGFloat(45).degrees()   //Compensate for mask rotation
+            bridgeCrop.zRotation = CGFloat(45).degrees()   //Compensate for mask rotation
             
             bridge.addChild(bridgeCrop)
             f8Background.addChild(bridge)
@@ -471,7 +471,6 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             nodeData.name = veh1Node.name!      //OR = (index + 1)?
                             nodeData.size = veh1Node.size
                             nodeData.position = veh1Node.position
-                            nodeData.lane = veh1Node.lane
                             nodeData.laps = veh1Node.laps
                             nodeData.preferredSpeed = veh1Node.preferredSpeed
                             nodeData.currentSpeed = abs(veh1Node.physicsBody!.velocity.dy * 3.6)      //  ????? x 3.6 for kph?
@@ -480,6 +479,22 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             nodeData.speedMax = veh1Node.speedMax
                             nodeData.speedMin = veh1Node.speedMin
                             nodeData.reachedSpd = veh1Node.reachedSpd
+                            nodeData.indicator = veh1Node.indicator
+//                            switch veh1Node.indicator {
+//                            case .overtake:
+//                                print("\t\t\tOvertake\t\(index)")
+//                                nodeData.lane = 1
+//                                veh1Node.lane = 1
+//                            case .end_overtake:
+//                                print("\t\t\tEnd Overtake\t\(index)")
+//                                nodeData.lane = 0
+//                                veh1Node.lane = 0
+//                            default:
+                                nodeData.lane = veh1Node.lane
+//                            }
+////                            nodeData.lane = veh1Node.lane
+//                            sKLAllVehicles[index].lane = nodeData.lane
+////                            f8KLAllVehicles[index].lane = veh1Node.lane
                             //                nodeData.f8zPos = veh1Node.f8zPos
                             //                nodeData.equivF8Name = not needed here!
                         }
@@ -507,6 +522,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             nodeData.speedMax = veh2Node.speedMax
                             nodeData.speedMin = veh2Node.speedMin
                             nodeData.reachedSpd = veh2Node.reachedSpd
+                            nodeData.indicator = veh2Node.indicator
                             //                nodeData.equivF8Name = not needed here!
                         }
                         t2xVehicle.append(nodeData)
@@ -552,13 +568,18 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             var re1turnV: [NodeData] = await nodeData.goLeft(teeVeh: &ret1urn)
 //                            var re1turnV: [NodeData] = nodeData.goLeft(teeVeh: &ret1urn)
 //                            var re1turnV: [NodeData] = ret1urn
-
+//
+//                            for i in re1turnV.indices {
+////                                if enableMinSpeed == true {
+//                                    sKLAllVehicles[i].lane = re1turnV[i].lane //for some reason locks up if this enabled from start?
+////                                }
+//                            }
 
 
                             //***************  3. findF8Pos + updateF8Spots  ***************
                             var f8T1Spots = await nodeData.findF8Pos(t1Veh: &re1turnV)
                             
-                            updateF8TSpots(t1Vehicle: f8T1Spots)
+                            updateF8TSpots(t1Vehicle: f8T1Spots, kLTrack: true)
                             
                             
                             //***************  4. updateLabel  ***************
@@ -579,12 +600,23 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                                 sKLAllVehicles[i].speedMin = rtnT1Veh[i].speedMin
                                 sKLAllVehicles[i].reachedSpd = rtnT1Veh[i].reachedSpd
                                 
-                                if enableMinSpeed == true {
-                                    sKLAllVehicles[i].lane = rtnT1Veh[i].lane //for some reason locks up if this enabled from start?
-                                }
-                                
                                 if rtnT1Veh[i].reachedSpd == false { allAtSpeed1 = false } //Flag cleared if ANY vehicle NOT up to speed
                                 
+                                //                                if enableMinSpeed == true {
+                                                                    if rtnT1Veh[i].indicator == .overtake {
+                                //                                        print("Overtake\t\(i)")
+                                                                        sKLAllVehicles[i].indicator = .overtake
+                                //                                        sKLAllVehicles[i].lane = 1
+                                //                                        rtnT1Veh[i].lane = 1
+                                                                    } else if rtnT1Veh[i].indicator == .end_overtake {
+                                //                                        print("End Overtake\t\(i)")
+                                                                        sKLAllVehicles[i].indicator = .end_overtake
+                                //                                        sKLAllVehicles[i].lane = 0
+                                //                                        rtnT1Veh[i].lane = 0
+                                                                    }
+                                //                                    sKLAllVehicles[i].lane = rtnT1Veh[i].lane //for some reason locks up if this enabled from start?
+                                //                                }
+
                                 //If vehicle crosses 1km boundary then subtract tracklength from the y position.
                                 if sKLAllVehicles[i].position.y >= sTrackLength {
                                     //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
@@ -644,7 +676,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             //***************  3. findF8Pos + updateF8Spots  ***************
                             var f8T2Spots = await nodeData.findF8Pos(t1Veh: &re2turnV)
                             
-                            updateF8TSpots(t1Vehicle: f8T2Spots)
+                            updateF8TSpots(t1Vehicle: f8T2Spots, kLTrack: false)
                             
                             
                             //***************  4. updateLabel  ***************
@@ -707,6 +739,29 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                     }       //End Task
                     
                         gameStage = gameStage & (0xFF - noVehTest)       //Clear 2nd MSB. Don't clear until all above done!
+                
+//                for i in 1..<sKLAllVehicles.count {
+//                    switch sKLAllVehicles[i].indicator {
+//                    case .overtake:
+//                        sKLAllVehicles[i].lane = 1
+//                    case .end_overtake:
+//                        sKLAllVehicles[i].lane = 0
+//                    default:
+//                        continue
+//                    }
+//                }
+                    
+                    
+                    
+//                for i in 1..<sKLAllVehicles.count {
+//                    if sKLAllVehicles[i].indicator == .overtake {
+//                        sKLAllVehicles[i].lane = 1
+//                    }
+//                    if sKLAllVehicles[i].indicator == .end_overtake {
+//                        sKLAllVehicles[i].lane = 0
+//                    }
+//                }
+//
                         
                     }       //End gameStage < 0x3F
                     
@@ -963,10 +1018,11 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             
             setAspectForWidth(sprite: sKLVehicle, width: vWidth)  //Sets veh width = 2m (default) & maintains aspect ratio
             let vehSize = sKLVehicle.size
+            let gapBetween: CGFloat = 1.5       //Sets minimum gap between vehicles when stationary in metres.
             
             sKLVehicle.zPosition = +50
             sKLVehicle.name = "stKL_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
-            sKLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: sKLVehicle.size.width, height: sKLVehicle.size.height + 1))   //Make rectangle same size as sprite + 0.5m front and back!
+            sKLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: sKLVehicle.size.width, height: sKLVehicle.size.height + gapBetween))   //Make rectangle same size as sprite + 0.75m front and back!
             sKLVehicle.physicsBody?.friction = 0
             sKLVehicle.physicsBody?.restitution = 0
             sKLVehicle.physicsBody?.linearDamping = 0
@@ -983,7 +1039,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
             f8KLVehicle.zPosition = 10      //Set starting "altitude" above track and below bridge
             f8KLVehicle.name = "f8KL_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
-            f8KLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: f8KLVehicle.size.width, height: f8KLVehicle.size.height + 1))   //Make rectangle same size as sprite + 0.5m front and back!
+            f8KLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: f8KLVehicle.size.width, height: f8KLVehicle.size.height + gapBetween))   //Make rectangle same size as sprite + 0.5m front and back!
             f8KLVehicle.physicsBody?.friction = 0
             f8KLVehicle.physicsBody?.restitution = 0
             f8KLVehicle.physicsBody?.linearDamping = 0
@@ -1265,7 +1321,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
     }       //end @MainActor func updateSpeeds
     
     //MARK: - Update position of vehicles on Fig 8 Track based on Straight Track vehicles
-    @MainActor func updateF8TSpots(t1Vehicle: [NodeData]) {
+    @MainActor func updateF8TSpots(t1Vehicle: [NodeData], kLTrack: Bool) {
         
         var key: String = ""            //Create Unique key for each Fig 8 vehicle
         let actionTimeF8: CGFloat = 0.5 //SKAction time in seconds
@@ -1277,9 +1333,17 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             key = "keyF8\(key)"
             
             guard let f8Node = childNode(withName: veh1Node.equivF8Name) else {
+                print("f8Node NOT found!!! (see 'func updateF8TSpots')\t\(childNode(withName: veh1Node.equivF8Name))\t\(veh1Node.equivF8Name)")
                 return
             }
             
+//            print("f8Node: \(f8Node)\tkey: \(key)")
+            if kLTrack == true {
+                sKLAllVehicles[index].lane = veh1Node.lane
+            } else {
+                sOtherAllVehicles[index].lane = veh1Node.lane
+            }
+
             f8Node.position = veh1Node.f8Pos
             f8Node.zRotation = veh1Node.f8Rot
             f8Node.zPosition = veh1Node.f8zPos

@@ -18,7 +18,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
     
     @Published var speedKPH: CGFloat
     @Published var km: CGFloat
-    @Published var lane: CGFloat
+    var lane: CGFloat
     
     @Published var laps: CGFloat
     @Published var distance: CGFloat        //Distance travelled in km
@@ -45,7 +45,9 @@ class Vehicle: SKSpriteNode, ObservableObject {
     @Published var goalSpeed: CGFloat   //Used to temp store immediate goal speed following proximity check
     @Published var changeTime: CGFloat  //Time in seconds for next SKAction on Straight Track vehicles
     
-    @Published var reachedSpd: Bool     //Set for each vehicle when it reaches speed. Cleared when vehicles stopped.
+    var reachedSpd: Bool     //Set for each vehicle when it reaches speed. Cleared when vehicles stopped.
+    
+    var indicator: Indicator
 
 //    @Published var indicate: String
 //    @Published var lights: Bool
@@ -77,6 +79,8 @@ class Vehicle: SKSpriteNode, ObservableObject {
         goalSpeed = 0.0     //Overwritten later!
         changeTime = 1.0    //seconds. Overwritten later!
         reachedSpd = false
+        
+        indicator = .off
 
         super.init(texture: texture, color: UIColor.clear, size: texture.size())
 //        super.init(imageName: imageName)

@@ -82,7 +82,7 @@ var maxTrucks = trucks.count
 var maxBuses = buses.count
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 28 //28
+var numVehicles = 18 //28
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
 var sOtherAllVehicles: [Vehicle] = []   //Array of vehicles on Other Straight Track
@@ -288,3 +288,9 @@ var randUnitNo: Int = 1
 
 var allAtSpeed1: Bool = false
 var allAtSpeed2: Bool = false
+
+enum Indicator {
+    case off                //Vehicle in left or right lane
+    case overtake           //Vehicle changing to overtaking (right) lane
+    case end_overtake       //Vehicle returning to normal (left) lane
+}
