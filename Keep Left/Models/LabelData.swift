@@ -209,7 +209,7 @@ class LabelData: SKLabelNode, ObservableObject {
     
     func updateLabel(topLabel: Bool, vehicel: NodeData) {
         f8KLLabelTitle.text = topLabel ? "\(kLTitle)" : "Std Track"
-        f8KLLabelDescription.text = f8DisplayDat == 0 ? "All Vehicles" : "Vehicle \(f8DisplayDat)"
+        f8KLLabelDescription.text = f8DisplayDat == 0 ? "All Vehicles" : flashOffFlag ? "" : "Vehicle \(f8DisplayDat)"
         f8KLLabelDescription.fontColor = f8DisplayDat == 0 ? subTitleColour : UIColor(displayP3Red: 0.98, green: 1, blue: 0.84, alpha: 1)
         avgDistanceDesc.text = f8DisplayDat == 0 ? "Avg \(Km)" : "Total \(Km)"
         maxDistanceDesc.text = f8DisplayDat == 0 ? "Max \(Km)" : ""

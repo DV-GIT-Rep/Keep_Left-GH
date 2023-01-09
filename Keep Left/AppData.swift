@@ -82,12 +82,14 @@ var maxTrucks = trucks.count
 var maxBuses = buses.count
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 18 //28
+var numVehicles = 32 //28
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
 var sOtherAllVehicles: [Vehicle] = []   //Array of vehicles on Other Straight Track
 var f8KLAllVehicles: [F8Vehicle] = []     //Array of vehicles on Keep Left Figure 8 Track
 var f8OtherAllVehicles: [F8Vehicle] = []  //Array of vehicles on Other Figure 8 Track
+
+var flashOffFlag = false        //
 
 //Vehicle Stats = Inner Dictionary =
 //  Name, Actual Speed, Intended Speed, Speed Limited, Algorithm

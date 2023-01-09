@@ -1018,10 +1018,10 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             
             setAspectForWidth(sprite: sKLVehicle, width: vWidth)  //Sets veh width = 2m (default) & maintains aspect ratio
             let vehSize = sKLVehicle.size
-            let gapBetween: CGFloat = 1.5       //Sets minimum gap between vehicles when stationary in metres.
+            let gapBetween: CGFloat = 2.5     //Sets minimum gap between vehicles when stationary in metres.
             
             sKLVehicle.zPosition = +50
-            sKLVehicle.name = "stKL_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
+            sKLVehicle.name = "stKL_\(i)"   //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
             sKLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: sKLVehicle.size.width, height: sKLVehicle.size.height + gapBetween))   //Make rectangle same size as sprite + 0.75m front and back!
             sKLVehicle.physicsBody?.friction = 0
             sKLVehicle.physicsBody?.restitution = 0
@@ -1388,11 +1388,13 @@ func flashVehicle(thisVehicle: Vehicle) {           //Called every 500ms. 'thisV
             if f8DisplayDat == vehNum {
                 if thisVehicle.alpha == 0 {
                     thisVehicle.alpha = 1
+                    flashOffFlag = false
                     sOtherAllVehicles[vehNum].alpha = 1
                     f8KLAllVehicles[vehNum].alpha = 1
                     f8OtherAllVehicles[vehNum].alpha = 1
                 } else {
                     thisVehicle.alpha = 0
+                    flashOffFlag = true
                     sOtherAllVehicles[vehNum].alpha = 0
                     f8KLAllVehicles[vehNum].alpha = 0
                     f8OtherAllVehicles[vehNum].alpha = 0

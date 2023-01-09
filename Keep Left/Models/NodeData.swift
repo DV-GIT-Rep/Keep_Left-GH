@@ -719,12 +719,15 @@ struct NodeData {
 
         var bigGap: CGFloat = 0             //bigGap = 110% of 3 sec gap. Calc'd for each vehicle during loop.
 //        print("\n")
+        let minChangeLaneSpd: CGFloat = 1.2
         
         for indx in teeVeh.indices {
 //        for (indx, vehc) in teeVeh.enumerated() {
             if indx == 0 { continue }       //Skip loop for element[0] = All Vehicles
             
 //            print("\(indx)\t\(teeVeh[indx])")
+            
+            if teeVeh[indx].currentSpeed < minChangeLaneSpd { continue }   //Vehicle MUST be >= 1 kph to change lanes
             
             //****************  Test for permissible oRearGap \/   ****************
             oRearSub = (teeVeh[indx].oRearSpd - teeVeh[indx].currentSpeed)  //Used to calc speed difference
@@ -752,7 +755,7 @@ struct NodeData {
             //****************  Test for permissible oRearGap /\   ****************
             //****************  Test for permissible oFrontGap \/  ****************
             //For now same constants used for front as for back. Name not changed as may later be changed.
-            oFrontSub = (teeVeh[indx].oRearSpd - teeVeh[indx].currentSpeed)  //Used to calc speed difference
+            oFrontSub = (teeVeh[indx].oFrontSpd - teeVeh[indx].currentSpeed)  //Used to calc speed difference
             
             if oFrontSub < 0 {
                 oFrontSub = 0
