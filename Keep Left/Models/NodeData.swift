@@ -727,7 +727,7 @@ struct NodeData {
             
 //            print("\(indx)\t\(teeVeh[indx])")
             
-            if teeVeh[indx].currentSpeed < minChangeLaneSpd { continue }   //Vehicle MUST be >= 1 kph to change lanes
+            if teeVeh[indx].currentSpeed < minChangeLaneSpd { continue }   //Vehicle MUST be >= 1.2 kph to change lanes
             
             //****************  Test for permissible oRearGap \/   ****************
             oRearSub = (teeVeh[indx].oRearSpd - teeVeh[indx].currentSpeed)  //Used to calc speed difference
@@ -756,7 +756,7 @@ struct NodeData {
             //****************  Test for permissible oFrontGap \/  ****************
             //For now same constants used for front as for back. Name not changed as may later be changed.
             oFrontSub = (teeVeh[indx].oFrontSpd - teeVeh[indx].currentSpeed)  //Used to calc speed difference
-            
+
             if oFrontSub < 0 {
                 oFrontSub = 0
             } else {
@@ -767,7 +767,7 @@ struct NodeData {
 
             oFrontOKGap = oRearMinGap + (oRearGapRange / maxORearSpdDiff * oFrontSub) //returns min gap allowed = 0.5 - 3 secs
             oFrontOKGap = (teeVeh[indx].oFrontSpd * oFrontOKGap) / 3.6                 //converts to metres
-            
+
             if oFrontOKGap <= 1 { oFrontOKGap = 1 }       //Limit minimum gap to 1m ( + 1m = 2m) at low speeds
 
             if teeVeh[indx].otherGap <= oFrontOKGap { continue } //oFrontGap insufficient to change lanes. End.
@@ -810,10 +810,11 @@ struct NodeData {
 //                    if teeVeh[indx].otherTrack == false {
 //                        print("Spd1: \(allAtSpeed1)\tSpd2: \(allAtSpeed2)\tignoreSpd: \(ignoreSpd)\t\(indx): \(teeVeh[indx].reachedSpd)")   //allAtSpeed1 == true && allAtSpeed2 == true && ignoreSpd == false. rtnT2Veh[i].reachedSpd
 //                    }
-                    if enableMinSpeed == false {
-//                        print("enablSpd: \(enableMinSpeed)")
-                        continue
-                    }
+                    
+//                    if enableMinSpeed == false {
+////                        print("enablSpd: \(enableMinSpeed)")
+//                        continue
+//                    }
                     teeVeh[indx].lane = 0       //Return to left lane
                     teeVeh[indx].indicator = .end_overtake              //Return to left lane
 //                    print("ta\t\(indx)\t\(teeVeh[indx].lane)\tenablSpd: \(enableMinSpeed)")

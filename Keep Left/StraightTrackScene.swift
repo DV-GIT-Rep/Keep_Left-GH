@@ -407,6 +407,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
     
     override func update(_ currentTime: TimeInterval) {
         //ideally occurs every 60ms
+//        var whichWay: String
         
 //        f8Background.alpha = ((whichScene == .figure8) ? 1.0 : 0)
 
@@ -417,22 +418,31 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         case .portrait:
             camera?.zRotation = 0
             print("Portrait - orientation = \(orientation)")
+//            whichWay = ".portrait"
         case .portraitUpsideDown:
             camera?.zRotation = CGFloat.pi/3
             print("Portrait Upside Down - orientation = \(orientation)")
+//            whichWay = ".portrait"
         case .landscapeLeft:
             camera?.zRotation = 2 * CGFloat.pi
             print("Landscape Left - orientation = \(orientation)")
+//            whichWay = ".landscape"
         case .landscapeRight:
             camera?.zRotation = CGFloat.pi/2
             print("Landscape Right - orientation = \(orientation)")
+//            whichWay = ".landscape"
         default:
             camera?.zRotation = 0
             print("Default - orientation = \(orientation)")
         }
 
-        let value = UIInterfaceOrientation.portrait.rawValue
-        UIDevice.current.setValue(value, forKey: "orientation")
+            guard let windowScene = view?.window?.windowScene else { return }
+            
+            windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: .all)) { error in
+                print("requestGeometryUpdate Error!")
+            }
+//        let value = UIInterfaceOrientation.portrait.rawValue
+//        UIDevice.current.setValue(value, forKey: "orientation")
             
             updateOneTime = true
         }

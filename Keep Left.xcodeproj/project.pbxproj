@@ -56,6 +56,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9D0EA4E42973D29000A9770D /* Keep-Left-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Keep-Left-Info.plist"; sourceTree = SOURCE_ROOT; };
 		9D174FC1281507FC00DF0996 /* ResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsView.swift; sourceTree = "<group>"; };
 		9D2544D028B2483E00A0B58C /* tempOnly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = tempOnly.swift; sourceTree = "<group>"; };
 		9D2E9D8D289AC862002B7882 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
@@ -222,6 +223,7 @@
 		9DD199D727901F8500866318 /* Keep Left */ = {
 			isa = PBXGroup;
 			children = (
+				9D0EA4E42973D29000A9770D /* Keep-Left-Info.plist */,
 				9DD199D827901F8500866318 /* KeepLeftApp.swift */,
 				9D6CF2762846FCE5001CD66C /* Views */,
 				9D6CF2752846FCD8001CD66C /* ViewModels */,
@@ -504,7 +506,7 @@
 				DEVELOPMENT_TEAM = Q53HBB2F75;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_FILE = "Keep-Left-Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
@@ -540,7 +542,7 @@
 				DEVELOPMENT_TEAM = Q53HBB2F75;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_FILE = "Keep-Left-Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
