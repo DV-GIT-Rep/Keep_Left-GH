@@ -313,7 +313,7 @@ struct NodeData {
             //    var truckDecel: CGFloat = 0.9
             let spdChange = abs(goalSpeed - vehNode.currentSpeed)
             gapTime = (gap * 3.6) / vehNode.currentSpeed   //Time in secs to catch vehicle in front @ current speed
-            
+            //_____________________________________________________________________________________________________
             //MARK: - Create variable value of decel when gap 1 - 3 secs from vehicle in front
             if gapTime < (gapVal * 0.33) {
                 decel = decelMax + 2                        //Max decel! Gap < 1 second. (+2 is TEMPORARY!!!)
@@ -342,12 +342,13 @@ struct NodeData {
                     }
                 }
                 
-                if (vehNode.currentSpeed < vehNode.frontSpd) { decel = 0 }  //decelCoast }
+                if (vehNode.currentSpeed < vehNode.frontSpd) { decel = decelCoast }  //decelCoast }
 //                    goalSpeed = vehNode.currentSpeed        //Travelling slower than vehicle in front - maintain speed
 //                    if goalSpeed < gapSpeed {
 //                        goalSpeed = gapSpeed  //Aim for this speed while in this lane
 //                    }
 //                }
+                //NEVER allow decel = 0! (may get divide by zero error)
                 
                 //MARK: - IF GAP << 3 SECS THEN INCREASE DECELERATION!!! See above
                 if (spdChange / 3.6) > decel {      //spdChange in kph / 3.6 = m/s
@@ -356,6 +357,7 @@ struct NodeData {
                 
             } else {
                 
+                //NEVER allow accel = 0! (may get divide by zero error)
                 //ACCELERATE to goalSpeed which can be preferredSpeed or gapSpeed
                 if (spdChange / 3.6) > accel {      //spdChange in kph / 3.6 = m/s
                     changeTime = ((spdChange / 3.6) / accel)
@@ -743,7 +745,7 @@ struct NodeData {
             oRearOKGap = oRearMinGap + (oRearGapRange / maxORearSpdDiff * oRearSub) //returns min gap allowed = 0.5 - 3 secs
             oRearOKGap = (teeVeh[indx].oRearSpd * oRearOKGap) / 3.6                 //converts to metres
             
-            if oRearOKGap <= 1 { oRearOKGap = 1 }       //Limit minimum gap to 1m ( + 1m = 2m) at low speeds
+            if oRearOKGap <= 1.5 { oRearOKGap = 1.5 }       //Limit minimum gap to 1.5m ( + 1m = 2.5m) at low speeds
 //            tmp3Gap = teeVeh[indx].oRearSpd * 3 / 3.6
 //            ttt = "OK"
 //            if teeVeh[indx].oRearGap <= oRearOKGap { ttt = "No" }
@@ -768,12 +770,16 @@ struct NodeData {
             oFrontOKGap = oRearMinGap + (oRearGapRange / maxORearSpdDiff * oFrontSub) //returns min gap allowed = 0.5 - 3 secs
             oFrontOKGap = (teeVeh[indx].oFrontSpd * oFrontOKGap) / 3.6                 //converts to metres
 
-            if oFrontOKGap <= 1 { oFrontOKGap = 1 }       //Limit minimum gap to 1m ( + 1m = 2m) at low speeds
+            if oFrontOKGap <= 1.5 { oFrontOKGap = 1.5 }       //Limit minimum gap to 1.5m ( + 1m = 2.5m) at low speeds
 
             if teeVeh[indx].otherGap <= oFrontOKGap { continue } //oFrontGap insufficient to change lanes. End.
                                                         //oRearGap OK - Test other factors.
             
             //****************  Test for permissible oFrontGap /\  ****************
+            //*********  Test for minimum speed to permit lane change \/  ****************
+            if teeVeh[indx].currentSpeed < 1.5 { continue }     //Don't permit lane change when vehicle speed < 1.5 kph.
+            
+            //*********  Test for minimum speed to permit lane change /\  ****************
 
             bigGap = ((1.1 * gapVal) * teeVeh[indx].currentSpeed) / 3.6    //bigGap = 110% of 3 sec gap.
             
