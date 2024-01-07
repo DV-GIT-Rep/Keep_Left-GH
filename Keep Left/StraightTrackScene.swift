@@ -450,9 +450,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         //Run on Main Thread!
         
-        if gameStage < 0xFF {           //Prevents code from running before vehicles are created.
+        if gameStage < 0x80 {           //Prevents code from running before vehicles are created.
                                         //MSB cleared when vehicles created ie. #7FH -> gameStage
-            //Should the above read < 80H???
+            //Above changed from 0xFF to 0x80 7/1/24. Should make NO DIFFERENCE TO OPERATION!
             //'noVehTest' flag (40H) set prior to 'Task' & set to 0 at end of Task.
             if gameStage < 0x40 {
                 
@@ -461,12 +461,16 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
             //gameStage bit 40H set indicates below is in progress
             //          bits 1 & 0 indicate stage: 10 -> 01 -> 00 -> 11
-            testNo = (gameStage & noOfCycles)   //Only interested in 2 LSBs gameStage. Set other bits = 0.
+//            testNo = (gameStage & noOfCycles)   //Only interested in 2 LSBs gameStage. Set other bits = 0.
+            testNo = (gameStage & 0x03)   //Only interested in 2 LSBs gameStage. Set other bits = 0.
+                //Changed from 'noOfCycles' to 0x03 7/1/24
                                                 //Result = 00, 01, 10 or 11
                 if testNo != 0 {
                     gameStage -= 1      //Decrement gameStage only when > 0
                 } else {
-                    gameStage = gameStage | noOfCycles      //Set 2 LSBs
+//                    gameStage = gameStage | noOfCycles      //Set 2 LSBs
+                    gameStage = gameStage | 0x03      //Set 2 LSBs
+                    //Changed from 'noOfCycles' to 0x03 7/1/24
                 }   //End else
             
                     gameStage = gameStage | noVehTest       //Set 2nd MSB. Don't clear until all below done!
