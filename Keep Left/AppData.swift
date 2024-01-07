@@ -56,10 +56,6 @@ let y1Mx: CGFloat = 270 / (1.5 * .pi * F8Radius)
 ///Returns y coordinate change between (0,0) and the fig 8 circle centre in metres
 let f8CircleCentre: CGFloat = F8Radius / cos45Deg
 
-///All but 8 LSBs cleared once all vehicles created. Value then dictates which code runs during 'update'
-var gameStage: Int = 0xFF   //0xFF = Max value
-//var gameStage: Int = 1024   //1024 = 100 0000 0000 H
-
 var carXWidth: CGFloat = .zero
 var carXLength: CGFloat = .zero
 var carXRatio: CGFloat = .zero
@@ -157,6 +153,11 @@ var enableMinSpeed: Bool = false    //Minimum speed is only calculated after thi
 var runStop: runCondition = .stop
 var ignoreSpd: Bool = true          //ignoreSpd set when vehicles stopped. Reset when started plus 2 secs (runTimerDelay)
 
+///All but 8 LSBs cleared once all vehicles created. Value then dictates which code runs during 'update'
+var gameStage: Int = 0xFF   //0xFF = Max value
+//var gameStage: Int = 1024   //1024 = 100 0000 0000 H
+
+//Set ONLY to 01 or 11! Track 1 & 2 alternate based on value of bit 0!
 let noOfCycles = 0x03       //Calc speeds & f8Pos once every 'noOfCycles' 60ms periods.
                             //0 - No Delay                  60fps   (smoothest)
                             //1 - Run every 2nd 60ms cycle  30fps   (good)

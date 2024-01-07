@@ -468,8 +468,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                 if testNo != 0 {
                     gameStage -= 1      //Decrement gameStage only when > 0
                 } else {
-//                    gameStage = gameStage | noOfCycles      //Set 2 LSBs
-                    gameStage = gameStage | 0x03      //Set 2 LSBs
+                    gameStage = gameStage & 0xFC        //0 -> 2 LSBs
+                    gameStage = gameStage | noOfCycles  //Set 2 LSBs = noOfCycles
+//                    gameStage = gameStage | 0x03      //Set 2 LSBs (same effect as above IF noOfCycles = 03).
                     //Changed from 'noOfCycles' to 0x03 7/1/24
                 }   //End else
             
@@ -778,7 +779,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //                }
 //
                         
-                    }       //End gameStage < 0x3F
+                    }       //End gameStage < 0x40
                     
         }           //End gameStage < 0xFF
         
