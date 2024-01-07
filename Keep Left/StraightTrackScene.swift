@@ -468,10 +468,10 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                 if testNo != 0 {
                     gameStage -= 1      //Decrement gameStage only when > 0
                 } else {
-                    gameStage = gameStage & 0xFC        //0 -> 2 LSBs
+//                    gameStage = gameStage & 0xFC        //0 -> 2 LSBs. 2 LSBs ALREADY = 0!!!
                     gameStage = gameStage | noOfCycles  //Set 2 LSBs = noOfCycles
 //                    gameStage = gameStage | 0x03      //Set 2 LSBs (same effect as above IF noOfCycles = 03).
-                    //Changed from 'noOfCycles' to 0x03 7/1/24
+                    //Changed 7/1/24
                 }   //End else
             
                     gameStage = gameStage | noVehTest       //Set 2nd MSB. Don't clear until all below done!
