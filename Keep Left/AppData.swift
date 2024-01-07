@@ -162,6 +162,9 @@ let noOfCycles = 0x03       //Calc speeds & f8Pos once every 'noOfCycles' 60ms p
                             //1 - Run every 2nd 60ms cycle  30fps   (good)
                             //2 - Run every 3rd 60ms cycle  20fps   (a little jumpy)
                             //3 - Run every 4th 60ms cycle  15fps
+                            //NOTE: Larger no. here quickens speed change in vehicles! Compensates
+                            //      for fact that routine runs less often! (also set by this constant)
+//WEIRD!!! IF SET TO 0, FIG 8 SCREEN DOESN'T FULLY LOAD!!!
 
 //MARK: - These values are for the straight line auto track
 //var sMetre1: CGFloat = 0.0       //Multiply metres by this constant to get display points

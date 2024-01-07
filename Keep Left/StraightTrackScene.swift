@@ -452,7 +452,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         
         if gameStage < 0xFF {           //Prevents code from running before vehicles are created.
                                         //MSB cleared when vehicles created ie. #7FH -> gameStage
-            
+            //Should the above read < 80H???
+            //'noVehTest' flag (40H) set prior to 'Task' & set to 0 at end of Task.
             if gameStage < 0x40 {
                 
                 let noVehTest: Int = 0x40   //Test Flag
@@ -460,7 +461,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
             //gameStage bit 40H set indicates below is in progress
             //          bits 1 & 0 indicate stage: 10 -> 01 -> 00 -> 11
-            testNo = (gameStage & noOfCycles)   //Only interested in 2 LSBs gameStage
+            testNo = (gameStage & noOfCycles)   //Only interested in 2 LSBs gameStage. Set other bits = 0.
                                                 //Result = 00, 01, 10 or 11
                 if testNo != 0 {
                     gameStage -= 1      //Decrement gameStage only when > 0
@@ -1299,6 +1300,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         
         speedChange = (vehNode.goalSpeed - vehNode.currentSpeed)
         newTime = vehNode.changeTime * (60 / (CGFloat(noOfCycles) + 1))     //newTime = no of cycles @60/30/20Hz in changeTime
+//        print("\(unitNum)\tvehNode.changeTime = \(vehNode.changeTime.dp2)\tnewTime = \(newTime.dp2)")
         newSpeed = vehNode.currentSpeed + (speedChange / newTime)
         //print("1.\t\(unitNum)\t\t\(vehNode.preferredSpeed.dp2)\t\(vehNode.goalSpeed.dp2)\t\(vehNode.currentSpeed.dp2)\t\(newSpeed.dp2)\t\(vehNode.changeTime.dp2)\t\(vehNode.gap.dp2)\t\(newTime.dp2)")
 //        allVeh[unitNum].physicsBody?.velocity.dy = newSpeed / 3.6

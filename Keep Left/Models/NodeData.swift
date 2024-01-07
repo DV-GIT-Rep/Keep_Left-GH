@@ -206,7 +206,7 @@ struct NodeData {
                 //                }       //end lane check
                 //                //@@@@@@@@@@@@ Old Lane Check - End   @@@@@@@
                 
-            }               //end while
+            }               //end 'While' loop
             
             tVehicle[index].rearGap = rearGap      // same as vehNode.rearGap
             tVehicle[index].oRearGap = oRearGap    // same as vehNode.oRearGap
@@ -214,7 +214,7 @@ struct NodeData {
             rearGap = 0
             oRearGap = 0
             
-        }               //end 1st for loop
+        }               //end 1st 'For' loop
         //########################### end RearGap calc loop #######################################
         
         tVehicle.sort(by: keepLeft ? {$0.position.y < $1.position.y} : {$0.position.y >= $1.position.y}) //Sort into positional order, 000 - 999.999
@@ -255,7 +255,7 @@ struct NodeData {
                 
                 //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
                 if sameLane.contains(tVehicle[nextIndex].lane) {
-                    //Both vehicles in same lane
+                    //Both vehicles in same lane +/- 0.8
                     if gap == 0 {
                         gap = (past1km == false) ? sameLap : lastLap
                         if gap <= 0 { gap = 0.1 } //Should NEVER happen! (due to self braking)
@@ -274,7 +274,7 @@ struct NodeData {
                         }
                     }
                 } else {
-                    //The two vehicles are in different lanes
+                    //The two vehicles are in different lanes ie.> 0.8 lanes away from this lane!
                     if otherGap == 0 {
                         otherGap = (past1km == false) ? sameLap : lastLap
                         if otherGap <= 0 { otherGap = 0.1 } //Could prevent -ve values by using <= here
@@ -294,6 +294,9 @@ struct NodeData {
             //       (Has been changed by using <= instead of == above)
             
             gapSpeed = (gap * 3.6) / gapVal     //Max allowable speed for current gap. gapVal = 3 secs
+            //  gap = metres to vehicle in front.
+            //  Multiply 'gap' * 3.6 & then divide by no. of secs (=3 secs) gives kph required to traverse gap in 3 secs.
+            //  Therefore gapSpeed is in kph!
             goalSpeed = gapSpeed
             
 //            if (vehNode.currentSpeed < vehNode.frontSpd) { decel = decelCoast }
@@ -308,7 +311,7 @@ struct NodeData {
             //    var truckAccel: CGFloat = 1.0
             var decelMax: CGFloat = 8 // m/sec2
             var decelMin: CGFloat = 4  // m/sec2
-            var decelCoast: CGFloat = 0.2       // m/sec2. Rate when vehicle in front is faster
+            var decelCoast: CGFloat = 0.1       // m/sec2. Rate when vehicle in front is faster
             //        var decel: CGFloat = 4    // m per sec2
             //    var truckDecel: CGFloat = 0.9
             let spdChange = abs(goalSpeed - vehNode.currentSpeed)
@@ -333,35 +336,64 @@ struct NodeData {
             
             var changeTime: CGFloat = 1     //Set initial value = 1 second
             if vehNode.currentSpeed >= goalSpeed {
-                
+                //currentSpeed >= goalSpeed
                 //DECELERATE to goalSpeed which can be preferredSpeed or gapSpeed
                 if ignoreSpd == false {                     //ignoreSpd set when vehicles stopped. Reset when started plus 2 secs (runTimerDelay)
 //                    if tVehicle[index].frontSpd > 30 {                      //frontSpd > 30kph
                     if tVehicle[index].currentSpeed > 30 {                      //frontSpd > 30kph
                         tVehicle[index].reachedSpd = true       //This vehicle is now up to speed.
                     }
+                    //The above is not ideal - assumes up to speed once > 30 kph! Short term solution ONLY!
                 }
                 
-                if (vehNode.currentSpeed < vehNode.frontSpd) { decel = decelCoast }  //decelCoast }
-//                    goalSpeed = vehNode.currentSpeed        //Travelling slower than vehicle in front - maintain speed
-//                    if goalSpeed < gapSpeed {
-//                        goalSpeed = gapSpeed  //Aim for this speed while in this lane
-//                    }
-//                }
-                //NEVER allow decel = 0! (may get divide by zero error)
-                
-                //MARK: - IF GAP << 3 SECS THEN INCREASE DECELERATION!!! See above
-                if (spdChange / 3.6) > decel {      //spdChange in kph / 3.6 = m/s
-                    changeTime = ((spdChange / 3.6) / decel)
-                }   //else { changeTime = 1 }   //already = 1. Slows final deceleration
+                if (vehNode.currentSpeed < vehNode.frontSpd) {                          //NEED TO CHANGE changeTime TOO ?????
+                    ////ALL ADDED CODE BELOW HERE SO DECEL GRADUAL WHEN VEHICLE IN FRONT FASTER!!!
+
+
+
+                    changeTime = 3600
+
+
+
+                    decel = decelCoast
+                    gapTime = gapVal            //FORCED to gapVal (=3s) when vehicle in front is faster to minimise deceleration!
+                    if goalSpeed < vehNode.currentSpeed { goalSpeed = vehNode.currentSpeed }    //Just coast along
+                    if goalSpeed > vehNode.frontSpd { goalSpeed = vehNode.frontSpd }           //But not faster than vehicle in front!
+                    ////ALL ADDED CODE ABOVE HERE SO DECEL GRADUAL WHEN VEHICLE IN FRONT FASTER!!!
+                }  //decelCoast }
+                else {
+                    //                    goalSpeed = vehNode.currentSpeed        //Travelling slower than vehicle in front - maintain speed
+                    //                    if goalSpeed < gapSpeed {
+                    //                        goalSpeed = gapSpeed  //Aim for this speed while in this lane
+                    //                    }
+                    //                }
+                    //NEVER allow decel = 0! (may get divide by zero error)
+                    
+                    //MARK: - IF GAP << 3 SECS THEN INCREASE DECELERATION!!! (unless coasting) See above
+                    if (spdChange / 3.6) > decel {      //spdChange in kph / 3.6 = m/s
+                        changeTime = ((spdChange / 3.6) / decel)
+                    }   //else { changeTime = 1 }   //already = 1. Slows final deceleration
+                }
                 
             } else {
-                
+                //currentSpeed < goalSpeed
+
                 //NEVER allow accel = 0! (may get divide by zero error)
                 //ACCELERATE to goalSpeed which can be preferredSpeed or gapSpeed
                 if (spdChange / 3.6) > accel {      //spdChange in kph / 3.6 = m/s
                     changeTime = ((spdChange / 3.6) / accel)
                 }   //else { changeTime = 1 }   //already = 1. Slows final acceleration
+                
+//               TEMP!!!
+                
+                if (vehNode.currentSpeed < vehNode.frontSpd) {                          //NEED TO CHANGE changeTime TOO ?????
+                    ////ALL ADDED CODE BELOW HERE SO DECEL GRADUAL WHEN VEHICLE IN FRONT FASTER!!!
+                    changeTime = 3600
+                    decel = decelCoast
+                }
+
+//               TEMP!!!
+                
                 
             }
             
@@ -702,6 +734,7 @@ struct NodeData {
     }       //end calcAvgData
     
     
+    //MARK: - goLeft decides whether to change lanes or not
     func goLeft(teeVeh: inout [NodeData]) async -> ([NodeData]) {
         //    func goLeft(teeVeh: inout [NodeData]) -> ([NodeData]) {
         
