@@ -564,10 +564,10 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             allAtSpeed1 = true
                             
                             var ret1urn: [NodeData] = t1Vehicle        //Used for both Track 1 & Track 2
-                            var result = await nodeData.findObstacles(tVehicle: &t1Vehicle)
-                            ret1urn = result
+                            var result1 = await nodeData.findObstacles(tVehicle: &t1Vehicle)
+                            ret1urn = result1
 
-                            updateSpeeds(retVeh: result, allVeh: &sKLAllVehicles)      //Update vehicle speeds
+                            updateSpeeds(retVeh: result1, allVeh: &sKLAllVehicles)      //Update vehicle speeds
                             
                             
                             //***************  2. Restore Array  ***************
@@ -575,7 +575,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             //Sort back into Vehicle No order. Note [0] is missing
                             ret1urn.sort {
                                 $0.name.localizedStandardCompare($1.name) == .orderedAscending
-                            }                               //'lacalizedStandardCompare' ensures 21 sorted AFTER 3
+                            }                               //'localizedStandardCompare' ensures 21 sorted AFTER 3
                             ret1urn.insert(t1xVehicle[0], at: 0)   //Copy All Vehicles into position [0].
                             ret1urn[0].name = "All Vehicles"
                             
@@ -641,7 +641,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                                 }
                                 
                             }
-                            
+                            //All vehicles on Track 1 (Keep Left Track) checked
+
                             //MARK: - Calculate distances & speeds for 'All Vehicles'
                             //Note: Avg Speed = speed to drive Avg Distance.
                             //      Max Speed = Avg Speed of vehicle that has driven furthest
@@ -654,7 +655,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             rtnT1Veh[0].speedAvg = sKLAllVehicles[0].speedAvg
                             sKLAllVehicles[0].speedMax = max(sKLAllVehicles[0].speedMax, klSpeedMax0)
                             rtnT1Veh[0].speedMax = sKLAllVehicles[0].speedMax
-                            if (sOtherAllVehicles[0].speedMin < 500) || enableMinSpeed == true {         //Wait for ALL vehicles up to speed
+                            if (sKLAllVehicles[0].speedMin < 500) || enableMinSpeed == true {         //Wait for ALL vehicles up to speed
                                 sKLAllVehicles[0].speedMin = min(sKLAllVehicles[0].speedMin, klSpeedMin0)
                                 rtnT1Veh[0].speedMin = sKLAllVehicles[0].speedMin
                             } else {
@@ -665,14 +666,14 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             
                         } else {
                             //***************  1. findObstacles + updateSpeeds  ***************
-                            //Keep Left Track (Track 1)  = gameStage bit 0 = 0
+                            //Other Track (Track 2)  = gameStage bit 0 = 1
                             allAtSpeed2 = true
                             
-                            var ret2urn: [NodeData] = t1Vehicle        //Used for both Track 1 & Track 2
-                            var result = await nodeData.findObstacles(tVehicle: &t2Vehicle)
-                            ret2urn = result
+                            var ret2urn: [NodeData] = t2Vehicle        //Used for both Track 2
+                            var result2 = await nodeData.findObstacles(tVehicle: &t2Vehicle)
+                            ret2urn = result2
 
-                            updateSpeeds(retVeh: result, allVeh: &sOtherAllVehicles)      //Update vehicle speeds
+                            updateSpeeds(retVeh: result2, allVeh: &sOtherAllVehicles)      //Update vehicle speeds
                             
                             
                             //***************  2. Restore Array  ***************
@@ -680,14 +681,16 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             //Sort back into Vehicle No order. Note [0] is missing
                             ret2urn.sort {
                                 $0.name.localizedStandardCompare($1.name) == .orderedAscending
-                            }                               //'lacalizedStandardCompare' ensures 21 sorted AFTER 3
+                            }                               //'localizedStandardCompare' ensures 21 sorted AFTER 3
                             ret2urn.insert(t2xVehicle[0], at: 0)   //Copy All Vehicles into position [0].
                             ret2urn[0].name = "All Vehicles"
                             
                             
-//                            //***************  2a. KL Overtake  ***************
+                            //***************  2a. KL Overtake  ***************
+                            //NOTE: Other Track doesn't Keep Left!
 //                            var re2turnV: [NodeData] = await nodeData.goLeft(teeVeh: &ret2urn)
                             var re2turnV: [NodeData] = ret2urn
+                            //Toggle above 2 instructions to run goLeft function! (currently only KL Track)
 
                             //***************  3. findF8Pos + updateF8Spots  ***************
                             var f8T2Spots = await nodeData.findF8Pos(t1Veh: &re2turnV)
@@ -716,6 +719,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                                 }
 
                             }
+                            //All vehicles on Track 2 (Other Track) checked
                             
 //                            print("b4:\tMin: \(sOtherAllVehicles[0].speedMin.dp2)\tAvg: \((sOtherAllVehicles[0].speedAvg.dp2))\tMax: \(sOtherAllVehicles[0].speedMax.dp2)\tenableMinSpeed: \(enableMinSpeed)")
                             //MARK: - Calculate distances & speeds for 'All Vehicles'

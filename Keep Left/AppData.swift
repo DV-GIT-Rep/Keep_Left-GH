@@ -156,6 +156,12 @@ var ignoreSpd: Bool = true          //ignoreSpd set when vehicles stopped. Reset
 ///All but 8 LSBs cleared once all vehicles created. Value then dictates which code runs during 'update'
 var gameStage: Int = 0xFF   //0xFF = Max value
 //var gameStage: Int = 1024   //1024 = 100 0000 0000 H
+                            //Bit 7 = 1 UNTIL vehicles created then set to 0!
+                            //Bit 6 = noVehTest. Set during Task & clr'd when Task complete.
+                            //        Prevents code running again during Task.
+                            //Bits 5-2 = Not used (yet).
+                            //Bits 1-0 = Defines which code runs during Task.
+                            //           Track 1 when bit 0 = 0. Track 2 when bit 0 = 1.
 
 //Set ONLY to 01 or 11! Track 1 & 2 alternate based on value of bit 0!
 let noOfCycles = 0x03       //Calc speeds & f8Pos once every 'noOfCycles' 60ms periods.
