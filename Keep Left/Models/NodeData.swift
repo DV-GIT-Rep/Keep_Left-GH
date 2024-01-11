@@ -308,6 +308,7 @@ struct NodeData {
             
             //Acceleration & deceleration fixed FOR NOW!!!
             var accel: CGFloat = 4.5    // m per sec2 (use 2?)
+            var accelMin: CGFloat = accel   //NOT USED YET! Use to determine spdClk.
             //    var truckAccel: CGFloat = 1.0
             var decelMax: CGFloat = 8 // m/sec2
             var decelMin: CGFloat = 4  // m/sec2
