@@ -45,6 +45,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
     @Published var goalSpeed: CGFloat   //Used to temp store immediate goal speed following proximity check
     @Published var changeTime: CGFloat  //Time in seconds for next SKAction on Straight Track vehicles
     
+    @Published var spdClk: Int          //Clock decs every 120ms. reachedSpd set when spdClk times out.
     var reachedSpd: Bool     //Set for each vehicle when it reaches speed. Cleared when vehicles stopped.
     
     var indicator: Indicator
@@ -78,6 +79,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
         rearGap = 0.0
         goalSpeed = 0.0     //Overwritten later!
         changeTime = 1.0    //seconds. Overwritten later!
+        spdClk = 60         //Dummy value to start. 0.12sec * 60 = 7.2 secs
         reachedSpd = false
         
         indicator = .off

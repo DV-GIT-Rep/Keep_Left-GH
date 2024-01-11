@@ -59,6 +59,7 @@ struct NodeData {
     var maxSumKL: CGFloat
     var minSumKL: CGFloat
     
+    var spdClk: Int
     var reachedSpd: Bool     //Set for each vehicle when it reaches speed. Cleared when vehicles stopped.
     var indicator: Indicator
     
@@ -103,11 +104,15 @@ struct NodeData {
         maxSumKL = 0            //Used to hold the MAX distance ANY vehicle on THIS track has travelled.
         minSumKL = 99999999     //Used to hold the MIN distance ANY vehicle on THIS track has travelled.
         
+        spdClk = 60         //Dummy value to start. 0.12sec * 60 = 7.2 secs
         reachedSpd = false
         
         indicator = .off
     }
     
+//*****************************
+//Flowchart Page 1 of 4     :Determine Rear Gaps etc
+//*****************************
     //    mutating func findObstacles(tVehicle: inout [NodeData]) async -> (tVehicle: [NodeData], t2Vehicle: [NodeData]) {
     func findObstacles(tVehicle: inout [NodeData]) async -> ([NodeData]) {
         //Create copy of vehicles for calculating proximity to other vehicles
@@ -217,6 +222,9 @@ struct NodeData {
         }               //end 1st 'For' loop
         //########################### end RearGap calc loop #######################################
         
+        //*****************************
+        //Flowchart Page 2 of 4     :Determine Front Gaps etc
+        //*****************************
         tVehicle.sort(by: keepLeft ? {$0.position.y < $1.position.y} : {$0.position.y >= $1.position.y}) //Sort into positional order, 000 - 999.999
         
         //        t2Vehicle.sort(by: {$0.position.y < $1.position.y}) //Sort into positional order, 000 - 999.999
@@ -288,23 +296,13 @@ struct NodeData {
             tVehicle[index].gap = gap              // same as vehNode.gap
             tVehicle[index].otherGap = otherGap    // same as vehNode.otherGap
             
+            //*****************************
+            //Flowchart Page 3 of 4     :Determine decel & goalSpeed etc
+            //*****************************
             //MARK: - At this point spacing = distance to vehicle in front(gap: same lane, otherGap: other lane)
             //MARK:   oRearGap = distance of first vehicle behind & in other lane.
             //NOTE: ALL values above can read negative IF position differences < vehicle lengths!
             //       (Has been changed by using <= instead of == above)
-            
-            gapSpeed = (gap * 3.6) / gapVal     //Max allowable speed for current gap. gapVal = 3 secs
-            //  gap = metres to vehicle in front.
-            //  Multiply 'gap' * 3.6 & then divide by no. of secs (=3 secs) gives kph required to traverse gap in 3 secs.
-            //  Therefore gapSpeed is in kph!
-            goalSpeed = gapSpeed
-            
-//            if (vehNode.currentSpeed < vehNode.frontSpd) { decel = decelCoast }
-
-            if goalSpeed > vehNode.preferredSpeed {
-                goalSpeed = vehNode.preferredSpeed
-            }
-            //Aim for this speed while in this lane
             
             //Acceleration & deceleration fixed FOR NOW!!!
             var accel: CGFloat = 4.5    // m per sec2 (use 2?)
@@ -315,88 +313,85 @@ struct NodeData {
             var decelCoast: CGFloat = 0.1       // m/sec2. Rate when vehicle in front is faster
             //        var decel: CGFloat = 4    // m per sec2
             //    var truckDecel: CGFloat = 0.9
-            let spdChange = abs(goalSpeed - vehNode.currentSpeed)
-            gapTime = (gap * 3.6) / vehNode.currentSpeed   //Time in secs to catch vehicle in front @ current speed
-            //_____________________________________________________________________________________________________
-            //MARK: - Create variable value of decel when gap 1 - 3 secs from vehicle in front
-            if gapTime < (gapVal * 0.33) {
-                decel = decelMax + 2                        //Max decel! Gap < 1 second. (+2 is TEMPORARY!!!)
-            } else {
-                if gapTime > gapVal {
-                    decel = decelMin                        //Min decel! Gap > 3 seconds
-                } else {                                    //Gap 1 - 3 seconds
-                    gapTime = gapTime - (gapVal * 0.33)     //Change value from 1-3 to 0-2 (secs for gapVal = 3)
-                    gapTime = gapTime / (gapVal * 0.67)     //Convert to ratio of 0-1
-                    decel = decelMax - ((decelMax - decelMin) * gapTime)
-                }
-            }
             
-            if ignoreSpd == true {
-                tVehicle[index].reachedSpd = false           //ignoreSpd set when vehicles stopped. Reset when started plus 2 secs (runTimerDelay)
+            gapTime = (gap * 3.6) / vehNode.currentSpeed   //Time in secs to catch vehicle in front @ current speed
+
+            //MARK: - Create variable value of decel when gap 1 - 3 secs from vehicle in front
+            //        Note gapVal = max allowed gap = 3 seconds.
+            if gapTime > gapVal {                   //gapTime > 3 secs? (gapVal = 3 secs)
+                decel = decelMin                    //Min decel! Gap >= 3 seconds
+
+                goalSpeed = (gap * 3.6) / gapVal     //Max allowable speed for current gap. gapVal = 3 secs
+                //  gap = metres to vehicle in front.
+                //  Multiply 'gap' * 3.6 & then divide by no. of secs (=3 secs) gives kph required to traverse gap in 3 secs.
+                //  Therefore gapSpeed is in kph!
+                //gapSpeed = goalSpeed              //gapSpeed no longer used but sb speed to close 'gap' in 3s
+                
+            } else {                                //gapTime <= 3 secs
+                if currentSpeed < frontSpd {        //currentSpeed < frontSpd
+                    decel = decelCoast              //Min deceleration as vehicle in front going faster
+                    
+                    goalSpeed = currentSpeed - 0.05 //Set goalSpeed = (currentSpeed - 0.05 kph)
+                } else {                            //currentSpeed >= frontSpeed
+                    if gapTime < (gapVal * 0.333) { //gapTime < (1/3 x 3s) = 1 sec
+                        decel = decelMax + 2        //Max decel! Gap < 1 second. (+2 is TEMPORARY!!!)
+                    } else {                        //gapTime >= 1 sec
+                        gapTime = gapTime - (gapVal * 0.33)     //Change value from 1-3 to 0-2 (secs for gapVal = 3)
+                        gapTime = gapTime / (gapVal * 0.67)     //Convert to ratio of 0-1
+                        decel = decelMax - ((decelMax - decelMin) * gapTime)
+                        
+                        goalSpeed = frontSpd - 0.05 //Set goalSpeed = (frontSpd - 0.05kph)
+                    }
+                }
             }
             
             var changeTime: CGFloat = 1     //Set initial value = 1 second
-            if vehNode.currentSpeed >= goalSpeed {
-                //currentSpeed >= goalSpeed
-                //DECELERATE to goalSpeed which can be preferredSpeed or gapSpeed
-                if ignoreSpd == false {                     //ignoreSpd set when vehicles stopped. Reset when started plus 2 secs (runTimerDelay)
-//                    if tVehicle[index].frontSpd > 30 {                      //frontSpd > 30kph
-                    if tVehicle[index].currentSpeed > 30 {                      //frontSpd > 30kph
-                        tVehicle[index].reachedSpd = true       //This vehicle is now up to speed.
-                    }
-                    //The above is not ideal - assumes up to speed once > 30 kph! Short term solution ONLY!
-                }
+            
+            if goalSpeed > vehNode.preferredSpeed {
+                goalSpeed = vehNode.preferredSpeed  //Don't allow goalSpeed > preferredSpeed!
+            }
+            //Aim for this speed while in this lane
+            
+            let spdChange = abs(goalSpeed - vehNode.currentSpeed)
+            
+            //*****************************
+            //Flowchart Page 4 of 4     :Determine 'reachedSpd', changeTime & save values etc
+            //*****************************
+            let maxPreferredSpd: CGFloat = 120    //Set maxPreferredSpd = 120kph for now!
+            
+            if ignoreSpd == true || preferredSpeed == 0 {   //ignoreSpd = true OR preferredSpeed = 0
+                tVehicle[index].spdClk = Int((maxPreferredSpd/30)/accelMin) //Set spdClk = no of 120ms cycles
                 
-                if (vehNode.currentSpeed < vehNode.frontSpd) {                          //NEED TO CHANGE changeTime TOO ?????
-                    ////ALL ADDED CODE BELOW HERE SO DECEL GRADUAL WHEN VEHICLE IN FRONT FASTER!!!
-
-
-
-                    changeTime = 3600
-
-
-
-                    decel = decelCoast
-                    gapTime = gapVal            //FORCED to gapVal (=3s) when vehicle in front is faster to minimise deceleration!
-                    if goalSpeed < vehNode.currentSpeed { goalSpeed = vehNode.currentSpeed }    //Just coast along
-                    if goalSpeed > vehNode.frontSpd { goalSpeed = vehNode.frontSpd }           //But not faster than vehicle in front!
-                    ////ALL ADDED CODE ABOVE HERE SO DECEL GRADUAL WHEN VEHICLE IN FRONT FASTER!!!
-                }  //decelCoast }
-                else {
-                    //                    goalSpeed = vehNode.currentSpeed        //Travelling slower than vehicle in front - maintain speed
-                    //                    if goalSpeed < gapSpeed {
-                    //                        goalSpeed = gapSpeed  //Aim for this speed while in this lane
-                    //                    }
-                    //                }
-                    //NEVER allow decel = 0! (may get divide by zero error)
+                tVehicle[index].reachedSpd = false  //reachedSpd cleared when vehicle NOT up to speed
+                
+            } else {                                //ignoreSpd = false AND preferredSpeed != 0
+                if currentSpeed < 3 {               //currentSpeed < 3 kph
+                    tVehicle[index].spdClk = Int((preferredSpeed/30)/accelMin) //Set spdClk = no of 120ms cycles
                     
-                    //MARK: - IF GAP << 3 SECS THEN INCREASE DECELERATION!!! (unless coasting) See above
-                    if (spdChange / 3.6) > decel {      //spdChange in kph / 3.6 = m/s
-                        changeTime = ((spdChange / 3.6) / decel)
-                    }   //else { changeTime = 1 }   //already = 1. Slows final deceleration
+                    tVehicle[index].reachedSpd = false  //reachedSpd cleared when vehicle NOT up to speed
+                    
+                } else {                                //currentSpeed >= 3 kph
+                    if tVehicle[index].spdClk == 0 {    //spdClk timed out
+                        tVehicle[index].reachedSpd = true   //reachedSpd set when vehicle up to speed
+                    } else {                            //spdClk NOT timed out
+                        tVehicle[index].spdClk = tVehicle[index].spdClk - 1 //Decrement spdClk
+                    }                                   //End spdClk check
+                }                                   //End currentSpeed check gt or lt 3 kph
+            }                                       //End ignoreSpd = true OR false
+
+            if vehNode.currentSpeed >= goalSpeed {  //currentSpeed >= goalSpeed
+                //DECELERATE to goalSpeed
+                if (spdChange / 3.6) > decel {      //spdChange in kph / 3.6 = m/s
+                    changeTime = ((spdChange / 3.6) / decel)
                 }
                 
-            } else {
-                //currentSpeed < goalSpeed
-
+            } else {                                //currentSpeed < goalSpeed
                 //NEVER allow accel = 0! (may get divide by zero error)
-                //ACCELERATE to goalSpeed which can be preferredSpeed or gapSpeed
+                //ACCELERATE to goalSpeed
                 if (spdChange / 3.6) > accel {      //spdChange in kph / 3.6 = m/s
                     changeTime = ((spdChange / 3.6) / accel)
-                }   //else { changeTime = 1 }   //already = 1. Slows final acceleration
-                
-//               TEMP!!!
-                
-                if (vehNode.currentSpeed < vehNode.frontSpd) {                          //NEED TO CHANGE changeTime TOO ?????
-                    ////ALL ADDED CODE BELOW HERE SO DECEL GRADUAL WHEN VEHICLE IN FRONT FASTER!!!
-                    changeTime = 3600
-                    decel = decelCoast
-                }
-
-//               TEMP!!!
-                
-                
-            }
+                }   //else { changeTime = 1 }       //already = 1. Slows final acceleration
+            }                                       //End currentSpeed >= goalSpeed
             
             //MARK: - aim for 'goalSpeed' after 'changeTime' seconds
             tVehicle[index].goalSpeed = goalSpeed   //Store ready for SKAction
@@ -412,12 +407,13 @@ struct NodeData {
             //                print("oVeh \(index):\tReached Speed?: \(tVehicle[index].reachedSpd)")
             //            }
             
-        }           //end 2nd for loop
+        }           //end 2nd For loop
         
         //        return (tVehicle, t2Vehicle)
         return tVehicle
     }       //End findObstacles method
     
+//***************************************************************
     //This method calculates the position of vehicles on the Fig 8 Track from equiv positions on Straight Track
     //Make the method below part of the NodeData Struct
     func findF8Pos(t1Veh: inout [NodeData]) async -> ([NodeData]) {         //Note: t1Veh has stKL_0 or stOt_0 removed!

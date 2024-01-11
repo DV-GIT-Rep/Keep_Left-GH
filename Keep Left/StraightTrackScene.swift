@@ -494,6 +494,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             nodeData.startPos = veh1Node.startPos
                             nodeData.speedMax = veh1Node.speedMax
                             nodeData.speedMin = veh1Node.speedMin
+                            nodeData.spdClk = veh1Node.spdClk
                             nodeData.reachedSpd = veh1Node.reachedSpd
                             nodeData.indicator = veh1Node.indicator
 //                            switch veh1Node.indicator {
@@ -537,6 +538,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             nodeData.startPos = veh2Node.startPos
                             nodeData.speedMax = veh2Node.speedMax
                             nodeData.speedMin = veh2Node.speedMin
+                            nodeData.spdClk = veh2Node.spdClk
                             nodeData.reachedSpd = veh2Node.reachedSpd
                             nodeData.indicator = veh2Node.indicator
                             //                nodeData.equivF8Name = not needed here!
@@ -614,6 +616,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                                 //                            print("name:   \(String(rtnT1Veh[i].name))")
                                 sKLAllVehicles[i].speedMax = rtnT1Veh[i].speedMax
                                 sKLAllVehicles[i].speedMin = rtnT1Veh[i].speedMin
+                                sKLAllVehicles[i].spdClk = rtnT1Veh[i].spdClk
                                 sKLAllVehicles[i].reachedSpd = rtnT1Veh[i].reachedSpd
                                 
                                 if rtnT1Veh[i].reachedSpd == false { allAtSpeed1 = false } //Flag cleared if ANY vehicle NOT up to speed
@@ -707,7 +710,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                                 //                            print("name:   \(String(rtnT2Veh[i].name))")
                                 sOtherAllVehicles[i].speedMax = rtnT2Veh[i].speedMax
                                 sOtherAllVehicles[i].speedMin = rtnT2Veh[i].speedMin
-                                
+                                sOtherAllVehicles[i].spdClk = rtnT2Veh[i].spdClk
                                 sOtherAllVehicles[i].reachedSpd = rtnT2Veh[i].reachedSpd
                                 if rtnT2Veh[i].reachedSpd == false { allAtSpeed2 = false } //Flag cleared if ANY vehicle NOT up to speed
                                 
