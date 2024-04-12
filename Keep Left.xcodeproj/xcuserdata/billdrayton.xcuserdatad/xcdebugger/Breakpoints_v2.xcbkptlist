@@ -30,42 +30,10 @@
             filePath = "Keep Left/StraightTrackScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "759"
-            endingLineNumber = "759"
+            startingLineNumber = "773"
+            endingLineNumber = "773"
             landmarkName = "update(_:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "64DF7A67-1B9A-4739-9D65-797736F0479A - 7496a9d05b9da544"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(9) suspend resume partial function for function signature specialization &lt;Arg[1] = Value Promoted from Box&gt; of closure #1 @Sendable () async -&gt; () in Keep_Left.StraightTrackScene.update(Swift.Double) -&gt; ()"
-                  moduleName = "Keep Left"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/billdrayton/Library/CloudStorage/OneDrive-Personal/Drayvest/Apps/Keep%20Left/Keep%20Left/StraightTrackScene.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "667"
-                  endingLineNumber = "667"
-                  offsetFromSymbolStart = "5449">
-               </Location>
-               <Location
-                  uuid = "64DF7A67-1B9A-4739-9D65-797736F0479A - bf666998862bbf85"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(13) suspend resume partial function for function signature specialization &lt;Arg[1] = Value Promoted from Box&gt; of closure #1 @Sendable () async -&gt; () in Keep_Left.StraightTrackScene.update(Swift.Double) -&gt; ()"
-                  moduleName = "Keep Left"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/billdrayton/Library/CloudStorage/OneDrive-Personal/Drayvest/Apps/Keep%20Left/Keep%20Left/StraightTrackScene.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "667"
-                  endingLineNumber = "667"
-                  offsetFromSymbolStart = "1322">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -82,53 +50,6 @@
             endingLineNumber = "548"
             landmarkName = "update(_:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "174F14C0-90A8-48F4-9A17-CCBCEF0A3EDF - 9124631df668f2b5"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Keep_Left.StraightTrackScene.update(Swift.Double) -&gt; ()"
-                  moduleName = "Keep Left"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/billdrayton/Library/CloudStorage/OneDrive-Personal/Drayvest/Apps/Keep%20Left/Keep%20Left/StraightTrackScene.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "514"
-                  endingLineNumber = "514"
-                  offsetFromSymbolStart = "30363">
-               </Location>
-               <Location
-                  uuid = "174F14C0-90A8-48F4-9A17-CCBCEF0A3EDF - 287847e193f0b447"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "function signature specialization &lt;Arg[1] = Value Promoted from Box, Arg[5] = Value Promoted from Box&gt; of closure #6 @Sendable () async -&gt; () in Keep_Left.StraightTrackScene.update(Swift.Double) -&gt; ()"
-                  moduleName = "Keep Left"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/billdrayton/Library/CloudStorage/OneDrive-Personal/Drayvest/Apps/Keep%20Left/Keep%20Left/StraightTrackScene.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "514"
-                  endingLineNumber = "514"
-                  offsetFromSymbolStart = "310">
-               </Location>
-               <Location
-                  uuid = "174F14C0-90A8-48F4-9A17-CCBCEF0A3EDF - 5109f5df490d80ff"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(1) suspend resume partial function for function signature specialization &lt;Arg[1] = Value Promoted from Box, Arg[5] = Value Promoted from Box&gt; of closure #6 @Sendable () async -&gt; () in Keep_Left.StraightTrackScene.update(Swift.Double) -&gt; ()"
-                  moduleName = "Keep Left"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/billdrayton/Library/CloudStorage/OneDrive-Personal/Drayvest/Apps/Keep%20Left/Keep%20Left/StraightTrackScene.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "514"
-                  endingLineNumber = "514"
-                  offsetFromSymbolStart = "54">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -145,38 +66,6 @@
             endingLineNumber = "566"
             landmarkName = "update(_:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "21AFA054-0C24-451C-B670-59C89824765E - 9124631df668f1df"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Keep_Left.StraightTrackScene.update(Swift.Double) -&gt; ()"
-                  moduleName = "Keep Left"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/billdrayton/Library/CloudStorage/OneDrive-Personal/Drayvest/Apps/Keep%20Left/Keep%20Left/StraightTrackScene.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "540"
-                  endingLineNumber = "540"
-                  offsetFromSymbolStart = "31095">
-               </Location>
-               <Location
-                  uuid = "21AFA054-0C24-451C-B670-59C89824765E - 637f49c78f9b6d8b"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "function signature specialization &lt;Arg[1] = Value Promoted from Box&gt; of closure #1 @Sendable () async -&gt; () in Keep_Left.StraightTrackScene.update(Swift.Double) -&gt; ()"
-                  moduleName = "Keep Left"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/billdrayton/Library/CloudStorage/OneDrive-Personal/Drayvest/Apps/Keep%20Left/Keep%20Left/StraightTrackScene.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "488"
-                  endingLineNumber = "488"
-                  offsetFromSymbolStart = "173">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -205,8 +94,8 @@
             filePath = "Keep Left/Models/NodeData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "902"
-            endingLineNumber = "902"
+            startingLineNumber = "953"
+            endingLineNumber = "953"
             landmarkName = "goLeft(teeVeh:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -221,8 +110,8 @@
             filePath = "Keep Left/StraightTrackScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1280"
-            endingLineNumber = "1280"
+            startingLineNumber = "1316"
+            endingLineNumber = "1316"
             landmarkName = "every500ms()"
             landmarkType = "7">
          </BreakpointContent>
@@ -237,8 +126,8 @@
             filePath = "Keep Left/Models/NodeData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "890"
-            endingLineNumber = "890"
+            startingLineNumber = "941"
+            endingLineNumber = "941"
             landmarkName = "goLeft(teeVeh:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -253,8 +142,8 @@
             filePath = "Keep Left/Models/NodeData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "919"
-            endingLineNumber = "919"
+            startingLineNumber = "970"
+            endingLineNumber = "970"
             landmarkName = "goLeft(teeVeh:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -269,8 +158,8 @@
             filePath = "Keep Left/Models/NodeData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "931"
-            endingLineNumber = "931"
+            startingLineNumber = "982"
+            endingLineNumber = "982"
             landmarkName = "goLeft(teeVeh:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -285,8 +174,8 @@
             filePath = "Keep Left/Models/NodeData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "881"
-            endingLineNumber = "881"
+            startingLineNumber = "932"
+            endingLineNumber = "932"
             landmarkName = "goLeft(teeVeh:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -301,8 +190,8 @@
             filePath = "Keep Left/Models/NodeData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "861"
-            endingLineNumber = "861"
+            startingLineNumber = "912"
+            endingLineNumber = "912"
             landmarkName = "goLeft(teeVeh:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -317,8 +206,8 @@
             filePath = "Keep Left/Models/NodeData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "863"
-            endingLineNumber = "863"
+            startingLineNumber = "914"
+            endingLineNumber = "914"
             landmarkName = "goLeft(teeVeh:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -333,9 +222,41 @@
             filePath = "Keep Left/StraightTrackScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1316"
-            endingLineNumber = "1316"
+            startingLineNumber = "1352"
+            endingLineNumber = "1352"
             landmarkName = "updateSpeeds(retVeh:allVeh:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "092D358B-F34D-4948-ACEC-7D1F03BE1EBF"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Keep Left/StraightTrackScene.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "602"
+            endingLineNumber = "602"
+            landmarkName = "update(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "ABB61439-01A3-4D49-BB61-559679AC101C"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Keep Left/StraightTrackScene.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "606"
+            endingLineNumber = "606"
+            landmarkName = "update(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

@@ -111,7 +111,7 @@ struct NodeData {
     }
     
 //*****************************
-//Flowchart Page 1 of 4     :Determine Rear Gaps etc
+//findObstacles Flowchart Page 1 of 4     :Determine Rear Gaps etc
 //*****************************
     //    mutating func findObstacles(tVehicle: inout [NodeData]) async -> (tVehicle: [NodeData], t2Vehicle: [NodeData]) {
     func findObstacles(tVehicle: inout [NodeData]) async -> ([NodeData]) {
@@ -123,16 +123,16 @@ struct NodeData {
         //    tVehicle.sort(by: {$0.position.y < $1.position.y}) //Sort into positional order, 000 - 999.999
         
         var gapSpeed: CGFloat = 0       //Speed required to catch vehicle in front in 3 secs
-        var goalSpeed: CGFloat = 0      //Lesser of gapSpeed & preferredSpeed (reduced if closer than 3 secs to veh in front)
+        var golSpeed: CGFloat = 0      //Lesser of gapSpeed & preferredSpeed (reduced if closer than 3 secs to veh in front)
         var gapTime: CGFloat = 0        //Time in secs to catch vehicle in front @ current speed
         var decel: CGFloat = 4          // m/sec2. Typical. Varies!
         
         //########################### RearGap calc loop #######################################
-        tVehicle.sort(by: keepLeft ? {$0.position.y > $1.position.y} : {$0.position.y <= $1.position.y}) //Sort into positional order, 999.999 - 000
+        tVehicle.sort(by: keepLeft ? {$0.position.y > $1.position.y} : {$0.position.y <= $1.position.y}) //Sort into positional order for REAR detection, 999.999 - 000
         
         var unitNumb: Int
-        var rearGap: CGFloat = 0.0      //Distance behind in this lane
-        var oRearGap: CGFloat = 0.0     //Distance behind in OTHER lane
+        var reerGap: CGFloat = 0.0      //Distance behind in this lane
+        var oReerGap: CGFloat = 0.0     //Distance behind in OTHER lane
         var nextIndex: Int = 0
         var past1km = false
         let midLanes = 0.2...0.8
@@ -148,7 +148,7 @@ struct NodeData {
             
             nextIndex = index
             
-            while rearGap == 0 || oRearGap == 0 {
+            while reerGap == 0 || oReerGap == 0 {
                 
                 nextIndex = nextIndex + 1       // same as nextIndex += 1
                 
@@ -168,28 +168,28 @@ struct NodeData {
                 //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
                 if sameLane.contains(tVehicle[nextIndex].lane) {
                     //Both vehicles in same lane
-                    if rearGap == 0 {
-                        rearGap = (past1km == false) ? sameLap : lastLap
-                        if rearGap <= 0 { rearGap = 0.1 } //Should NEVER happen! (due to self braking)
+                    if reerGap == 0 {
+                        reerGap = (past1km == false) ? sameLap : lastLap
+                        if reerGap <= 0 { reerGap = 0.1 } //Should NEVER happen! (due to self braking)
                         //                    vehNode.spacing = gap
                         tVehicle[index].rearUnit = tVehicle[nextIndex].name      //Save identity of rear unit (NOT Required?)
                         tVehicle[index].rearPos = tVehicle[nextIndex].position   //Save position of rear unit (NOT Required?)
                     }
                     if midLanes.contains(tVehicle[nextIndex].lane) {
                         //If this vehicle is mid-lane, set oRearGap = rearGap
-                        if oRearGap == 0 {
-                            oRearGap = (past1km == false) ? sameLap : lastLap
-                            if oRearGap <= 0 { oRearGap = 0.1 } //Could prevent -ve values by using <= here
-                            //                    vehNode.oRearGap = oRearGap
+                        if oReerGap == 0 {
+                            oReerGap = (past1km == false) ? sameLap : lastLap
+                            if oReerGap <= 0 { oReerGap = 0.1 } //Could prevent -ve values by using <= here
+                            //                    vehNode.oRearGap = oReerGap
                             tVehicle[index].oRearSpd = tVehicle[nextIndex].currentSpeed   //Save speed of oRear unit
                         }
                     }
                 } else {
                     //The two vehicles are in different lanes
-                    if oRearGap == 0 {
-                        oRearGap = (past1km == false) ? sameLap : lastLap
-                        if oRearGap <= 0 { oRearGap = 0.1 } //Could prevent -ve values by using <= here
-                        //                    vehNode.oRearGap = oRearGap
+                    if oReerGap == 0 {
+                        oReerGap = (past1km == false) ? sameLap : lastLap
+                        if oReerGap <= 0 { oReerGap = 0.1 } //Could prevent -ve values by using <= here
+                        //                    vehNode.oRearGap = oReerGap
                         tVehicle[index].oRearSpd = tVehicle[nextIndex].currentSpeed   //Save speed of oRear unit
                     }
                 }       //end lane check
@@ -198,14 +198,14 @@ struct NodeData {
                 //                //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
                 //                if !sameLane.contains(tVehicle[nextIndex].lane) {
                 //                    //Both vehicles in different lanes
-                //                    oRearGap = (past1km == false) ? sameLap : lastLap
-                //                    if oRearGap <= 0 { oRearGap = 0.1 }
-                //                    //                    vehNode.oRearGap = oRearGap
+                //                    oReerGap = (past1km == false) ? sameLap : lastLap
+                //                    if oReerGap <= 0 { oReerGap = 0.1 }
+                //                    //                    vehNode.oRearGap = oReerGap
                 //                    //                    } else {
                 //                    //                        //The two vehicles are in the same lane
                 //                    //                        nextIndex += 1  //Move onto next vehicle
-                //                    //                        if nextIndex == index {         //All other vehicles checked. oRearGap sb 0 here!
-                //                    //                            if oRearGap == 0 { oRearGap = 1000 }
+                //                    //                        if nextIndex == index {         //All other vehicles checked. oReerGap sb 0 here!
+                //                    //                            if oReerGap == 0 { oReerGap = 1000 }
                 //                    //                        }    //Continue until spacing for BOTH lanes != 0
                 //
                 //                }       //end lane check
@@ -213,24 +213,25 @@ struct NodeData {
                 
             }               //end 'While' loop
             
-            tVehicle[index].rearGap = rearGap      // same as vehNode.rearGap
-            tVehicle[index].oRearGap = oRearGap    // same as vehNode.oRearGap
+            tVehicle[index].rearGap = reerGap      // same as vehNode.rearGap
+            tVehicle[index].oRearGap = oReerGap    // same as vehNode.oRearGap
             past1km = false
-            rearGap = 0
-            oRearGap = 0
+            reerGap = 0
+            oReerGap = 0
             
         }               //end 1st 'For' loop
         //########################### end RearGap calc loop #######################################
         
         //*****************************
-        //Flowchart Page 2 of 4     :Determine Front Gaps etc
+        //findObstacles Flowchart Page 2 of 4     :Determine Front Gaps etc
         //*****************************
-        tVehicle.sort(by: keepLeft ? {$0.position.y < $1.position.y} : {$0.position.y >= $1.position.y}) //Sort into positional order, 000 - 999.999
+        //########################### Front Gap calc loop #######################################
+        tVehicle.sort(by: keepLeft ? {$0.position.y < $1.position.y} : {$0.position.y >= $1.position.y}) //Sort into positional order for FRONT detection, 000 - 999.999
         
         //        t2Vehicle.sort(by: {$0.position.y < $1.position.y}) //Sort into positional order, 000 - 999.999
         
-        var gap: CGFloat = 0.0      //Distance ahead in THIS lane
-        var otherGap: CGFloat = 0.0     //Distance ahead in OTHER lane
+        var gapp: CGFloat = 0.0      //Distance ahead in THIS lane
+        var othergapp: CGFloat = 0.0     //Distance ahead in OTHER lane
         //    nextIndex = 0               //Not required - value loaded below!
         past1km = false
         
@@ -245,7 +246,7 @@ struct NodeData {
             
             nextIndex = index
             
-            while gap == 0 || otherGap == 0 {       //Find both gap & otherGap
+            while gapp == 0 || othergapp == 0 {       //Find both gap & otherGap
                 
                 nextIndex = nextIndex + 1       // same as nextIndex += 1
                 
@@ -264,9 +265,9 @@ struct NodeData {
                 //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
                 if sameLane.contains(tVehicle[nextIndex].lane) {
                     //Both vehicles in same lane +/- 0.8
-                    if gap == 0 {
-                        gap = (past1km == false) ? sameLap : lastLap
-                        if gap <= 0 { gap = 0.1 } //Should NEVER happen! (due to self braking)
+                    if gapp == 0 {
+                        gapp = (past1km == false) ? sameLap : lastLap
+                        if gapp <= 0 { gapp = 0.1 } //Should NEVER happen! (due to self braking)
                         //                    vehNode.spacing = gap
                         tVehicle[index].frontUnit = tVehicle[nextIndex].name      //Save identity of front unit
                         tVehicle[index].frontPos = tVehicle[nextIndex].position   //Save position of front unit
@@ -274,30 +275,30 @@ struct NodeData {
                     }
                     if midLanes.contains(tVehicle[nextIndex].lane) {            //midLanes = 0.2 - 0.8
                         //If this vehicle is mid-lane, set otherGap = gap
-                        if otherGap == 0 {
-                            otherGap = (past1km == false) ? sameLap : lastLap
-                            if otherGap <= 0 { otherGap = 0.1 } //Could prevent -ve values by using <= here
-                            //                    vehNode.otherGap = otherGap
+                        if othergapp == 0 {
+                            othergapp = (past1km == false) ? sameLap : lastLap
+                            if othergapp <= 0 { othergapp = 0.1 } //Could prevent -ve values by using <= here
+                            //                    vehNode.othergap = othergapp
                             tVehicle[index].oFrontSpd = tVehicle[nextIndex].currentSpeed   //Save speed of oFront unit
                         }
                     }
                 } else {
                     //The two vehicles are in different lanes ie.> 0.8 lanes away from this lane!
-                    if otherGap == 0 {
-                        otherGap = (past1km == false) ? sameLap : lastLap
-                        if otherGap <= 0 { otherGap = 0.1 } //Could prevent -ve values by using <= here
-                        //                    vehNode.otherGap = otherGap
+                    if othergapp == 0 {
+                        othergapp = (past1km == false) ? sameLap : lastLap
+                        if othergapp <= 0 { othergapp = 0.1 } //Could prevent -ve values by using <= here
+                        //                    vehNode.otherGap = othergapp
                         tVehicle[index].oFrontSpd = tVehicle[nextIndex].currentSpeed   //Save speed of oFront unit
                     }
                 }       //end lane check
                 
             }               //end While
             
-            tVehicle[index].gap = gap              // same as vehNode.gap
-            tVehicle[index].otherGap = otherGap    // same as vehNode.otherGap
+            tVehicle[index].gap = gapp              // same as vehNode.gap
+            tVehicle[index].otherGap = othergapp    // same as vehNode.otherGap
             
             //*****************************
-            //Flowchart Page 3 of 4     :Determine decel & goalSpeed etc
+            //findObstacles Flowchart Page 3 of 4     :Determine decel & goalSpeed etc
             //*****************************
             //MARK: - At this point spacing = distance to vehicle in front(gap: same lane, otherGap: other lane)
             //MARK:   oRearGap = distance of first vehicle behind & in other lane.
@@ -310,63 +311,112 @@ struct NodeData {
             //    var truckAccel: CGFloat = 1.0
             var decelMax: CGFloat = 8 // m/sec2
             var decelMin: CGFloat = 4  // m/sec2
-            var decelCoast: CGFloat = 0.1       // m/sec2. Rate when vehicle in front is faster
+            var decelCoast: CGFloat = 0.01       // m/sec2. Rate when vehicle in front is faster
             //        var decel: CGFloat = 4    // m per sec2
             //    var truckDecel: CGFloat = 0.9
             
-            gapTime = (gap * 3.6) / vehNode.currentSpeed   //Time in secs to catch vehicle in front @ current speed
+            gapTime = (gapp * 3.6) / vehNode.currentSpeed   //Time in secs to catch vehicle in front @ current speed
+            if gapTime > 9.9 { gapTime = 9.9 }    //Avoid infinite result!
 
             //MARK: - Create variable value of decel when gap 1 - 3 secs from vehicle in front
             //        Note gapVal = max allowed gap = 3 seconds.
             if gapTime > gapVal {                   //gapTime > 3 secs? (gapVal = 3 secs)
+                //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                        if printSpd == 1 && (Int.extractNum(from: vehNode.name)!) == WHICH {
+                //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                                if gapTime.isInfinite {
+                                    PATH = "1" + "inf"
+                                } else {
+                                    PATH = "1 " + String(gapTime.dp1)
+                                }
+                            CS = vehNode.currentSpeed
+                            FS = tVehicle[index].frontSpd   //Can't use vehNode here as not updated yet!
+                        }
+                //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                                            
                 decel = decelMin                    //Min decel! Gap >= 3 seconds
 
-                goalSpeed = (gap * 3.6) / gapVal     //Max allowable speed for current gap. gapVal = 3 secs
-                //  gap = metres to vehicle in front.
-                //  Multiply 'gap' * 3.6 & then divide by no. of secs (=3 secs) gives kph required to traverse gap in 3 secs.
+                golSpeed = (gapp * 3.6) / gapVal     //Max allowable speed for current gap. gapVal = 3 secs
+                //  gapp = metres to vehicle in front.
+                //  Multiply 'gapp' * 3.6 & then divide by no. of secs (=3 secs) gives kph required to traverse gap in 3 secs.
                 //  Therefore gapSpeed is in kph!
-                //gapSpeed = goalSpeed              //gapSpeed no longer used but sb speed to close 'gap' in 3s
+                //gapSpeed = golSpeed              //gapSpeed no longer used but sb speed to close 'gap' in 3s
                 
             } else {                                //gapTime <= 3 secs
-                if currentSpeed < frontSpd {        //currentSpeed < frontSpd
+                if vehNode.currentSpeed < tVehicle[index].frontSpd {        //currentSpeed < frontSpd
+                    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                            if printSpd == 1 && (Int.extractNum(from: vehNode.name)!) == WHICH {
+                    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                                    if gapTime.isInfinite {
+                                        PATH = "3" + "inf"
+                                    } else {
+                                        PATH = "3 " + String(gapTime.dp1)
+                                    }
+                                CS = vehNode.currentSpeed
+                                FS = tVehicle[index].frontSpd   //Can't use vehNode here as not updated yet!
+                            }
+                    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
                     decel = decelCoast              //Min deceleration as vehicle in front going faster
                     
-                    goalSpeed = currentSpeed - 0.05 //Set goalSpeed = (currentSpeed - 0.05 kph)
+//                    golSpeed = vehNode.currentSpeed - 0.0001 //Set goalSpeed = (currentSpeed - 0.0001 kph)
+                    golSpeed = vehNode.currentSpeed        //Set goalSpeed = (currentSpeed)
                 } else {                            //currentSpeed >= frontSpeed
+                    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                            if printSpd == 1 && (Int.extractNum(from: vehNode.name)!) == WHICH {
+                    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                                    if gapTime.isInfinite {
+                                        PATH = "2" + "inf"
+                                    } else {
+                                        PATH = "2 " + String(gapTime.dp1)
+                                    }
+                                CS = vehNode.currentSpeed
+                                FS = tVehicle[index].frontSpd   //Can't use vehNode here as not updated yet!
+                            }
+                    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
                     if gapTime < (gapVal * 0.333) { //gapTime < (1/3 x 3s) = 1 sec
                         decel = decelMax + 2        //Max decel! Gap < 1 second. (+2 is TEMPORARY!!!)
                     } else {                        //gapTime >= 1 sec
                         gapTime = gapTime - (gapVal * 0.33)     //Change value from 1-3 to 0-2 (secs for gapVal = 3)
                         gapTime = gapTime / (gapVal * 0.67)     //Convert to ratio of 0-1
                         decel = decelMax - ((decelMax - decelMin) * gapTime)
-                        
-                        goalSpeed = frontSpd - 0.05 //Set goalSpeed = (frontSpd - 0.05kph)
+                        if decel == 0 {decel = decelCoast} //Ensure decel CAN'T = 0!
                     }
+
+                    golSpeed = tVehicle[index].frontSpd - 0.001 //Set goalSpeed = (frontSpd - 0.001kph)
+//                    golSpeed = tVehicle[index].frontSpd        //Set goalSpeed = (frontSpd)
                 }
             }
             
-            var changeTime: CGFloat = 1     //Set initial value = 1 second
+            //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                    if printSpd == 1 && (Int.extractNum(from: vehNode.name)!) == WHICH {
+            //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                        GS = golSpeed
+                    }
+            //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            var chngeTime: CGFloat = 1     //Set initial value = 1 second
             
-            if goalSpeed > vehNode.preferredSpeed {
-                goalSpeed = vehNode.preferredSpeed  //Don't allow goalSpeed > preferredSpeed!
+            if golSpeed > vehNode.preferredSpeed {
+                golSpeed = vehNode.preferredSpeed  //Don't allow goalSpeed > preferredSpeed!
             }
             //Aim for this speed while in this lane
             
-            let spdChange = abs(goalSpeed - vehNode.currentSpeed)
+            let spdChange = abs(golSpeed - vehNode.currentSpeed)
             
             //*****************************
-            //Flowchart Page 4 of 4     :Determine 'reachedSpd', changeTime & save values etc
+            //findObstacles Flowchart Page 4 of 4     :Determine 'reachedSpd', changeTime & save values etc
             //*****************************
             let maxPreferredSpd: CGFloat = 120    //Set maxPreferredSpd = 120kph for now!
             
-            if ignoreSpd == true || preferredSpeed == 0 {   //ignoreSpd = true OR preferredSpeed = 0
+            if ignoreSpd == true || vehNode.preferredSpeed == 0 {   //ignoreSpd = true OR preferredSpeed = 0
                 tVehicle[index].spdClk = Int((maxPreferredSpd/30)/accelMin) //Set spdClk = no of 120ms cycles
                 
                 tVehicle[index].reachedSpd = false  //reachedSpd cleared when vehicle NOT up to speed
                 
             } else {                                //ignoreSpd = false AND preferredSpeed != 0
-                if currentSpeed < 3 {               //currentSpeed < 3 kph
-                    tVehicle[index].spdClk = Int((preferredSpeed/30)/accelMin) //Set spdClk = no of 120ms cycles
+                if vehNode.currentSpeed < 3 {               //currentSpeed < 3 kph
+                    tVehicle[index].spdClk = Int((vehNode.preferredSpeed/30)/accelMin) //Set spdClk = no of 120ms cycles
                     
                     tVehicle[index].reachedSpd = false  //reachedSpd cleared when vehicle NOT up to speed
                     
@@ -379,27 +429,27 @@ struct NodeData {
                 }                                   //End currentSpeed check gt or lt 3 kph
             }                                       //End ignoreSpd = true OR false
 
-            if vehNode.currentSpeed >= goalSpeed {  //currentSpeed >= goalSpeed
+            if vehNode.currentSpeed >= golSpeed {  //currentSpeed >= goalSpeed
                 //DECELERATE to goalSpeed
                 if (spdChange / 3.6) > decel {      //spdChange in kph / 3.6 = m/s
-                    changeTime = ((spdChange / 3.6) / decel)
+                    chngeTime = ((spdChange / 3.6) / decel)
                 }
                 
             } else {                                //currentSpeed < goalSpeed
                 //NEVER allow accel = 0! (may get divide by zero error)
                 //ACCELERATE to goalSpeed
                 if (spdChange / 3.6) > accel {      //spdChange in kph / 3.6 = m/s
-                    changeTime = ((spdChange / 3.6) / accel)
-                }   //else { changeTime = 1 }       //already = 1. Slows final acceleration
+                    chngeTime = ((spdChange / 3.6) / accel)
+                }   //else { chngeTime = 1 }       //already = 1. Slows final acceleration
             }                                       //End currentSpeed >= goalSpeed
             
             //MARK: - aim for 'goalSpeed' after 'changeTime' seconds
-            tVehicle[index].goalSpeed = goalSpeed   //Store ready for SKAction
-            tVehicle[index].changeTime = changeTime //Store run time for next SKAction
+            tVehicle[index].goalSpeed = golSpeed   //Store ready for SKAction
+            tVehicle[index].changeTime = chngeTime //Store run time for next SKAction
             
             past1km = false
-            gap = 0
-            otherGap = 0
+            gapp = 0
+            othergapp = 0
             
             //            if tVehicle[index].otherTrack == false {
             //                print("kVeh \(index):\tReached Speed?: \(tVehicle[index].reachedSpd)")
@@ -408,8 +458,8 @@ struct NodeData {
             //            }
             
         }           //end 2nd For loop
-        
-        //        return (tVehicle, t2Vehicle)
+
+//        return (tVehicle, t2Vehicle)
         return tVehicle
     }       //End findObstacles method
     
@@ -544,7 +594,8 @@ struct NodeData {
                 //        f8Node.removeAction(forKey: "key")
                 //        f8Node.run(group, withKey: "key")
                 
-            case var y1 where y1 <= ((4 * F8Radius) + (piBy3 * F8Radius)):
+//            case var y1 where y1 <= ((4 * F8Radius) + (piBy3 * F8Radius)):
+            default:
                 //3rd & final straight stretch 45' down & back to origin
                 //            y1 = y1 - ((3 * F8Radius) + (piBy3 * F8Radius))
                 y1 = ((4 * F8Radius) + (piBy3 * F8Radius)) - y1    //Changes y1 so 1006.858 (for F8Radius = 75m) = the origin (easier calculation)
@@ -566,7 +617,7 @@ struct NodeData {
                 //
                 //        f8Node.run(group, withKey: "key")
                 
-            default:
+//            default:
                 break
                 
             }           //end Switch statement

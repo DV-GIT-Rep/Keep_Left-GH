@@ -65,20 +65,33 @@ var numCar: Int = 6
 var numTruck: Int = 2
 var numBus: Int = 2
 
-let vehicles = ["C1", "C2", "C3", "C4", "C5", "C6"] //Obsolete!
+//let vehicles = ["C1", "C2", "C3", "C4", "C5", "C6"] //Obsolete!
 
 //The following arrays represent all vehicles for which there are images. Names match filenames!
 let cars = ["C1", "C2", "C3", "C4", "C5", "C6"]
-let trucks = ["T1", "T2", "T3"]
+let trucks = ["T1", "T2", "T3", "T4"]
 let buses = ["B1", "B2", "B3"]
+//let cars = ["No1", "No2", "No3", "No4", "No5", "No6"]
+//let trucks = ["No7", "No8", "No9", "NoA"]
+//let buses = ["NoB", "NoC", "NoD"]
 let vehImage = "VehicleImage/"
 
 var maxCars = cars.count
 var maxTrucks = trucks.count
 var maxBuses = buses.count
 
+//Nxt 2 are compile options!!!
+let NumberedVehicles = false    //Display no's instead of veh's when = true. MAX 13 NO'S - see Assets!
+
+var printSpd = 0    //Prints Speed details if = 1. Set to 0 to disable!
+var WHICH = 1       //TEMP for printing !!! MUST set if printSpd != 0 !
+var PATH = ""       //Only used when printSpd != 0 !
+var CS:CGFloat = 0
+var FS:CGFloat = 0
+var GS:CGFloat = 0
+
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 11 //28
+var numVehicles = 28 //28
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
 var sOtherAllVehicles: [Vehicle] = []   //Array of vehicles on Other Straight Track

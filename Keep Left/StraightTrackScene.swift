@@ -254,7 +254,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             //MARK: - Create mask for overhead bridge
             let bridge = SKCropNode()
             bridge.position = CGPoint(x: 0, y: 0)
-            bridge.zPosition = 15       //Set "altitude" of bridge
+//            bridge.zPosition = 15       //Set "altitude" of bridge
             bridge.maskNode = SKSpriteNode(color: .red, size: CGSize(width: bridgeWidth, height: bridgeWidth))
             bridge.zRotation = -CGFloat(135).degrees()        //Create cropping mask
 
@@ -593,6 +593,20 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 ////                                }
 //                            }
 
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        if printSpd == 1 {
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                                //  var WHICH = 1 (set in AppData so can be tweaked here - sets unit no.)
+            //Opt 1
+                                print("Veh\tgapT\tPrSpd\tSpeed\tGSpd\tgap\t\tFNo\tFSpd\tPos\t\tFPos\toGap")
+                                print(WHICH,"\t",PATH,"\t",re1turnV[WHICH].preferredSpeed.dp1,"\t",re1turnV[WHICH].currentSpeed.dp1,"\t",re1turnV[WHICH].goalSpeed.dp1,"\t",re1turnV[WHICH].gap.dp1,"\t",Int.extractNum(from: re1turnV[WHICH].frontUnit)!,"",re1turnV[WHICH].frontSpd.dp1,"\t",re1turnV[WHICH].position.y.dp1,"",re1turnV[WHICH].frontPos.y.dp1,"",re1turnV[WHICH].otherGap.dp1)
+
+            //Opt 2
+//                                print("Veh\tgapT\tPrSpd\tSpeed\tGSpd\tgap\t\tFNo\tFSpd\tCS\t\tFS\t\tGS")
+//                                print(WHICH,"\t",PATH,"\t",re1turnV[WHICH].preferredSpeed.dp1,"\t",re1turnV[WHICH].currentSpeed.dp1,"\t",re1turnV[WHICH].goalSpeed.dp1,"\t",re1turnV[WHICH].gap.dp1,"\t",Int.extractNum(from: re1turnV[WHICH].frontUnit)!,"",re1turnV[WHICH].frontSpd.dp1,"\t",CS.dp1,"\t",FS.dp1,"\t",GS.dp1)
+        }
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                            
 
                             //***************  3. findF8Pos + updateF8Spots  ***************
                             var f8T1Spots = await nodeData.findF8Pos(t1Veh: &re1turnV)
@@ -1025,17 +1039,39 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
         for i in 1...numVehicles {
             var randomVehicle = Int.random(in: 1...maxVehicles)
-            var vWidth: CGFloat = 2.3   //Car width. Set truck & bus width = 2.5m (allow 300mm for side mirrors?)
-            switch randomVehicle {
-            case 1...maxCars:                       //Vehicle = Car
+//            var vWidth: CGFloat = 2.3   //Car width. Set truck & bus width = 2.5m (allow 300mm for side mirrors?)
+            var vWidth: CGFloat = 2.8   //Car width. Set truck & bus width = 2.5m (allow 300mm for side mirrors?) SET ALL = 2.5M FOR NOW!!!
+            
+            if NumberedVehicles == false {  //false = normal else display numbers instead of vehicles!
+                switch randomVehicle {
+                case 1...maxCars:                       //Vehicle = Car
                 fName = "C\(randomVehicle)"
-            case (maxCars+1)...(maxCars+maxTrucks): //Vehicle = Truck
+//                    fName = "No\(i)"
+                case (maxCars+1)...(maxCars+maxTrucks): //Vehicle = Truck
                 fName = "T\(randomVehicle-maxCars)"
-                vWidth = 2.5
-            default:                                //Vehicle = Bus
+//                    fName = "No\(i)"
+                    vWidth = 2.8
+                default:                                //Vehicle = Bus
                 fName = "B\(randomVehicle-maxCars-maxTrucks)"
-                vWidth = 2.5
-            }
+//                    fName = "No\(i)"
+                    vWidth = 2.8
+                }
+                
+            } else {    //NumberedVehicles != 0 therefore display no's for vehicles!
+                switch randomVehicle {
+                case 1...maxCars:                       //Vehicle = Car
+                    //                fName = "C\(randomVehicle)"
+                    fName = "No\(i)"
+                case (maxCars+1)...(maxCars+maxTrucks): //Vehicle = Truck
+                    //                fName = "T\(randomVehicle-maxCars)"
+                    fName = "No\(i)"
+                    vWidth = 2.8
+                default:                                //Vehicle = Bus
+                    //                fName = "B\(randomVehicle-maxCars-maxTrucks)"
+                    fName = "No\(i)"
+                    vWidth = 2.8
+                }
+            }       //end NumberedVehicles
             
             var sKLVehicle: Vehicle = Vehicle(imageName: vehImage + String(fName))
             
