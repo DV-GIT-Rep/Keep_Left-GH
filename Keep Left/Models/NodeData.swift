@@ -317,6 +317,10 @@ struct NodeData {
             
             gapTime = (gapp * 3.6) / vehNode.currentSpeed   //Time in secs to catch vehicle in front @ current speed
             if gapTime > 9.9 { gapTime = 9.9 }    //Avoid infinite result!
+            
+            if gapp <= gapBetween {
+                golSpeed = 0    //Force speed to 0 if gap is less than minimum allowed!
+            } else {
 
             //MARK: - Create variable value of decel when gap 1 - 3 secs from vehicle in front
             //        Note gapVal = max allowed gap = 3 seconds.
@@ -383,18 +387,23 @@ struct NodeData {
                         decel = decelMax - ((decelMax - decelMin) * gapTime)
                         if decel == 0 {decel = decelCoast} //Ensure decel CAN'T = 0!
                     }
-
-                    golSpeed = tVehicle[index].frontSpd - 0.001 //Set goalSpeed = (frontSpd - 0.001kph)
-//                    golSpeed = tVehicle[index].frontSpd        //Set goalSpeed = (frontSpd)
+                    
+                    if tVehicle[index].frontSpd >= 0.001 {
+                        golSpeed = tVehicle[index].frontSpd - 0.001
+                    } else {
+                        golSpeed = 0    //Ensure value can't be negative
+                    }
                 }
             }
-            
+            }
+
             //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                     if printSpd == 1 && (Int.extractNum(from: vehNode.name)!) == WHICH {
             //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                         GS = golSpeed
                     }
             //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
             var chngeTime: CGFloat = 1     //Set initial value = 1 second
             
             if golSpeed > vehNode.preferredSpeed {

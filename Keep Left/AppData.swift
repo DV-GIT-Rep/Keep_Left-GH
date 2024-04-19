@@ -89,14 +89,23 @@ var PATH = ""       //Only used when printSpd != 0 !
 var CS:CGFloat = 0
 var FS:CGFloat = 0
 var GS:CGFloat = 0
+var TEST: Int = 0
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 28 //28
+var numVehicles = 60 //28
+let gapBetween: CGFloat = 2     //Sets minimum permissible gap between vehicles in metres. MUST be >=1 metre!
+//let gapBetween: CGFloat = 2.5     //Sets minimum permissible gap between vehicles in metres. MUST be >=1 metre!
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
 var sOtherAllVehicles: [Vehicle] = []   //Array of vehicles on Other Straight Track
 var f8KLAllVehicles: [F8Vehicle] = []     //Array of vehicles on Keep Left Figure 8 Track
 var f8OtherAllVehicles: [F8Vehicle] = []  //Array of vehicles on Other Figure 8 Track
+
+let backgroundCategory: UInt32 = 0b0001     //Flags used for physicsBody detection
+let carCategory: UInt32 = 0b0010
+let busCategory: UInt32 = 0b0100
+let truckCategory: UInt32 = 0b1000
+let vehicleCategory: UInt32 = carCategory | busCategory | truckCategory
 
 var flashOffFlag = false        //Used to flash "Vehicle x" where x = vehicle no being displayed.
 
@@ -126,7 +135,8 @@ var m400: CGFloat = 1
 var fig8TrackPortrait = true
 
 //MARK: - Road Dimensions (metres) used for all views
-let roadLength: CGFloat = 1000.0   //Road length. (USE sTrackLength INSTEAD???)
+//let roadLength: CGFloat = 1000.0   //Road length. (USE sTrackLength INSTEAD???)
+let roadLength: CGFloat = 1008.0   //Road length in metres: FUDGED TO FIT FIG 8 IMAGE !!! TEMP !!!
 let laneWidth: CGFloat = 3.5        //Width of single lane measured between lines
 let lineWidth: CGFloat = 0.2        //Sets width of centre line markings in metres XXX
 let lineLength: CGFloat = 3         //Length of each centre line
@@ -191,8 +201,10 @@ let noOfCycles = 0x03       //Calc speeds & f8Pos once every 'noOfCycles' 60ms p
 //var sSceneWidth: CGFloat = 0.0  //Straight Track Scene Width in Points
 //var sSceneHeight: CGFloat = 0.0 //Straight Track Scene Height in Points
 //var portrait = true
-let sTrackWidth: CGFloat = 120.0 //Width of straight track scene in metres
-let sTrackLength: CGFloat = 1008.0 //Length of straight track scene in metres: FUDGED TO FIT FIG 8 IMAGE !!! TEMP !!!
+let sTrackWidth: CGFloat = 760.0 //Width of straight track scene in metres
+//let sTrackWidth: CGFloat = 120.0 //Width of straight track scene in metres. 750m ~max value on 12.9" iPad.
+//let sTrackWidth: CGFloat = 600.0 //Width of straight track scene in metres. 750m ~max value on 12.9" iPad.
+let sTrackLength: CGFloat = roadLength //Length of straight track scene in metres: FUDGED TO FIT FIG 8 IMAGE !!! TEMP !!!
 //let sTrackLength: CGFloat = 1000.0 //Length of straight track scene in metres
 let centreStrip: CGFloat = 4    //Width of centre strip in metres
 

@@ -136,8 +136,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         scene?.size.width = straightScene.width //* 2         // XXXXXXXXXXXXXXXXXXXXXX !!!!!!!!!!
         scene?.size.height = sTrackLength
 
-            sBackground.makeBackground(size: CGSize(width: straightScene.width * 2, height: sTrackLength * straightScene.metre1), zPos: -200)
-            sBackground.anchorPoint = CGPoint(x: 0.5, y: 0)
+            sBackground.makeBackground(size: CGSize(width: straightScene.width * 2, height: sTrackLength * straightScene.metre1 * 2), zPos: -200)   //Added *2 to height 12.04.24. Better when zoomed out!
+            sBackground.anchorPoint = CGPoint(x: 0.5, y: 0.05)  //was y: 0. Changed 12.04.24. Not sure why better?
 //            print("1. Scene = \(scene?.size) : sBackground = \(sBackground.size)")
 
 //            sBackground.position = CGPoint(x: 0, y: 0)    // = default
@@ -945,7 +945,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         var yOffset = 0.0    //Starting point for first line = -500m
 //        let xOffset = (roadWidth / 2) + (centreStrip / 2)     //metres (no change from road surfaces)
 //        let numLines: CGFloat = trunc(roadLength / linePeriod)
-        let lineSpacing: CGFloat = 1000/83  //where 1000 = track length & 83 = no lines per km. Cld use sTrackLength here???
+        let lineSpacing: CGFloat = sTrackLength/83  //where 1000 = track length & 83 = no lines per km. Cld use sTrackLength here???
         for i in 0..<83 {   //83 = no times centre line is drawn per 1km
             yOffset = (CGFloat(i) * lineSpacing)  //metres
             createLine(xOffset: xOffset, yOffset: yOffset, lLength: lineLength, parent: parent)
@@ -1018,22 +1018,22 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //        var sKLVehicle: SKSpriteNode = SKSpriteNode(imageNamed: "\(vehImage)C1")
         
         var sKLAll: Vehicle = Vehicle(imageName: vehImage + "C1")       //Dummy node for 'All Vehicles' KL
-        sKLAll.name = "sKLVehicle_0"
+//        sKLAll.name = "sKLVehicle_0"
+        sKLAll.name = "stKL_0"
         sKLAll.distance = 0.0
-//        sBackground.addChild(sKLAll)          //May not need to add to scene ???
         sKLAllVehicles.append(sKLAll)       //Place sKAll into position 0 of array
         var f8KLAll: F8Vehicle = F8Vehicle(imageName: vehImage + "C1")       //Dummy node for 'All Vehicles' KL
-        f8KLAll.name = "sKLVehicle_0"
+//        f8KLAll.name = "f8KLVehicle_0"
+        f8KLAll.name = "f8KL_0"
         f8KLAll.distance = 0.0
         f8KLAllVehicles.append(f8KLAll)
 
         var sOtherAll: Vehicle = Vehicle(imageName: vehImage + "C1")    //Dummy node for 'All Vehicles' Other
-        sOtherAll.name = "sOtherVehicle_0"
+        sOtherAll.name = "stOt_0"
         sOtherAll.distance = 0.0
-//        sBackground.addChild(sOtherAll)       //May not need to add to scene ???
         sOtherAllVehicles.append(sOtherAll) //Place sOtherAll into position 0 of array
         var f8OtherAll: F8Vehicle = F8Vehicle(imageName: vehImage + "C1")    //Dummy node for 'All Vehicles' Other
-        f8OtherAll.name = "f8OtherVehicle_0"
+        f8OtherAll.name = "f8Ot_0"
         f8OtherAll.distance = 0.0
         f8OtherAllVehicles.append(f8OtherAll)
 
@@ -1046,14 +1046,11 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                 switch randomVehicle {
                 case 1...maxCars:                       //Vehicle = Car
                 fName = "C\(randomVehicle)"
-//                    fName = "No\(i)"
                 case (maxCars+1)...(maxCars+maxTrucks): //Vehicle = Truck
                 fName = "T\(randomVehicle-maxCars)"
-//                    fName = "No\(i)"
                     vWidth = 2.8
                 default:                                //Vehicle = Bus
                 fName = "B\(randomVehicle-maxCars-maxTrucks)"
-//                    fName = "No\(i)"
                     vWidth = 2.8
                 }
                 
@@ -1076,19 +1073,22 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             var sKLVehicle: Vehicle = Vehicle(imageName: vehImage + String(fName))
             
             setAspectForWidth(sprite: sKLVehicle, width: vWidth)  //Sets veh width = 2m (default) & maintains aspect ratio
-            let vehSize = sKLVehicle.size
-            let gapBetween: CGFloat = 2.5     //Sets minimum gap between vehicles when stationary in metres.
+             let vehSize = sKLVehicle.size
             
             sKLVehicle.zPosition = +50
-            sKLVehicle.name = "stKL_\(i)"   //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
-            sKLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: sKLVehicle.size.width, height: sKLVehicle.size.height + gapBetween))   //Make rectangle same size as sprite + 0.75m front and back!
+            sKLVehicle.name = "stKL_\(i)"   //stKL_x -> Straight Track 1, f8KL_x -> Figure 8 Track 1, gKL_x -> Game Track 1.
+//            sKLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: sKLVehicle.size.width, height: (sKLVehicle.size.height + gapBetween)))   //Make rectangle same size as sprite + 0.75m front and back!
+            sKLVehicle.physicsBody = SKPhysicsBody(rectangleOf: sKLVehicle.size)   //Make rectangle same size as sprite + 0.75m front and back!
             sKLVehicle.physicsBody?.friction = 0
             sKLVehicle.physicsBody?.restitution = 0
             sKLVehicle.physicsBody?.linearDamping = 0
             sKLVehicle.physicsBody?.angularDamping = 0
             sKLVehicle.physicsBody?.allowsRotation = false
             sKLVehicle.physicsBody?.isDynamic = true
-            
+            sKLVehicle.physicsBody?.categoryBitMask = vehicleCategory
+            sKLVehicle.physicsBody?.contactTestBitMask = vehicleCategory
+            sKLVehicle.physicsBody?.collisionBitMask = 0
+
             sBackground.addChild(sKLVehicle)
             
             //_________________________ Fig 8 Track below __________________________________________________
@@ -1097,17 +1097,20 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             f8KLVehicle.size = vehSize
 
             f8KLVehicle.zPosition = 10      //Set starting "altitude" above track and below bridge
-            f8KLVehicle.name = "f8KL_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
-            f8KLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: f8KLVehicle.size.width, height: f8KLVehicle.size.height + gapBetween))   //Make rectangle same size as sprite + 0.5m front and back!
+            f8KLVehicle.name = "f8KL_\(i)"  //stKL_x -> Straight Track 1, f8KL_x -> Figure 8 Track 1, gKL_x -> Game Track 1.
+//            f8KLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: f8KLVehicle.size.width, height: (f8KLVehicle.size.height + gapBetween)))   //Make rectangle same size as sprite + 0.5m front and back!
+            f8KLVehicle.physicsBody = SKPhysicsBody(rectangleOf: f8KLVehicle.size)   //Make rectangle same size as sprite + 0.5m front and back!
             f8KLVehicle.physicsBody?.friction = 0
             f8KLVehicle.physicsBody?.restitution = 0
             f8KLVehicle.physicsBody?.linearDamping = 0
             f8KLVehicle.physicsBody?.angularDamping = 0
             f8KLVehicle.physicsBody?.allowsRotation = false
             f8KLVehicle.physicsBody?.isDynamic = false
+            f8KLVehicle.physicsBody?.categoryBitMask = vehicleCategory
+            f8KLVehicle.physicsBody?.contactTestBitMask = vehicleCategory
+            f8KLVehicle.physicsBody?.collisionBitMask = 0
 
             f8Background.addChild(f8KLVehicle)
-            
             //_________________________ Fig 8 Track above __________________________________________________
 
             var sOtherVehicle: Vehicle = Vehicle(imageName: vehImage + String(fName))
@@ -1116,8 +1119,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             
             sOtherVehicle.otherTrack = true //Flag identifies vehicle as being on the otherTrack!
             sOtherVehicle.zPosition = +50
-            sOtherVehicle.name = "stOt_\(i)"  //sOtherVehicle_x -> Straight Track 2, f2Vehicle_x -> Figure 8 Track 2, g2Vehicle_x -> Game Track 2.
-            sOtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: secSize.width, height: secSize.height + 1))   //Make rectangle same size as sprite + 0.5m front and back!
+            sOtherVehicle.name = "stOt_\(i)"  //stOt_x -> Straight Track 2, f8Ot_x -> Figure 8 Track 2, gOt_x -> Game Track 2 (if any!).
+//            sOtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: secSize.width, height: secSize.height + gapBetween))   //Make rectangle same size as sprite + 0.5m front and back!
+            sOtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: secSize)   //Make rectangle same size as sprite + 0.5m front and back!
             sOtherVehicle.physicsBody?.friction = 0
             sOtherVehicle.zRotation = CGFloat(Double.pi)  //rotate 180 degrees //XXXXXXXXXX
             sOtherVehicle.physicsBody?.restitution = 0
@@ -1125,7 +1129,10 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             sOtherVehicle.physicsBody?.angularDamping = 0
             sOtherVehicle.physicsBody?.allowsRotation = false
             sOtherVehicle.physicsBody?.isDynamic = true
-            
+            sOtherVehicle.physicsBody?.categoryBitMask = vehicleCategory
+            sOtherVehicle.physicsBody?.contactTestBitMask = vehicleCategory
+            sOtherVehicle.physicsBody?.collisionBitMask = 0
+
             sBackground.addChild(sOtherVehicle)
 
             //_________________________ Fig 8 Track below __________________________________________________
@@ -1135,17 +1142,20 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
             f8OtherVehicle.otherTrack = true     //Flag identifies vehicle as being on the otherTrack!
             f8OtherVehicle.zPosition = 10       //Set starting "altitude" above track and below bridge
-            f8OtherVehicle.name = "f8Ot_\(i)"  //sKLVehicle_x -> Straight Track 1, f1Vehicle_x -> Figure 8 Track 1, g1Vehicle_x -> Game Track 1.
-            f8OtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: f8OtherVehicle.size.width, height: f8OtherVehicle.size.height + 1))   //Make rectangle same size as sprite + 0.5m front and back!
+            f8OtherVehicle.name = "f8Ot_\(i)"  //stOt_x -> Straight Track 2, f8Ot_x -> Figure 8 Track 2, gOt_x -> Game Track 2 (if any!).
+//            f8OtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: f8OtherVehicle.size.width, height: f8OtherVehicle.size.height + gapBetween))   //Make rectangle same size as sprite + 0.5m front and back!
+            f8OtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: f8OtherVehicle.size)   //Make rectangle same size as sprite + 0.5m front and back!
             f8OtherVehicle.physicsBody?.friction = 0
             f8OtherVehicle.physicsBody?.restitution = 0
             f8OtherVehicle.physicsBody?.linearDamping = 0
             f8OtherVehicle.physicsBody?.angularDamping = 0
             f8OtherVehicle.physicsBody?.allowsRotation = false
             f8OtherVehicle.physicsBody?.isDynamic = false
+            f8OtherVehicle.physicsBody?.categoryBitMask = vehicleCategory
+            f8OtherVehicle.physicsBody?.contactTestBitMask = vehicleCategory
+            f8OtherVehicle.physicsBody?.collisionBitMask = 0
 
             f8Background.addChild(f8OtherVehicle)
-
             //_________________________ Fig 8 Track above __________________________________________________
 
             f8KLAllVehicles.append(f8KLVehicle)
@@ -1164,8 +1174,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         
         gameStage = gameStage & 0x3F    //Clear 2 MSBs when vehicles all exist (Int = 8 bits)
                                         //  - allows processing of vehicle speeds etc.
-
-        return
+        return              //Should this return anything in particular???
 //        return sKLVehicle
     }
     
@@ -1185,30 +1194,57 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         sKLVehicle.position.y = randomPos
 //        sKLVehicle.position.x = (randomLane == 0) ? ((sSceneWidth / 2.0) - (((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1)) : ((sSceneWidth / 2.0) - (((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1))
         sKLVehicle.position.x = (randomLane == 0) ? ( -((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2))) : ( -((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)))
-        sKLVehicle.startPos = sKLVehicle.position.y
+//        sKLVehicle.startPos = sKLVehicle.position.y
         sKLVehicle.lane = CGFloat(randomLane)
         
         sOtherVehicle.position.y = sTrackLength - randomPos
 //        sOtherVehicle.position.x = (randomLane == 0) ? ((sSceneWidth / 2.0) + (((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1)) : ((sSceneWidth / 2.0) + (((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)) * straightScene.metre1))
         sOtherVehicle.position.x = (randomLane == 0) ? ( +((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2))) : ( +((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2)))
-        sOtherVehicle.startPos = sOtherVehicle.position.y
+//        sOtherVehicle.startPos = sOtherVehicle.position.y
         sOtherVehicle.lane = CGFloat(randomLane)
         
         spriteClear = true
         //        veh.position = CGPoint(x: ((view?.bounds.size.width)! / 2.0) - ((5.85 + centreStrip/2) * sMetre1), y: 400.0 * sMetre1)
         //MARK: - Ensure vehicle doesn't overlap existing vehicle!
+        var noRoom = 100
+        sKLVehicle.size.height = (sKLVehicle.size.height + (gapBetween * 2))    //Temporarily increase length
         for sprite in sKLAllVehicles.dropFirst() {
+//            sprite.size.height = sprite.size.height + (gapBetween*2)
             if (sKLVehicle.intersects(sprite)) {
                 spriteClear = false
-//                print("\(sKLVehicle.name!)\t\(sKLVehicle.position.x.dp2)\t\(sKLVehicle.position.y.dp2)\t\(sprite.name ?? "none")\t\(sprite.position.x.dp2)\t\(sprite.position.y.dp2)")
+                print ("\(Int.extractNum(from: sKLVehicle.name ?? "S")!),\(Int.extractNum(from: sprite.name ?? "D")!),Lane = ,\(Int(sKLVehicle.lane)),Pos = ,\(Int(sKLVehicle.position.y)),,Width = \(sKLVehicle.size.width.dp1),Length = ,\((sKLVehicle.size.height).dp2) *")
+                print(sKLVehicle.physicsBody!,"\n")
+                print(sKLVehicle,"\n")
+                print(sprite.physicsBody!,"\n")
+                print(sprite,"\n")
                 break
-//            } else {
-//                print("\(sKLVehicle.name!)\t\(sKLVehicle.position.x.dp2)\t\(sKLVehicle.position.y.dp2)")
-            }
-        }
-//        print("\(sKLVehicle.name!)\t\(sKLVehicle.position.y.dp2)\tspriteClear: \(spriteClear)")
+            } else {                //OK - test if values approaching zero close to values approaching max
+                let tempS = sprite.position.y       //Temp storage of Y position
+                let tempK = sKLVehicle.position.y   //Temp storage of Y position
+                if tempS < 250 {sprite.position.y = tempS + sTrackLength}      //Add 1000 to pos Y
+                if tempK < 250 {sKLVehicle.position.y = tempK + sTrackLength}  //Add 1000 to pos Y
+                if (sKLVehicle.intersects(sprite)) {
+                    spriteClear = false
+//                    print ("\(Int.extractNum(from: sKLVehicle.name ?? "S")!),\(Int.extractNum(from: sprite.name ?? "D")!),Lane = ,\(Int(sKLVehicle.lane)),Pos = ,\(Int(sKLVehicle.position.y)),,Width = \(sKLVehicle.size.width.dp1),Length = ,\((sKLVehicle.size.height).dp2) *")
+//                    print(sKLVehicle.physicsBody!,"\n")
+//                    print(sKLVehicle,"\n")
+//                    print(sprite.physicsBody!,"\n")
+//                    print(sprite,"\n")
+                    break
+                }                       //End 2nd 'intersects' function
+                sprite.position.y = tempS           //Restore Y position
+                sKLVehicle.position.y = tempK       //Restore Y position
+            }                           //End 1st 'intersects' function
+        }                               //End 'for sprite' loop
+        sKLVehicle.size.height = (sKLVehicle.size.height - (gapBetween * 2))    //Restore original length
+
+        print ("\(Int.extractNum(from: sKLVehicle.name ?? "S")!),  ,Lane = ,\(Int(sKLVehicle.lane)),Pos = ,\(Int(sKLVehicle.position.y.rounded())),,Width = \(sKLVehicle.size.width.dp1),Length = ,\((sKLVehicle.size.height).dp2)")
+
     } while !spriteClear
     
+    sKLVehicle.startPos = sKLVehicle.position.y
+    sOtherVehicle.startPos = sOtherVehicle.position.y
+
     sKLAllVehicles.append(sKLVehicle)
     sOtherAllVehicles.append(sOtherVehicle)
 
@@ -1356,6 +1392,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //        allVeh[1].lane = 0.8000001
         if vehNode.otherTrack == false {
             allVeh[unitNum].physicsBody?.velocity.dy = newSpeed / 3.6
+            allVeh[unitNum].physicsBody?.velocity.dx = 0
             allVeh[unitNum].position.x = -((centreStrip/2) + shoulderWidth + shoulderLineWidth + (laneWidth / 2) + (laneWidth + lineWidth)) + (vehNode.lane * (laneWidth + lineWidth))  //Set vehicle position in lane - Straight Track Only!
 
 //            if vehNode.lane == 0 {         //Reinforce xPos when in centre of lane - sKLVehicle
@@ -1365,6 +1402,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //            }
         } else {
             allVeh[unitNum].physicsBody?.velocity.dy = -(newSpeed / 3.6)
+            allVeh[unitNum].physicsBody?.velocity.dx = 0
             allVeh[unitNum].position.x = +((centreStrip/2) + shoulderWidth + shoulderLineWidth + (laneWidth / 2) + (laneWidth + lineWidth)) - (vehNode.lane * (laneWidth + lineWidth))  //Set vehicle position in lane - Straight Track Only!
             
 //            if vehNode.lane == 0 {         //Reinforce xPos when in centre of lane - sKLVehicle
