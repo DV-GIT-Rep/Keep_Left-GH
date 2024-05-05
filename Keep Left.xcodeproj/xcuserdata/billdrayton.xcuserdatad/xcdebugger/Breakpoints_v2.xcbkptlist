@@ -30,8 +30,8 @@
             filePath = "Keep Left/StraightTrackScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "917"
-            endingLineNumber = "917"
+            startingLineNumber = "925"
+            endingLineNumber = "925"
             landmarkName = "update(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -94,8 +94,8 @@
             filePath = "Keep Left/Models/NodeData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "993"
-            endingLineNumber = "993"
+            startingLineNumber = "997"
+            endingLineNumber = "997"
             landmarkName = "goLeft(teeVeh:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -110,8 +110,8 @@
             filePath = "Keep Left/StraightTrackScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1547"
-            endingLineNumber = "1547"
+            startingLineNumber = "1611"
+            endingLineNumber = "1611"
             landmarkName = "every500ms()"
             landmarkType = "7">
          </BreakpointContent>
@@ -126,8 +126,8 @@
             filePath = "Keep Left/Models/NodeData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "981"
-            endingLineNumber = "981"
+            startingLineNumber = "985"
+            endingLineNumber = "985"
             landmarkName = "goLeft(teeVeh:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -142,8 +142,8 @@
             filePath = "Keep Left/Models/NodeData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1010"
-            endingLineNumber = "1010"
+            startingLineNumber = "1014"
+            endingLineNumber = "1014"
             landmarkName = "goLeft(teeVeh:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -158,8 +158,8 @@
             filePath = "Keep Left/Models/NodeData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1022"
-            endingLineNumber = "1022"
+            startingLineNumber = "1026"
+            endingLineNumber = "1026"
             landmarkName = "goLeft(teeVeh:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -174,8 +174,8 @@
             filePath = "Keep Left/Models/NodeData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "972"
-            endingLineNumber = "972"
+            startingLineNumber = "976"
+            endingLineNumber = "976"
             landmarkName = "goLeft(teeVeh:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -190,8 +190,8 @@
             filePath = "Keep Left/Models/NodeData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "949"
-            endingLineNumber = "949"
+            startingLineNumber = "953"
+            endingLineNumber = "953"
             landmarkName = "goLeft(teeVeh:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -206,8 +206,8 @@
             filePath = "Keep Left/Models/NodeData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "951"
-            endingLineNumber = "951"
+            startingLineNumber = "955"
+            endingLineNumber = "955"
             landmarkName = "goLeft(teeVeh:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -222,8 +222,8 @@
             filePath = "Keep Left/StraightTrackScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1585"
-            endingLineNumber = "1585"
+            startingLineNumber = "1649"
+            endingLineNumber = "1649"
             landmarkName = "updateSpeeds(retVeh:allVeh:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -270,8 +270,8 @@
             filePath = "Keep Left/Models/NodeData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "461"
-            endingLineNumber = "461"
+            startingLineNumber = "465"
+            endingLineNumber = "465"
             landmarkName = "findObstacles(tVehicle:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -286,8 +286,8 @@
             filePath = "Keep Left/StraightTrackScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1601"
-            endingLineNumber = "1601"
+            startingLineNumber = "1665"
+            endingLineNumber = "1665"
             landmarkName = "updateSpeeds(retVeh:allVeh:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -302,10 +302,10 @@
             filePath = "Keep Left/StraightTrackScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1446"
-            endingLineNumber = "1446"
-            landmarkName = "StraightTrackScene"
-            landmarkType = "3">
+            startingLineNumber = "1510"
+            endingLineNumber = "1510"
+            landmarkName = "placeVehicle(sKLVehicle:sOtherVehicle:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -334,8 +334,8 @@
             filePath = "Keep Left/StraightTrackScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1436"
-            endingLineNumber = "1436"
+            startingLineNumber = "1500"
+            endingLineNumber = "1500"
             landmarkName = "placeVehicle(sKLVehicle:sOtherVehicle:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -350,8 +350,8 @@
             filePath = "Keep Left/StraightTrackScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1364"
-            endingLineNumber = "1364"
+            startingLineNumber = "1428"
+            endingLineNumber = "1428"
             landmarkName = "makeVehicle()"
             landmarkType = "7">
          </BreakpointContent>
@@ -366,8 +366,8 @@
             filePath = "Keep Left/StraightTrackScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1355"
-            endingLineNumber = "1355"
+            startingLineNumber = "1419"
+            endingLineNumber = "1419"
             landmarkName = "makeVehicle()"
             landmarkType = "7">
          </BreakpointContent>
@@ -414,13 +414,13 @@
             filePath = "Keep Left/StraightTrackScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "782"
-            endingLineNumber = "782"
+            startingLineNumber = "790"
+            endingLineNumber = "790"
             landmarkName = "update(_:)"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "F1E6E60A-DC8E-45D2-A413-42CC1EB4C130 - 9c38c8e59803db02"
+                  uuid = "F1E6E60A-DC8E-45D2-A413-42CC1EB4C130 - 9c38c8e59803da1a"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -430,11 +430,11 @@
                   urlString = "file:///Users/billdrayton/Library/CloudStorage/OneDrive-Personal/Drayvest/Apps/Keep%20Left/Keep%20Left/StraightTrackScene.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "782"
-                  endingLineNumber = "782">
+                  startingLineNumber = "790"
+                  endingLineNumber = "790">
                </Location>
                <Location
-                  uuid = "F1E6E60A-DC8E-45D2-A413-42CC1EB4C130 - 75769b49db80a504"
+                  uuid = "F1E6E60A-DC8E-45D2-A413-42CC1EB4C130 - 75769b49db80a41c"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -444,11 +444,11 @@
                   urlString = "file:///Users/billdrayton/Library/CloudStorage/OneDrive-Personal/Drayvest/Apps/Keep%20Left/Keep%20Left/StraightTrackScene.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "782"
-                  endingLineNumber = "782">
+                  startingLineNumber = "790"
+                  endingLineNumber = "790">
                </Location>
                <Location
-                  uuid = "F1E6E60A-DC8E-45D2-A413-42CC1EB4C130 - 2e44adae1d046f06"
+                  uuid = "F1E6E60A-DC8E-45D2-A413-42CC1EB4C130 - 2e44adae1d046e1e"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -458,11 +458,11 @@
                   urlString = "file:///Users/billdrayton/Library/CloudStorage/OneDrive-Personal/Drayvest/Apps/Keep%20Left/Keep%20Left/StraightTrackScene.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "782"
-                  endingLineNumber = "782">
+                  startingLineNumber = "790"
+                  endingLineNumber = "790">
                </Location>
                <Location
-                  uuid = "F1E6E60A-DC8E-45D2-A413-42CC1EB4C130 - 7937c3250f92908"
+                  uuid = "F1E6E60A-DC8E-45D2-A413-42CC1EB4C130 - 7937c3250f92810"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -472,8 +472,8 @@
                   urlString = "file:///Users/billdrayton/Library/CloudStorage/OneDrive-Personal/Drayvest/Apps/Keep%20Left/Keep%20Left/StraightTrackScene.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "782"
-                  endingLineNumber = "782">
+                  startingLineNumber = "790"
+                  endingLineNumber = "790">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -488,8 +488,8 @@
             filePath = "Keep Left/Models/NodeData.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "901"
-            endingLineNumber = "901"
+            startingLineNumber = "905"
+            endingLineNumber = "905"
             landmarkName = "goLeft(teeVeh:)"
             landmarkType = "7">
          </BreakpointContent>

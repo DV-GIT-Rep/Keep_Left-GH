@@ -137,7 +137,11 @@ struct NodeData {
         var oReerGap: CGFloat = 0.0     //Distance behind in OTHER lane
         var nextIndex: Int = 0
         var past1km = false
-        let midLanes = 0.2...0.8
+        
+        //Below was originally 0.2-0.8. Trying new values but may change back!
+        let laneMin = 0.3
+        let laneMax = 0.7
+        let midLanes = laneMin...laneMax
         
         //Loop through arrays to confirm distance to vehicle behind in the other lane
         //Loop through Track 1 (KL) first
@@ -161,7 +165,7 @@ struct NodeData {
                     
                 }           //end nextIndex 'if' statement
                 
-                let sameLane = (vehNode.lane - 0.8)...(vehNode.lane + 0.8)   //Scan for vehicles within 0.8 lanes either side
+                let sameLane = (vehNode.lane - laneMax)...(vehNode.lane + laneMax)   //Scan for vehicles within 0.8 lanes either side
                 //                let sameLane = (vehNode.lane - 0.5) < 0 ? 0...(vehNode.lane + 0.5) : (vehNode.lane + 0.5) <= 1 ? (vehNode.lane - 0.5)...(vehNode.lane + 0.5) : (vehNode.lane - 0.5)...1   //Scan for vehicles within 0.5 lanes either side
                 let sameLap = (vehNode.position.y - (vehNode.size.height / 2)) - (tVehicle[nextIndex].position.y + (tVehicle[nextIndex].size.height / 2)) //Vehicle in front on same side of 1km boundary
                 let lastLap = ((vehNode.position.y + sTrackLength) - (vehNode.size.height / 2)) - (tVehicle[nextIndex].position.y + (tVehicle[nextIndex].size.height / 2))    //Vehicle in front is over the 1km boundary!
@@ -259,14 +263,14 @@ struct NodeData {
                     
                 }           //end nextIndex 'if' statement
                 
-                let sameLane = (vehNode.lane - 0.8)...(vehNode.lane + 0.8)   //Scan for vehicles within 0.8 lanes either side
+                let sameLane = (vehNode.lane - laneMax)...(vehNode.lane + laneMax)   //Scan for vehicles within 0.8 lanes either side
                 //                let sameLane = (vehNode.lane - 0.5) < 0 ? 0...(vehNode.lane + 0.5) : (vehNode.lane + 0.5) <= 1 ? (vehNode.lane - 0.5)...(vehNode.lane + 0.5) : (vehNode.lane - 0.5)...1   //Scan for vehicles within 0.5 lanes either side
                 let sameLap = (tVehicle[nextIndex].position.y - (tVehicle[nextIndex].size.height / 2)) - (vehNode.position.y + (vehNode.size.height / 2))                             //Vehicle in front on same side of 1km boundary
                 let lastLap = ((tVehicle[nextIndex].position.y + sTrackLength) - (tVehicle[nextIndex].size.height / 2)) - (vehNode.position.y + (vehNode.size.height / 2))      //Vehicle in front is over the 1km boundary!
                 
                 //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
                 if sameLane.contains(tVehicle[nextIndex].lane) {
-                    //Both vehicles in same lane +/- 0.8
+                    //Both vehicles in same lane +/- 0.8 (laneMax)
                     if gapp == 0 {
                         gapp = (past1km == false) ? sameLap : lastLap
                         if gapp <= 0 { gapp = 0.1 } //Should NEVER happen! (due to self braking)
@@ -275,7 +279,7 @@ struct NodeData {
                         tVehicle[index].frontPos = tVehicle[nextIndex].position   //Save position of front unit
                         tVehicle[index].frontSpd = tVehicle[nextIndex].currentSpeed   //Save speed of front unit
                     }
-                    if midLanes.contains(tVehicle[nextIndex].lane) {            //midLanes = 0.2 - 0.8
+                    if midLanes.contains(tVehicle[nextIndex].lane) {            //midLanes = 0.25...0.75
                         //If this vehicle is mid-lane, set otherGap = gap
                         if othergapp == 0 {
                             othergapp = (past1km == false) ? sameLap : lastLap

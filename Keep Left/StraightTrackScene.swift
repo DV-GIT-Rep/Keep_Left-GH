@@ -722,14 +722,19 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                                         sKLAllVehicles[i].startIndicator = rtnT1Veh[i].startIndicator
                                         sKLAllVehicles[i].lane = rtnT1Veh[i].lane
 
-                                       if printOvertake != 0 {
-                                            let startMsg1 = SKAction.run {print("\t\(i) Start Overtake\tLane \(sKLAllVehicles[i].lane.dp0)\tInd = \(sKLAllVehicles[i].indicator)")}
-                                            let laneFlash1 = SKAction.sequence([startMsg1, laneChange, endLane1])
-                                           async let newLanePos: Void = await sKLAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(laneFlash1)
-                                        } else {
-                                            let laneFlash1 = SKAction.sequence([laneChange, endLane1])
-                                            async let newLanePos: Void = await sKLAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(laneFlash1)
-                                        }
+//                                        if i != 0 {
+                                            if printOvertake != 0 {
+                                                let startMsg1 = SKAction.run {print("\t\(i) Start Overtake\tLane \(sKLAllVehicles[i].lane.dp0)\tInd = \(sKLAllVehicles[i].indicator)")}
+                                                let laneFlash1 = SKAction.sequence([startMsg1, laneChange, endLane1])
+                                                async let newLanePos: Void = await sKLAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(laneFlash1)
+                                                let lFlash1 = SKAction.sequence([laneChange, endLane1])
+                                                async {guard let newF8LanePos: Void = await f8KLAllVehicles[i].childNode(withName: "rightInd\(i)")?.run(lFlash1) else { return }}
+                                            } else {
+                                                let laneFlash1 = SKAction.sequence([laneChange, endLane1])
+                                                async let newLanePos: Void = await sKLAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(laneFlash1)
+                                                async {guard let newF8LanePos: Void = await f8KLAllVehicles[i].childNode(withName: "rightInd\(i)")?.run(laneFlash1) else { return }}
+                                            }
+//                                        }
                                         
                                     } else {        //About to go back to left lane
                                         if rtnT1Veh[i].indicator == .endOvertake {
@@ -771,13 +776,16 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                                            })      //End goToLane0 action
                                             let goLane0 = SKAction.group([goToLane0, flash0])
                                             let laneFlash0 = SKAction.sequence([startMsg, goLane0, endLane0])
-                                            
+                                            let lFlash0 = SKAction.sequence([goLane0, endLane0])
+
                                             sKLAllVehicles[i].indicator = rtnT1Veh[i].indicator
                                             sKLAllVehicles[i].startIndicator = rtnT1Veh[i].startIndicator
                                             sKLAllVehicles[i].lane = rtnT1Veh[i].lane
                                             
+//                                            async let newLanePos: Void = await sKLAllVehicles[i].childNode(withName: "leftInd\(i)")!.run(laneFlash0)
                                             async let newLanePos: Void = await sKLAllVehicles[i].childNode(withName: "leftInd\(i)")!.run(laneFlash0)
-                                            
+                                            async {guard let newF8LanePos: Void = await f8KLAllVehicles[i].childNode(withName: "leftInd\(i)")?.run(lFlash0) else { return }}
+
                                         } else {    //.startIndicator was set BUT .indicator WASN'T O/T or endO/T!
                                             if sKLAllVehicles[i].lane > 0.5 {
                                                 sKLAllVehicles[i].lane = 1      //Ensure lane only = 1 or 0 when here!
@@ -845,8 +853,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //                            print("Linez 813\t\(sKLAllVehicles[1].lane)")
                             //***************  2a. KL Overtake  ***************
                             //NOTE: Other Track doesn't Keep Left!
-//                            var re2turnV: [NodeData] = await nodeData.goLeft(teeVeh: &ret2urn)
-                            var re2turnV: [NodeData] = ret2urn
+                            var re2turnV: [NodeData] = await nodeData.goLeft(teeVeh: &ret2urn)
+//                            var re2turnV: [NodeData] = ret2urn
                             //Toggle above 2 instructions to run or disable goLeft function! (currently only KL Track)
 
 //                            print("Linez 820\t\(sKLAllVehicles[1].lane)")
@@ -1247,20 +1255,20 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             let fInd = indic.copy() as! SKShapeNode
             let rInd = indic.copy() as! SKShapeNode
             fInd.position.y = rInd.position.y + sKLVehicle.size.height - (indicatorRadius * 3)
-            let twoIndicators = SKShapeNode()
-            twoIndicators.addChild(fInd)
-            twoIndicators.addChild(rInd)
-            twoIndicators.name = "leftInd\(i)"
-            twoIndicators.position.x = sKLVehicle.position.x - (sKLVehicle.size.width / 2) + (indicatorRadius * 2)
-            twoIndicators.position.y = sKLVehicle.position.y - (sKLVehicle.size.height / 2) + (indicatorRadius * 1.5)
-            twoIndicators.isHidden = true
-            sKLVehicle.addChild(twoIndicators)
-            let next2Indicators = twoIndicators.copy() as! SKShapeNode
-            next2Indicators.name = "rightInd\(i)"
-            next2Indicators.position.x = sKLVehicle.position.x + (sKLVehicle.size.width / 2) - (indicatorRadius * 2)
-//            next2Indicators.isHidden = true
-            next2Indicators.isHidden = true
-            sKLVehicle.addChild(next2Indicators)
+            let leftSKLIndicators = SKShapeNode()
+            leftSKLIndicators.addChild(fInd)
+            leftSKLIndicators.addChild(rInd)
+            leftSKLIndicators.name = "leftInd\(i)"
+            leftSKLIndicators.position.x = sKLVehicle.position.x - (sKLVehicle.size.width / 2) + (indicatorRadius * 2)
+            leftSKLIndicators.position.y = sKLVehicle.position.y - (sKLVehicle.size.height / 2) + (indicatorRadius * 1.5)
+            leftSKLIndicators.isHidden = true
+            sKLVehicle.addChild(leftSKLIndicators)
+            let rightSKLIndicators = leftSKLIndicators.copy() as! SKShapeNode
+            rightSKLIndicators.name = "rightInd\(i)"
+            rightSKLIndicators.position.x = sKLVehicle.position.x + (sKLVehicle.size.width / 2) - (indicatorRadius * 2)
+//            rightSKLIndicators.isHidden = true
+            rightSKLIndicators.isHidden = true
+            sKLVehicle.addChild(rightSKLIndicators)
 
 ////            let cnrInd = indic.copy() as! SKShapeNode
 ////            cnrInd.position = CGPoint(x: sKLVehicle.position.x - 1, y: sKLVehicle.position.y + 3)
@@ -1298,6 +1306,25 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             f8KLVehicle.physicsBody?.collisionBitMask = 0
 
             f8Background.addChild(f8KLVehicle)
+            
+            let f8FInd = indic.copy() as! SKShapeNode
+            let f8RInd = indic.copy() as! SKShapeNode
+            f8FInd.position.y = f8RInd.position.y + f8KLVehicle.size.height - (indicatorRadius * 3)
+            let leftF8KLIndicators = SKShapeNode()
+            leftF8KLIndicators.addChild(f8FInd)
+            leftF8KLIndicators.addChild(f8RInd)
+            leftF8KLIndicators.name = "leftInd\(i)"
+            leftF8KLIndicators.position.x = f8KLVehicle.position.x - (f8KLVehicle.size.width / 2) + (indicatorRadius * 2)
+            leftF8KLIndicators.position.y = f8KLVehicle.position.y - (f8KLVehicle.size.height / 2) + (indicatorRadius * 1.5)
+            leftF8KLIndicators.isHidden = true
+            f8KLVehicle.addChild(leftF8KLIndicators)
+            let rightF8KLIndicators = leftF8KLIndicators.copy() as! SKShapeNode
+            rightF8KLIndicators.name = "rightInd\(i)"
+            rightF8KLIndicators.position.x = f8KLVehicle.position.x + (f8KLVehicle.size.width / 2) - (indicatorRadius * 2)
+//            rightF8KLIndicators.isHidden = true
+            rightF8KLIndicators.isHidden = true
+            f8KLVehicle.addChild(rightF8KLIndicators)
+
             //_________________________ Fig 8 Track above __________________________________________________
 
             var sOtherVehicle: Vehicle = Vehicle(imageName: vehImage + String(fName))
@@ -1322,6 +1349,24 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
             sBackground.addChild(sOtherVehicle)
 
+            let sFOInd = indic.copy() as! SKShapeNode
+            let sROInd = indic.copy() as! SKShapeNode
+            sFOInd.position.y = sROInd.position.y + sOtherVehicle.size.height - (indicatorRadius * 3)
+            let leftSOthIndicators = SKShapeNode()
+            leftSOthIndicators.addChild(sFOInd)
+            leftSOthIndicators.addChild(sROInd)
+            leftSOthIndicators.name = "leftInd\(i)"
+            leftSOthIndicators.position.x = sOtherVehicle.position.x - (sOtherVehicle.size.width / 2) + (indicatorRadius * 2)
+            leftSOthIndicators.position.y = sOtherVehicle.position.y - (sOtherVehicle.size.height / 2) + (indicatorRadius * 1.5)
+            leftSOthIndicators.isHidden = true
+            sOtherVehicle.addChild(leftSOthIndicators)
+            let rightSOthIndicators = leftSOthIndicators.copy() as! SKShapeNode
+            rightSOthIndicators.name = "rightInd\(i)"
+            rightSOthIndicators.position.x = sOtherVehicle.position.x + (sOtherVehicle.size.width / 2) - (indicatorRadius * 2)
+//            rightSOthIndicators.isHidden = true
+            rightSOthIndicators.isHidden = true
+            sOtherVehicle.addChild(rightSOthIndicators)
+
             //_________________________ Fig 8 Track below __________________________________________________
             var f8OtherVehicle: F8Vehicle = F8Vehicle(imageName: vehImage + String(fName))
 
@@ -1343,6 +1388,25 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             f8OtherVehicle.physicsBody?.collisionBitMask = 0
 
             f8Background.addChild(f8OtherVehicle)
+
+            let f8FOInd = indic.copy() as! SKShapeNode
+            let f8ROInd = indic.copy() as! SKShapeNode
+            f8FOInd.position.y = f8ROInd.position.y + f8OtherVehicle.size.height - (indicatorRadius * 3)
+            let leftF8OthIndicators = SKShapeNode()
+            leftF8OthIndicators.addChild(f8FOInd)
+            leftF8OthIndicators.addChild(f8ROInd)
+            leftF8OthIndicators.name = "leftInd\(i)"
+            leftF8OthIndicators.position.x = f8OtherVehicle.position.x - (f8OtherVehicle.size.width / 2) + (indicatorRadius * 2)
+            leftF8OthIndicators.position.y = f8OtherVehicle.position.y - (f8OtherVehicle.size.height / 2) + (indicatorRadius * 1.5)
+            leftF8OthIndicators.isHidden = true
+            f8OtherVehicle.addChild(leftF8OthIndicators)
+            let rightF8OthIndicators = leftF8OthIndicators.copy() as! SKShapeNode
+            rightF8OthIndicators.name = "rightInd\(i)"
+            rightF8OthIndicators.position.x = f8OtherVehicle.position.x + (f8OtherVehicle.size.width / 2) - (indicatorRadius * 2)
+//            rightF8OthIndicators.isHidden = true
+            rightF8OthIndicators.isHidden = true
+            f8OtherVehicle.addChild(rightF8OthIndicators)
+
             //_________________________ Fig 8 Track above __________________________________________________
 
             f8KLAllVehicles.append(f8KLVehicle)
