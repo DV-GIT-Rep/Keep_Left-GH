@@ -51,11 +51,18 @@ var sprite: SKSpriteNode!   //Temporary to stop XCode errors!
 var newNo: CGFloat = 120    // !!!! TEMP to randomise & dampen vehicle speed !!!!
 var oldNo: CGFloat = 120
 
+let indicatorRadius = 0.2
+
 //var dONTrEPEAT = false
 
 //Track scene may be temporary. Functions below MUST be called from within a scene!
 class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
     
+//    let indic = SKShapeNode(rect: CGRectMake(<#T##CGFloat#>, <#T##CGFloat#>, <#T##CGFloat#>, <#T##CGFloat#>), cornerRadius: <#T##CGFloat#>)
+//    let indic = SKShapeNode(rectOf: CGSize(width: 0.6, height: 0.4), cornerRadius: 0.15)
+    let indic = SKShapeNode(circleOfRadius: indicatorRadius)
+//    let indic = SKSpriteNode(color: SKColor(red: 255/255, green: 95/255, blue: 31/255, alpha: 1), size: CGSize(width: 3, height: 2))
+
     @StateObject var vehicle = Vehicle()
     @StateObject var f8Vehicle = F8Vehicle()
     
@@ -254,7 +261,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             //MARK: - Create mask for overhead bridge
             let bridge = SKCropNode()
             bridge.position = CGPoint(x: 0, y: 0)
-//            bridge.zPosition = 15       //Set "altitude" of bridge
+            bridge.zPosition = 15       //Set "altitude" of bridge (comment out to hide bridge!)
             bridge.maskNode = SKSpriteNode(color: .red, size: CGSize(width: bridgeWidth, height: bridgeWidth))
             bridge.zRotation = -CGFloat(135).degrees()        //Create cropping mask
 
@@ -476,9 +483,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             
                     gameStage = gameStage | noVehTest       //Set 2nd MSB. Don't clear until all below done!
 
-                    
+//                print("Linez 479\t\(sKLAllVehicles[1].lane)")
                     var temp1 = sKLAllVehicles      //Straight Track Vehicles.
-                    var nodeData: NodeData = NodeData()
+                    var nodeData: NodeData = NodeData() //Temp storage of data - NOT SKSpriteNode!!!
                     var t1xVehicle: [NodeData] = []
                     
                     for (index, veh1Node) in temp1.enumerated() {
@@ -497,12 +504,14 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             nodeData.spdClk = veh1Node.spdClk
                             nodeData.reachedSpd = veh1Node.reachedSpd
                             nodeData.indicator = veh1Node.indicator
+                            nodeData.startIndicator = veh1Node.startIndicator
+                            
 //                            switch veh1Node.indicator {
 //                            case .overtake:
 //                                print("\t\t\tOvertake\t\(index)")
 //                                nodeData.lane = 1
 //                                veh1Node.lane = 1
-//                            case .end_overtake:
+//                            case .endOvertake:
 //                                print("\t\t\tEnd Overtake\t\(index)")
 //                                nodeData.lane = 0
 //                                veh1Node.lane = 0
@@ -541,7 +550,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             nodeData.spdClk = veh2Node.spdClk
                             nodeData.reachedSpd = veh2Node.reachedSpd
                             nodeData.indicator = veh2Node.indicator
-                            //                nodeData.equivF8Name = not needed here!
+                            nodeData.startIndicator = veh2Node.startIndicator
+                            
+//                nodeData.equivF8Name = not needed here!
                         }
                         t2xVehicle.append(nodeData)
                     }
@@ -558,23 +569,28 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //                    allAtSpeed = false
 //                }
                         
+//MARK: - TASK
+//                print("Linez 566\t\(sKLAllVehicles[1].lane)")
                     Task {
                         let doT2: Int = 1
-                        if (gameStage & doT2) == 0 {
+                        if (gameStage & doT2) == 0 {    //Bit 0 = 0 then update Keep Left Track
                             //***************  1. findObstacles + updateSpeeds  ***************
                             //Keep Left Track (Track 1)  = gameStage bit 0 = 0
                             allAtSpeed1 = true
                             
+//                            print("Linez 574\t\(sKLAllVehicles[1].lane)")
                             var ret1urn: [NodeData] = t1Vehicle        //Used for both Track 1 & Track 2
                             var result1 = await nodeData.findObstacles(tVehicle: &t1Vehicle)
                             ret1urn = result1
 
+//                            print("Linez 579\t\(sKLAllVehicles[1].lane)")
                             updateSpeeds(retVeh: result1, allVeh: &sKLAllVehicles)      //Update vehicle speeds
                             
                             
                             //***************  2. Restore Array  ***************
                             //NOT in Vehicle order! Arranged by Y Position!
                             //Sort back into Vehicle No order. Note [0] is missing
+//                            print("Linez 586\t\(sKLAllVehicles[1].lane)")
                             ret1urn.sort {
                                 $0.name.localizedStandardCompare($1.name) == .orderedAscending
                             }                               //'localizedStandardCompare' ensures 21 sorted AFTER 3
@@ -582,6 +598,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             ret1urn[0].name = "All Vehicles"
                             
                             
+//                            print("Linez 594\t\(sKLAllVehicles[1].lane)")
                             //***************  2a. KL Overtake  ***************
                             var re1turnV: [NodeData] = await nodeData.goLeft(teeVeh: &ret1urn)
 //                            var re1turnV: [NodeData] = nodeData.goLeft(teeVeh: &ret1urn)
@@ -608,12 +625,15 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                             
 
+//                            print("Linez 621\t\(sKLAllVehicles[1].lane)")
                             //***************  3. findF8Pos + updateF8Spots  ***************
                             var f8T1Spots = await nodeData.findF8Pos(t1Veh: &re1turnV)
                             
+//                            print("Linez 625\t\(sKLAllVehicles[1].lane)")
                             updateF8TSpots(t1Vehicle: f8T1Spots, kLTrack: true)
                             
                             
+//                            print("Linez 629\t\(sKLAllVehicles[1].lane)")
                             //***************  4. updateLabel  ***************
                             //Once every 500-600ms sufficient for display calcs below
 //                            var rtnT1Veh = await nodeData.calcAvgData(t1Veh: &f8T1Spots)
@@ -625,6 +645,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             //                        rtnT1Veh.insert(rtnT1Veh[2], at: 0)   //Copy dummy into position [0] (All Vehicles).
                             //                        rtnT1Veh[0].name = "All Vehicles"
                             
+//                            print("Linez 641\t\(sKLAllVehicles[1].lane)")
                             for i in 1..<rtnT1Veh.count {
                                 if i == 0 {continue}       //Skip loop for element[0] = All Vehicles
                                 //                            print("name:   \(String(rtnT1Veh[i].name))")
@@ -635,20 +656,21 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                                 
                                 if rtnT1Veh[i].reachedSpd == false { allAtSpeed1 = false } //Flag cleared if ANY vehicle NOT up to speed
                                 
-                                //                                if enableMinSpeed == true {
-                                                                    if rtnT1Veh[i].indicator == .overtake {
-                                //                                        print("Overtake\t\(i)")
-                                                                        sKLAllVehicles[i].indicator = .overtake
-                                //                                        sKLAllVehicles[i].lane = 1
-                                //                                        rtnT1Veh[i].lane = 1
-                                                                    } else if rtnT1Veh[i].indicator == .end_overtake {
-                                //                                        print("End Overtake\t\(i)")
-                                                                        sKLAllVehicles[i].indicator = .end_overtake
-                                //                                        sKLAllVehicles[i].lane = 0
-                                //                                        rtnT1Veh[i].lane = 0
-                                                                    }
-                                //                                    sKLAllVehicles[i].lane = rtnT1Veh[i].lane //for some reason locks up if this enabled from start?
-                                //                                }
+////  Commented out below 24 April 2024 BUT may be needed???
+////                                if enableMinSpeed == true {
+//                                if rtnT1Veh[i].indicator == .overtake {
+////                                        print("Overtake\t\(i)")
+//                                    sKLAllVehicles[i].indicator = .overtake
+////                                        sKLAllVehicles[i].lane = 1
+////                                        rtnT1Veh[i].lane = 1
+//                                } else if rtnT1Veh[i].indicator == .endOvertake {
+////                                        print("End Overtake\t\(i)")
+//                                    sKLAllVehicles[i].indicator = .endOvertake
+////                                        sKLAllVehicles[i].lane = 0
+////                                        rtnT1Veh[i].lane = 0
+//                                }
+//// sKLAllVehicles[i].lane = rtnT1Veh[i].lane //for some reason locks up if this enabled from start?
+////                                }
 
                                 //If vehicle crosses 1km boundary then subtract tracklength from the y position.
                                 if sKLAllVehicles[i].position.y >= sTrackLength {
@@ -656,10 +678,124 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                                     sKLAllVehicles[i].position.y = (sKLAllVehicles[i].position.y - sTrackLength)
                                     sKLAllVehicles[i].laps += 1
                                 }
+
                                 
-                            }
+//Code below starts lane change & indicators where required for the Keep Left track
+                                if rtnT1Veh[i].startIndicator == true { //Code only runs to Start Flashing
+                                    rtnT1Veh[i].startIndicator = false
+                                    sKLAllVehicles[i].startIndicator = false
+                                    if rtnT1Veh[i].indicator == .overtake { //About to Overtake
+                                        let halfFlash: CGFloat = 0.3    //Time indicators are ON or OFF
+                                        let numFlash = 6        //No of full indicator flashes
+                                        let flashTime: CGFloat = CGFloat(numFlash) * halfFlash * 1.8
+//                                        let indicatorOn = SKAction.fadeIn(withDuration: 0.0) //Overtaking indicators ON
+//                                        let indicatorOff = SKAction.fadeOut(withDuration: 0.0)  //Overtaking indicators OFF
+                                        let indicatorOn = SKAction.unhide() //Overtaking indicators ON
+                                        let indicatorOff = SKAction.hide()  //Overtaking indicators OFF
+                                        let deelay = SKAction.wait(forDuration: halfFlash)  //Delay halfFlash secs
+                                        let pulseIndicators = SKAction.sequence([indicatorOn, deelay, indicatorOff, deelay])
+                                        let flash1 = SKAction.repeat(pulseIndicators, count: numFlash)
+                                        let endLane1 = SKAction.run {
+                                            sKLAllVehicles[i].lane = 1      //Ensure lane only = 1 or 0 when here!
+                                            rtnT1Veh[i].lane = 1      //Ensure lane only = 1 or 0 when here!
+                                            sKLAllVehicles[i].indicator = .off
+                                            rtnT1Veh[i].indicator = .off
+                                            if printOvertake != 0 {
+                                                print("\t\(i)   End Overtake\tLane \(sKLAllVehicles[i].lane.dp0)\tInd = \(sKLAllVehicles[i].indicator)")
+                                            }
+                                        }
+                                        
+                                        let goToLane1 = SKAction.customAction(withDuration: flashTime, actionBlock: {
+                                            (node, elapsedTime) in
+                                            sKLAllVehicles[i].lane = elapsedTime / flashTime
+//                                            rtnT1Veh[i].lane = elapsedTime / flashTime
+                                            rtnT1Veh[i].lane = sKLAllVehicles[i].lane
+                                            if printOvertake > 1 {  //
+                                                if whichOT == i {
+                                                    print("\(i) \(sKLAllVehicles[i].lane)") //All dig's. EndOT set to 3.
+                                                }
+                                            }
+                                        })
+                                        let laneChange = SKAction.group([goToLane1, flash1])
+                                        
+                                        sKLAllVehicles[i].indicator = rtnT1Veh[i].indicator
+                                        sKLAllVehicles[i].startIndicator = rtnT1Veh[i].startIndicator
+                                        sKLAllVehicles[i].lane = rtnT1Veh[i].lane
+
+                                       if printOvertake != 0 {
+                                            let startMsg1 = SKAction.run {print("\t\(i) Start Overtake\tLane \(sKLAllVehicles[i].lane.dp0)\tInd = \(sKLAllVehicles[i].indicator)")}
+                                            let laneFlash1 = SKAction.sequence([startMsg1, laneChange, endLane1])
+                                           async let newLanePos: Void = await sKLAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(laneFlash1)
+                                        } else {
+                                            let laneFlash1 = SKAction.sequence([laneChange, endLane1])
+                                            async let newLanePos: Void = await sKLAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(laneFlash1)
+                                        }
+                                        
+                                    } else {        //About to go back to left lane
+                                        if rtnT1Veh[i].indicator == .endOvertake {
+                                            let halfFlash: CGFloat = 0.3    //Time indicators are ON or OFF
+                                            let numFlash = 6        //No of full indicator flashes
+                                            let flashTime: CGFloat = CGFloat(numFlash) * halfFlash * 1.8
+//                                            let indicatorOn = SKAction.fadeIn(withDuration: 0.0) //Overtaking indicators ON
+//                                            let indicatorOff = SKAction.fadeOut(withDuration: 0.0)  //Overtaking indicators OFF
+                                            let indicatorOn = SKAction.unhide() //Overtaking indicators ON
+                                            let indicatorOff = SKAction.hide()  //Overtaking indicators OFF
+                                           let deelay = SKAction.wait(forDuration: halfFlash)  //Delay halfFlash secs
+                                            let pulseIndicators = SKAction.sequence([indicatorOn, deelay, indicatorOff, deelay])
+                                            let flash0 = SKAction.repeat(pulseIndicators, count: numFlash)
+                                            let endLane0 = SKAction.run {
+                                                sKLAllVehicles[i].lane = 0      //Ensure lane only = 1 or 0 when here!
+                                                rtnT1Veh[i].lane = 0      //Ensure lane only = 1 or 0 when here!
+                                                sKLAllVehicles[i].indicator = .off
+                                                rtnT1Veh[i].indicator = .off
+                                                if printOvertake != 0 {
+                                                    print("\t\t\t\t\t\t\(i)   End Back\tLane \(sKLAllVehicles[i].lane.dp0)\tInd = \(sKLAllVehicles[i].indicator)")
+                                                }
+                                            }       //End endLane0 action
+                                            
+                                            let startMsg = SKAction.run {
+                                                if printOvertake != 0 {
+                                                    print("\t\t\t\t\t\t\(i) Start Back\tLane \(sKLAllVehicles[i].lane.dp0)\tInd = \(sKLAllVehicles[i].indicator)")
+                                                }
+                                            }
+                                            let goToLane0 = SKAction.customAction(withDuration: flashTime, actionBlock: {
+                                                (node, elapsedTime) in
+                                                sKLAllVehicles[i].lane = (1 - (elapsedTime / flashTime))
+//                                                rtnT1Veh[i].lane = (1 - (elapsedTime / flashTime))
+                                                rtnT1Veh[i].lane = sKLAllVehicles[i].lane
+                                                if printOvertake > 1 {  //
+                                                    if whichOT == i {
+                                                        print("\(i) \(sKLAllVehicles[i].lane.dp3)")
+                                                    }
+                                                }
+                                           })      //End goToLane0 action
+                                            let goLane0 = SKAction.group([goToLane0, flash0])
+                                            let laneFlash0 = SKAction.sequence([startMsg, goLane0, endLane0])
+                                            
+                                            sKLAllVehicles[i].indicator = rtnT1Veh[i].indicator
+                                            sKLAllVehicles[i].startIndicator = rtnT1Veh[i].startIndicator
+                                            sKLAllVehicles[i].lane = rtnT1Veh[i].lane
+                                            
+                                            async let newLanePos: Void = await sKLAllVehicles[i].childNode(withName: "leftInd\(i)")!.run(laneFlash0)
+                                            
+                                        } else {    //.startIndicator was set BUT .indicator WASN'T O/T or endO/T!
+                                            if sKLAllVehicles[i].lane > 0.5 {
+                                                sKLAllVehicles[i].lane = 1      //Ensure lane only = 1 or 0 when here!
+                                            } else {
+                                                sKLAllVehicles[i].lane = 0      //Ensure lane only = 1 or 0 when here!
+                                            }
+                                            rtnT1Veh[i].lane = sKLAllVehicles[i].lane      //Ensure lane only = 1 or 0 when here!
+                                            sKLAllVehicles[i].indicator = .off  //Ensure 'goLeft' can run!
+                                            rtnT1Veh[i].indicator = .off
+                                        }
+                                    }
+//                                    rtnT1Veh[i].startIndicator = false
+                                }           //End startFlashing - End of .startIndicator was true routine
+                                
+                            }               //End 'for' loop
                             //All vehicles on Track 1 (Keep Left Track) checked
 
+//                            print("Linez 766\t\(sKLAllVehicles[1].lane)")
                             //MARK: - Calculate distances & speeds for 'All Vehicles'
                             //Note: Avg Speed = speed to drive Avg Distance.
                             //      Max Speed = Avg Speed of vehicle that has driven furthest
@@ -681,11 +817,13 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
                             topLabel.updateLabel(topLabel: true, vehicel: rtnT1Veh[f8DisplayDat])  //rtnT1Veh has no element 0!
                             
-                        } else {
+//                            print("Linez 788\t\(sKLAllVehicles[1].lane)")
+                        } else {            //Bit 0 = 1 then update Other Track
                             //***************  1. findObstacles + updateSpeeds  ***************
                             //Other Track (Track 2)  = gameStage bit 0 = 1
                             allAtSpeed2 = true
                             
+//                            print("Linez 794\t\(sKLAllVehicles[1].lane)")
                             var ret2urn: [NodeData] = t2Vehicle        //Used for both Track 2
                             var result2 = await nodeData.findObstacles(tVehicle: &t2Vehicle)
                             ret2urn = result2
@@ -693,7 +831,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             updateSpeeds(retVeh: result2, allVeh: &sOtherAllVehicles)      //Update vehicle speeds
                             
                             
-                            //***************  2. Restore Array  ***************
+//                            print("Linez 802\t\(sKLAllVehicles[1].lane)")
+                           //***************  2. Restore Array  ***************
                             //NOT in Vehicle order! Arranged by Y Position!
                             //Sort back into Vehicle No order. Note [0] is missing
                             ret2urn.sort {
@@ -703,18 +842,21 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             ret2urn[0].name = "All Vehicles"
                             
                             
+//                            print("Linez 813\t\(sKLAllVehicles[1].lane)")
                             //***************  2a. KL Overtake  ***************
                             //NOTE: Other Track doesn't Keep Left!
 //                            var re2turnV: [NodeData] = await nodeData.goLeft(teeVeh: &ret2urn)
                             var re2turnV: [NodeData] = ret2urn
-                            //Toggle above 2 instructions to run goLeft function! (currently only KL Track)
+                            //Toggle above 2 instructions to run or disable goLeft function! (currently only KL Track)
 
+//                            print("Linez 820\t\(sKLAllVehicles[1].lane)")
                             //***************  3. findF8Pos + updateF8Spots  ***************
                             var f8T2Spots = await nodeData.findF8Pos(t1Veh: &re2turnV)
                             
                             updateF8TSpots(t1Vehicle: f8T2Spots, kLTrack: false)
                             
                             
+//                            print("Linez 827\t\(sKLAllVehicles[1].lane)")
                             //***************  4. updateLabel  ***************
                             //Once every 500-600ms sufficient for display calcs below
 //                            var rtnT2Veh = await nodeData.calcAvgData(t1Veh: &f8T2Spots)
@@ -763,8 +905,10 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //                            topLabel.updateLabel(topLabel: true, vehicel: rtnT2Veh[f8DisplayDat])  //rtnT2Veh has no element 0!
                             bottomLabel.updateLabel(topLabel: false, vehicel: rtnT2Veh[f8DisplayDat])  //TEMP! Same data as Top Label!!!
                             
+//                            print("Linez 876\t\(sKLAllVehicles[1].lane)")
                         }   //Both tracks done
                         
+//                        print("Linez 879\t\(sKLAllVehicles[1].lane)")
 //                        print("\nallAtSpd: \(allAtSpeed)\tignoreSpd: \(ignoreSpd)")
                         //ignoreSpd set when vehicles stopped. Reset when started plus 2 secs (runTimerDelay)
                         //allAtSpeed1 set when ALL KL Track vehicles up to speed. allAtSpeed2 set when ALL Other Track vehicles up to speed.
@@ -775,13 +919,14 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
                     }       //End Task
                     
+//                print("Linez 890\t\(sKLAllVehicles[1].lane)")
                         gameStage = gameStage & (0xFF - noVehTest)       //Clear 2nd MSB. Don't clear until all above done!
                 
 //                for i in 1..<sKLAllVehicles.count {
 //                    switch sKLAllVehicles[i].indicator {
 //                    case .overtake:
 //                        sKLAllVehicles[i].lane = 1
-//                    case .end_overtake:
+//                    case .endOvertake:
 //                        sKLAllVehicles[i].lane = 0
 //                    default:
 //                        continue
@@ -794,7 +939,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //                    if sKLAllVehicles[i].indicator == .overtake {
 //                        sKLAllVehicles[i].lane = 1
 //                    }
-//                    if sKLAllVehicles[i].indicator == .end_overtake {
+//                    if sKLAllVehicles[i].indicator == .endOvertake {
 //                        sKLAllVehicles[i].lane = 0
 //                    }
 //                }
@@ -1013,6 +1158,14 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
 //    func makeVehicle() -> Vehicle {
     func makeVehicle() {
+        //________________ Make Indicator 1st ___________________________
+//        indic.fillColor = SKColor(red: 255/255, green: 95/255, blue: 31/255, alpha: 1)  //Orange
+//        indic.position = CGPoint(x: 0, y: 510)
+        indic.strokeColor = SKColor(red: 255/255, green: 95/255, blue: 31/255, alpha: 1)  //Orange
+//        sBackground.addChild(indic)
+        
+        //________________ Indicator Complete ___________________________
+
         var fName: String = ""
         let maxVehicles: Int = (maxCars+maxTrucks+maxBuses)
 //        var sKLVehicle: SKSpriteNode = SKSpriteNode(imageNamed: "\(vehImage)C1")
@@ -1090,6 +1243,40 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             sKLVehicle.physicsBody?.collisionBitMask = 0
 
             sBackground.addChild(sKLVehicle)
+            
+            let fInd = indic.copy() as! SKShapeNode
+            let rInd = indic.copy() as! SKShapeNode
+            fInd.position.y = rInd.position.y + sKLVehicle.size.height - (indicatorRadius * 3)
+            let twoIndicators = SKShapeNode()
+            twoIndicators.addChild(fInd)
+            twoIndicators.addChild(rInd)
+            twoIndicators.name = "leftInd\(i)"
+            twoIndicators.position.x = sKLVehicle.position.x - (sKLVehicle.size.width / 2) + (indicatorRadius * 2)
+            twoIndicators.position.y = sKLVehicle.position.y - (sKLVehicle.size.height / 2) + (indicatorRadius * 1.5)
+            twoIndicators.isHidden = true
+            sKLVehicle.addChild(twoIndicators)
+            let next2Indicators = twoIndicators.copy() as! SKShapeNode
+            next2Indicators.name = "rightInd\(i)"
+            next2Indicators.position.x = sKLVehicle.position.x + (sKLVehicle.size.width / 2) - (indicatorRadius * 2)
+//            next2Indicators.isHidden = true
+            next2Indicators.isHidden = true
+            sKLVehicle.addChild(next2Indicators)
+
+////            let cnrInd = indic.copy() as! SKShapeNode
+////            cnrInd.position = CGPoint(x: sKLVehicle.position.x - 1, y: sKLVehicle.position.y + 3)
+////            cnrInd.name = "cnrInd\(i)"
+//            let leftInd = twoIndicators.copy() as! SKNode
+//            leftInd.yScale = sKLVehicle.size.height / 6
+//            leftInd.position = CGPoint(x: sKLVehicle.position.x - (sKLVehicle.size.width / 2), y: sKLVehicle.position.y - (sKLVehicle.size.height / 2))
+//            leftInd.name = "leftInd\(i)"
+//            sKLVehicle.addChild(leftInd)
+            
+//            let cnrIndicator = SKLightNode()
+//            cnrIndicator.lightColor = UIColor(red: 251/255, green: 98/255, blue: 51/255, alpha: 1)
+//            cnrIndicator.falloff = 0.3
+//            cnrIndicator.zPosition = 1000
+//            cnrIndicator.position = CGPoint(x: 0, y: 0)
+//            sKLVehicle.addChild(cnrIndicator)
             
             //_________________________ Fig 8 Track below __________________________________________________
             var f8KLVehicle: F8Vehicle = F8Vehicle(imageName: vehImage + String(fName))
@@ -1174,6 +1361,14 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         
         gameStage = gameStage & 0x3F    //Clear 2 MSBs when vehicles all exist (Int = 8 bits)
                                         //  - allows processing of vehicle speeds etc.
+
+//        let sun = SKSpriteNode(color: UIColor(red: 255/255, green: 95/255, blue: 31/255, alpha: 1), size:
+//                                CGSize(width: 2, height: 2))
+//        sun.position = CGPoint(x: 0, y: 500)
+////            sun.zPosition = 1000000000
+//        sBackground.addChild(sun)
+//        sun.addGlow()
+
         return              //Should this return anything in particular???
 //        return sKLVehicle
     }
@@ -1212,11 +1407,11 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //            sprite.size.height = sprite.size.height + (gapBetween*2)
             if (sKLVehicle.intersects(sprite)) {
                 spriteClear = false
-                print ("\(Int.extractNum(from: sKLVehicle.name ?? "S")!),\(Int.extractNum(from: sprite.name ?? "D")!),Lane = ,\(Int(sKLVehicle.lane)),Pos = ,\(Int(sKLVehicle.position.y)),,Width = \(sKLVehicle.size.width.dp1),Length = ,\((sKLVehicle.size.height).dp2) *")
-                print(sKLVehicle.physicsBody!,"\n")
-                print(sKLVehicle,"\n")
-                print(sprite.physicsBody!,"\n")
-                print(sprite,"\n")
+//                print ("\(Int.extractNum(from: sKLVehicle.name ?? "S")!),\(Int.extractNum(from: sprite.name ?? "D")!),Lane = ,\(Int(sKLVehicle.lane)),Pos = ,\(Int(sKLVehicle.position.y)),,Width = \(sKLVehicle.size.width.dp1),Length = ,\((sKLVehicle.size.height).dp2) *")
+//                print(sKLVehicle.physicsBody!,"\n")
+//                print(sKLVehicle,"\n")
+//                print(sprite.physicsBody!,"\n")
+//                print(sprite,"\n")
                 break
             } else {                //OK - test if values approaching zero close to values approaching max
                 let tempS = sprite.position.y       //Temp storage of Y position
@@ -1238,8 +1433,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         }                               //End 'for sprite' loop
         sKLVehicle.size.height = (sKLVehicle.size.height - (gapBetween * 2))    //Restore original length
 
-        print ("\(Int.extractNum(from: sKLVehicle.name ?? "S")!),  ,Lane = ,\(Int(sKLVehicle.lane)),Pos = ,\(Int(sKLVehicle.position.y.rounded())),,Width = \(sKLVehicle.size.width.dp1),Length = ,\((sKLVehicle.size.height).dp2)")
-
+//        print ("\(Int.extractNum(from: sKLVehicle.name ?? "S")!),  ,Lane = ,\(Int(sKLVehicle.lane)),Pos = ,\(Int(sKLVehicle.position.y.rounded())),,Width = \(sKLVehicle.size.width.dp1),Length = ,\((sKLVehicle.size.height).dp2)")
+//
     } while !spriteClear
     
     sKLVehicle.startPos = sKLVehicle.position.y
@@ -1355,7 +1550,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //            sKLNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 2.7
 //            sKLNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 3.5
 //            sOtherNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 0.6
-            sOtherNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 2.2
+            
+//            sOtherNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 2.2
+            sOtherNode.preferredSpeed = sKLNode.preferredSpeed
         }
 
     }   //End of 'for' loop
@@ -1390,9 +1587,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //        allVeh[unitNum].physicsBody?.velocity.dy = newSpeed / 3.6
         
 //        allVeh[1].lane = 0.8000001
-        if vehNode.otherTrack == false {
+        if vehNode.otherTrack == false {        //KL Track
             allVeh[unitNum].physicsBody?.velocity.dy = newSpeed / 3.6
-            allVeh[unitNum].physicsBody?.velocity.dx = 0
+//            allVeh[unitNum].physicsBody?.velocity.dx = 0
             allVeh[unitNum].position.x = -((centreStrip/2) + shoulderWidth + shoulderLineWidth + (laneWidth / 2) + (laneWidth + lineWidth)) + (vehNode.lane * (laneWidth + lineWidth))  //Set vehicle position in lane - Straight Track Only!
 
 //            if vehNode.lane == 0 {         //Reinforce xPos when in centre of lane - sKLVehicle
@@ -1400,9 +1597,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //            } else if vehNode.lane == 1 {
 //                allVeh[unitNum].position.x = -((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2))
 //            }
-        } else {
+        } else {                                //Other Track
             allVeh[unitNum].physicsBody?.velocity.dy = -(newSpeed / 3.6)
-            allVeh[unitNum].physicsBody?.velocity.dx = 0
+//            allVeh[unitNum].physicsBody?.velocity.dx = 0
             allVeh[unitNum].position.x = +((centreStrip/2) + shoulderWidth + shoulderLineWidth + (laneWidth / 2) + (laneWidth + lineWidth)) - (vehNode.lane * (laneWidth + lineWidth))  //Set vehicle position in lane - Straight Track Only!
             
 //            if vehNode.lane == 0 {         //Reinforce xPos when in centre of lane - sKLVehicle
@@ -1436,11 +1633,13 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             }
             
 //            print("f8Node: \(f8Node)\tkey: \(key)")
-            if kLTrack == true {
-                sKLAllVehicles[index].lane = veh1Node.lane
-            } else {
-                sOtherAllVehicles[index].lane = veh1Node.lane
-            }
+            
+            //DON'T USE FOLLOWING CODE!!! - DELETE!!! (left temp in case other issue found!)
+//            if kLTrack == true {
+//                sKLAllVehicles[index].lane = veh1Node.lane
+//            } else {
+//                sOtherAllVehicles[index].lane = veh1Node.lane
+//            }
 
             f8Node.position = veh1Node.f8Pos
             f8Node.zRotation = veh1Node.f8Rot
@@ -1455,11 +1654,10 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //            let f8Node = childNode(withName: veh1Node.equivF8Name)!
 //            f8Node.zPosition = veh1Node.f8zPos
 //            f8Node.run(group, withKey: key)
-        }
+        }   //end 'for' loop
+    }       //end updateF8TSpots
 
-    }
-
-}
+}           //end Class 'StraightTrackScene'
 
 func redoCamera() {
     f8Background.alpha = ((whichScene == .figure8) ? 1.0 : 0)

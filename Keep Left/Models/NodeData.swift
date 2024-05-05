@@ -14,7 +14,7 @@ struct NodeData {
 //    enum Indicator {
 //        case off                //Vehicle in left or right lane
 //        case overtake           //Vehicle changing to overtaking (right) lane
-//        case end_overtake       //Vehicle returning to normal (left) lane
+//        case endOvertake       //Vehicle returning to normal (left) lane
 //    }
 //
     var name: String
@@ -61,6 +61,7 @@ struct NodeData {
     
     var spdClk: Int
     var reachedSpd: Bool     //Set for each vehicle when it reaches speed. Cleared when vehicles stopped.
+    var startIndicator:Bool
     var indicator: Indicator
     
     init() {
@@ -107,6 +108,7 @@ struct NodeData {
         spdClk = 60         //Dummy value to start. 0.12sec * 60 = 7.2 secs
         reachedSpd = false
         
+        startIndicator = false
         indicator = .off
     }
     
@@ -811,11 +813,20 @@ struct NodeData {
 
         var bigGap: CGFloat = 0             //bigGap = 110% of 3 sec gap. Calc'd for each vehicle during loop.
 //        print("\n")
-        let minChangeLaneSpd: CGFloat = 1.2
+        let minChangeLaneSpd: CGFloat = 2
         
         for indx in teeVeh.indices {
 //        for (indx, vehc) in teeVeh.enumerated() {
             if indx == 0 { continue }       //Skip loop for element[0] = All Vehicles
+            
+            if teeVeh[indx].indicator != .off { continue }  //Lane change already in progress
+            //NOTE: If inst's below omitted then each veh will O/T or return ONLY once!
+            //  (somewhere value of indicator changed by 0.002!)
+            if teeVeh[indx].lane > 0.5 {    //Ensure lane only = 1 or 0 when here!
+                teeVeh[indx].lane = 1
+            } else {
+                teeVeh[indx].lane = 0
+            }
             
 //            print("\(indx)\t\(teeVeh[indx])")
             
@@ -835,7 +846,7 @@ struct NodeData {
             oRearOKGap = oRearMinGap + (oRearGapRange / maxORearSpdDiff * oRearSub) //returns min gap allowed = 0.5 - 3 secs
             oRearOKGap = (teeVeh[indx].oRearSpd * oRearOKGap) / 3.6                 //converts to metres
             
-            if oRearOKGap <= 1.5 { oRearOKGap = 1.5 }       //Limit minimum gap to 1.5m ( + 1m = 2.5m) at low speeds
+            if oRearOKGap < gapBetween { oRearOKGap = gapBetween }       //Limit minimum gap to 1.5m ( + 1m = 2.5m) at low speeds
 //            tmp3Gap = teeVeh[indx].oRearSpd * 3 / 3.6
 //            ttt = "OK"
 //            if teeVeh[indx].oRearGap <= oRearOKGap { ttt = "No" }
@@ -860,7 +871,7 @@ struct NodeData {
             oFrontOKGap = oRearMinGap + (oRearGapRange / maxORearSpdDiff * oFrontSub) //returns min gap allowed = 0.5 - 3 secs
             oFrontOKGap = (teeVeh[indx].oFrontSpd * oFrontOKGap) / 3.6                 //converts to metres
 
-            if oFrontOKGap <= 1.5 { oFrontOKGap = 1.5 }       //Limit minimum gap to 1.5m ( + 1m = 2.5m) at low speeds
+            if oFrontOKGap <= gapBetween { oFrontOKGap = gapBetween }       //Limit minimum gap to 1.5m ( + 1m = 2.5m) at low speeds
 
             if teeVeh[indx].otherGap <= oFrontOKGap { continue } //oFrontGap insufficient to change lanes. End.
                                                         //oRearGap OK - Test other factors.
@@ -884,11 +895,26 @@ struct NodeData {
                         if teeVeh[indx].gap >= teeVeh[indx].otherGap {
                             continue    //LHS gap > otherGap. Stay in this lane.
                         } else {
-                            if teeVeh[indx].otherGap <= 1 { continue }      //Limit minimum gap to 1m ( + 1m = 2m) at low speeds
+                            if teeVeh[indx].otherGap <= gapBetween { continue }      //Limit minimum gap to 1m ( + 1m = 2m) at low speeds
 //                            print("to 1\t\(indx)\t\(teeVeh[indx].lane)")
-                            teeVeh[indx].lane = 1       //Overtake
+//                            teeVeh[indx].lane = 1       //Overtake (done elsewhere in SKAction)
                             teeVeh[indx].indicator = .overtake              //Move to right (overtaking) lane
+//                            sKLAllVehicles[indx].indicator = .overtake      //Move to right (overtaking) lane
+                            teeVeh[indx].startIndicator = true  //Flag used to start lane change
 //                            print("to 1\t\(indx)\t\(teeVeh[indx].lane)")
+
+
+//                            var flashTime: Double = 6     //6 secs ~ 6 flashes of indicator
+//                            var tmpLane: CGFloat = 0
+//                            let plusLane = SKAction.customAction(withDuration: flashTime) {
+//                                (node, elapsedTime) in
+//                                let timeLeft = flashTime - elapsedTime
+//                                tmpLane = elapsedTime / flashTime
+//                                print(tmpLane.dp2)
+////                                vehC.lane = tmpLane
+//                            }
+//                            await sKLAllVehicles[indx].run(plusLane)
+
                             continue
                         }
                     }
@@ -911,17 +937,22 @@ struct NodeData {
 ////                        print("enablSpd: \(enableMinSpeed)")
 //                        continue
 //                    }
-                    teeVeh[indx].lane = 0       //Return to left lane
-                    teeVeh[indx].indicator = .end_overtake              //Return to left lane
+//                    teeVeh[indx].lane = 0       //Return to left lane
+                    teeVeh[indx].indicator = .endOvertake               //Return to left lane
+//                    sKLAllVehicles[indx].indicator = .endOvertake       //Return to left lane
+                    teeVeh[indx].startIndicator = true      //Flag used to start lane change
 //                    print("ta\t\(indx)\t\(teeVeh[indx].lane)\tenablSpd: \(enableMinSpeed)")
                     continue                    //End this vehicle
                 } else {
                     if teeVeh[indx].otherGap >= teeVeh[indx].gap {
-                        if teeVeh[indx].otherGap <= 1 { continue }      //Limit minimum gap to 1m ( + 1m = 2m) at low speeds
+                        if teeVeh[indx].otherGap <= gapBetween { continue }      //Limit minimum gap to 1m ( + 1m = 2m) at low speeds
 //                        print("tb 0\t\(indx)\t\(teeVeh[indx].lane)")
-                        teeVeh[indx].lane = 0       //Return to left lane
-                        teeVeh[indx].indicator = .end_overtake              //Return to left lane
+//                        teeVeh[indx].lane = 0       //Return to left lane
+                        teeVeh[indx].indicator = .endOvertake              //Return to left lane
+//                        sKLAllVehicles[indx].indicator = .endOvertake       //Return to left lane
+                        teeVeh[indx].startIndicator = true      //Flag used to start lane change
 //                        print("tb 0\t\(indx)\t\(teeVeh[indx].lane)")
+//                        let tst = Vehicle.startOvertake(sKLAllVehicles[indx])
                         continue
                     }
                 }
@@ -1014,6 +1045,6 @@ struct NodeData {
         return teeVeh
     }
     
-}       //end of struct NodeData
-
 //gapSpeed = (gap * 3.6) / gapVal     //Max allowable speed for current gap. gapVal = 3 secs
+
+}       //end of struct NodeData

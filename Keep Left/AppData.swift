@@ -92,7 +92,7 @@ var GS:CGFloat = 0
 var TEST: Int = 0
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 60 //28
+var numVehicles = 14 //28
 let gapBetween: CGFloat = 2     //Sets minimum permissible gap between vehicles in metres. MUST be >=1 metre!
 //let gapBetween: CGFloat = 2.5     //Sets minimum permissible gap between vehicles in metres. MUST be >=1 metre!
 
@@ -135,8 +135,8 @@ var m400: CGFloat = 1
 var fig8TrackPortrait = true
 
 //MARK: - Road Dimensions (metres) used for all views
-//let roadLength: CGFloat = 1000.0   //Road length. (USE sTrackLength INSTEAD???)
-let roadLength: CGFloat = 1008.0   //Road length in metres: FUDGED TO FIT FIG 8 IMAGE !!! TEMP !!!
+let roadLength: CGFloat = 1000.0   //Road length. (USE sTrackLength INSTEAD???)
+//let roadLength: CGFloat = 1008.0   //Road length in metres: FUDGED TO FIT FIG 8 IMAGE !!! TEMP !!!
 let laneWidth: CGFloat = 3.5        //Width of single lane measured between lines
 let lineWidth: CGFloat = 0.2        //Sets width of centre line markings in metres XXX
 let lineLength: CGFloat = 3         //Length of each centre line
@@ -201,10 +201,10 @@ let noOfCycles = 0x03       //Calc speeds & f8Pos once every 'noOfCycles' 60ms p
 //var sSceneWidth: CGFloat = 0.0  //Straight Track Scene Width in Points
 //var sSceneHeight: CGFloat = 0.0 //Straight Track Scene Height in Points
 //var portrait = true
-let sTrackWidth: CGFloat = 760.0 //Width of straight track scene in metres
-//let sTrackWidth: CGFloat = 120.0 //Width of straight track scene in metres. 750m ~max value on 12.9" iPad.
+//let sTrackWidth: CGFloat = 760.0 //Width of straight track scene in metres
+let sTrackWidth: CGFloat = 120.0 //Width of straight track scene in metres. 750m ~max value on 12.9" iPad.
 //let sTrackWidth: CGFloat = 600.0 //Width of straight track scene in metres. 750m ~max value on 12.9" iPad.
-let sTrackLength: CGFloat = roadLength //Length of straight track scene in metres: FUDGED TO FIT FIG 8 IMAGE !!! TEMP !!!
+let sTrackLength: CGFloat = 1008.0 //Length of straight track scene in metres: FUDGED TO FIT FIG 8 IMAGE !!! TEMP !!!
 //let sTrackLength: CGFloat = 1000.0 //Length of straight track scene in metres
 let centreStrip: CGFloat = 4    //Width of centre strip in metres
 
@@ -256,6 +256,7 @@ var gSceneHeight: CGFloat = 0.0 //Game Track Scene Height in Points
 
 //let backgroundColour: UIColor = UIColor(red: 0.19, green: 0.38, blue: 0.16, alpha: 1)   //Green
 let backgroundColour: UIColor = UIColor(red: 48.45/255, green: 96.9/255, blue: 40.8/255, alpha: 1)   //Green
+//let backgroundColour: UIColor = UIColor(white: 1, alpha: 1)   //White
 //let backgroundColour: UIColor = UIColor(red: 168/255, green: 168/255, blue: 168/255, alpha: 1)   //Light Grey
 var gBackgroundColour: UIColor = backgroundColour
 
@@ -274,6 +275,10 @@ var oSpeedMax0: CGFloat = 0
 var oSpeedMin0: CGFloat = 99999999
 
 extension CGFloat {
+    ///Formats number as string with maximum of 3 decimal places
+    var dp3: String {
+        return String(format: "%.3f", self)
+    }
     ///Formats number as string with maximum of 2 decimal places
     var dp2: String {
         return String(format: "%.2f", self)
@@ -329,5 +334,8 @@ var allAtSpeed2: Bool = false
 enum Indicator {
     case off                //Vehicle in left or right lane
     case overtake           //Vehicle changing to overtaking (right) lane
-    case end_overtake       //Vehicle returning to normal (left) lane
+    case endOvertake       //Vehicle returning to normal (left) lane
 }
+
+let printOvertake = 0       //0 = Don't print. 1 = Print ea overtake & return. 2 = Show lane value throughout
+var whichOT = 1             //Defines which unit no shown when printOvertake = 2

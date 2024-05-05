@@ -18,7 +18,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
     
     @Published var speedKPH: CGFloat
     @Published var km: CGFloat
-    var lane: CGFloat
+    @Published var lane: CGFloat
     
     @Published var laps: CGFloat
     @Published var distance: CGFloat        //Distance travelled in km
@@ -49,6 +49,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
     var reachedSpd: Bool     //Set for each vehicle when it reaches speed. Cleared when vehicles stopped.
     
     var indicator: Indicator
+    var startIndicator: Bool    //Triggers start of lane change
 
 //    @Published var indicate: String
 //    @Published var lights: Bool
@@ -83,6 +84,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
         reachedSpd = false
         
         indicator = .off
+        startIndicator = false
 
         super.init(texture: texture, color: UIColor.clear, size: texture.size())
 //        super.init(imageName: imageName)
@@ -309,6 +311,19 @@ class Vehicle: SKSpriteNode, ObservableObject {
         }   //end Switch statement
     }       //end moveF8Vehicle method
     
+//    func startOvertake(vehC: Vehicle) async {
+//        let flashTime: Double = 6     //6 secs ~ 6 flashes of indicator
+//        var tmpLane: CGFloat = 0
+//        let plusLane = SKAction.customAction(withDuration: flashTime) {
+//            (node, elapsedTime) in
+//            let timeLeft = flashTime - elapsedTime
+//            tmpLane = elapsedTime / flashTime
+//            print(tmpLane.dp2)
+//            vehC.lane = tmpLane
+//        }
+//        await self.run(plusLane)
+//    }
+//
 }           //End of Vehicle class
 
 class F8Vehicle: Vehicle {
@@ -321,7 +336,9 @@ class F8Vehicle: Vehicle {
 //
 //    func addGlow(radius: Float = 80) {
 //        let effectNode = SKEffectNode()
+//        effectNode.name = "GlowEffect"
 //        effectNode.shouldRasterize = true
+//        effectNode.shouldEnableEffects = true
 //        addChild(effectNode)
 //        let effect = SKSpriteNode(texture: texture)
 //        effect.color = self.color

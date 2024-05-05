@@ -68,6 +68,19 @@ struct StraightTrackView: View {
         .statusBar(hidden: true)
         .onAppear {
             self.updateOrintation()
+            
+//            //SKShapeNode blurred - can be when view size = 0?
+//            print(UIView().bounds.size)
+//            print(self.straitScene.size)
+//            print()
+//            
+//            UIView().bounds.size = CGSize(width: 500, height: 1000)
+//            self.straitScene.size = CGSize(width: 5000, height: 10000)
+//
+//            print(UIView().bounds.size)
+//            print(self.straitScene.size)
+
+
 //            self.switchViews()
     }
 //
@@ -126,6 +139,22 @@ struct StraightTrackView: View {
     }
 
 }
+
+//extension SKSpriteNode {
+//
+//    func addGlow(radius: Float = 30) {
+//        let effectNode = SKEffectNode()
+//        effectNode.name = "GlowEffect"
+//        effectNode.shouldRasterize = true
+//        effectNode.shouldEnableEffects = true
+//        addChild(effectNode)
+//        let effect = SKSpriteNode(texture: texture)
+//        effect.color = self.color
+//        effect.colorBlendFactor = 0.5
+//        effectNode.addChild(effect)
+//        effectNode.filter = CIFilter(name: "CIGaussianBlur", parameters: ["inputRadius":radius])
+//    }
+//}
 
 
 struct StraightTrackView_Previews: PreviewProvider {
