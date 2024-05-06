@@ -679,126 +679,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                                     sKLAllVehicles[i].laps += 1
                                 }
 
-                                
 //Code below starts lane change & indicators where required for the Keep Left track
-                                if rtnT1Veh[i].startIndicator == true { //Code only runs to Start Flashing
-                                    rtnT1Veh[i].startIndicator = false
-                                    sKLAllVehicles[i].startIndicator = false
-                                    if rtnT1Veh[i].indicator == .overtake { //About to Overtake
-                                        let halfFlash: CGFloat = 0.3    //Time indicators are ON or OFF
-                                        let numFlash = 6        //No of full indicator flashes
-                                        let flashTime: CGFloat = CGFloat(numFlash) * halfFlash * 1.8
-//                                        let indicatorOn = SKAction.fadeIn(withDuration: 0.0) //Overtaking indicators ON
-//                                        let indicatorOff = SKAction.fadeOut(withDuration: 0.0)  //Overtaking indicators OFF
-                                        let indicatorOn = SKAction.unhide() //Overtaking indicators ON
-                                        let indicatorOff = SKAction.hide()  //Overtaking indicators OFF
-                                        let deelay = SKAction.wait(forDuration: halfFlash)  //Delay halfFlash secs
-                                        let pulseIndicators = SKAction.sequence([indicatorOn, deelay, indicatorOff, deelay])
-                                        let flash1 = SKAction.repeat(pulseIndicators, count: numFlash)
-                                        let endLane1 = SKAction.run {
-                                            sKLAllVehicles[i].lane = 1      //Ensure lane only = 1 or 0 when here!
-                                            rtnT1Veh[i].lane = 1      //Ensure lane only = 1 or 0 when here!
-                                            sKLAllVehicles[i].indicator = .off
-                                            rtnT1Veh[i].indicator = .off
-                                            if printOvertake != 0 {
-                                                print("\t\(i)   End Overtake\tLane \(sKLAllVehicles[i].lane.dp0)\tInd = \(sKLAllVehicles[i].indicator)")
-                                            }
-                                        }
-                                        
-                                        let goToLane1 = SKAction.customAction(withDuration: flashTime, actionBlock: {
-                                            (node, elapsedTime) in
-                                            sKLAllVehicles[i].lane = elapsedTime / flashTime
-//                                            rtnT1Veh[i].lane = elapsedTime / flashTime
-                                            rtnT1Veh[i].lane = sKLAllVehicles[i].lane
-                                            if printOvertake > 1 {  //
-                                                if whichOT == i {
-                                                    print("\(i) \(sKLAllVehicles[i].lane)") //All dig's. EndOT set to 3.
-                                                }
-                                            }
-                                        })
-                                        let laneChange = SKAction.group([goToLane1, flash1])
-                                        
-                                        sKLAllVehicles[i].indicator = rtnT1Veh[i].indicator
-                                        sKLAllVehicles[i].startIndicator = rtnT1Veh[i].startIndicator
-                                        sKLAllVehicles[i].lane = rtnT1Veh[i].lane
-
-//                                        if i != 0 {
-                                            if printOvertake != 0 {
-                                                let startMsg1 = SKAction.run {print("\t\(i) Start Overtake\tLane \(sKLAllVehicles[i].lane.dp0)\tInd = \(sKLAllVehicles[i].indicator)")}
-                                                let laneFlash1 = SKAction.sequence([startMsg1, laneChange, endLane1])
-                                                async let newLanePos: Void = await sKLAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(laneFlash1)
-                                                let lFlash1 = SKAction.sequence([laneChange, endLane1])
-                                                async {guard let newF8LanePos: Void = await f8KLAllVehicles[i].childNode(withName: "rightInd\(i)")?.run(lFlash1) else { return }}
-                                            } else {
-                                                let laneFlash1 = SKAction.sequence([laneChange, endLane1])
-                                                async let newLanePos: Void = await sKLAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(laneFlash1)
-                                                async {guard let newF8LanePos: Void = await f8KLAllVehicles[i].childNode(withName: "rightInd\(i)")?.run(laneFlash1) else { return }}
-                                            }
-//                                        }
-                                        
-                                    } else {        //About to go back to left lane
-                                        if rtnT1Veh[i].indicator == .endOvertake {
-                                            let halfFlash: CGFloat = 0.3    //Time indicators are ON or OFF
-                                            let numFlash = 6        //No of full indicator flashes
-                                            let flashTime: CGFloat = CGFloat(numFlash) * halfFlash * 1.8
-//                                            let indicatorOn = SKAction.fadeIn(withDuration: 0.0) //Overtaking indicators ON
-//                                            let indicatorOff = SKAction.fadeOut(withDuration: 0.0)  //Overtaking indicators OFF
-                                            let indicatorOn = SKAction.unhide() //Overtaking indicators ON
-                                            let indicatorOff = SKAction.hide()  //Overtaking indicators OFF
-                                           let deelay = SKAction.wait(forDuration: halfFlash)  //Delay halfFlash secs
-                                            let pulseIndicators = SKAction.sequence([indicatorOn, deelay, indicatorOff, deelay])
-                                            let flash0 = SKAction.repeat(pulseIndicators, count: numFlash)
-                                            let endLane0 = SKAction.run {
-                                                sKLAllVehicles[i].lane = 0      //Ensure lane only = 1 or 0 when here!
-                                                rtnT1Veh[i].lane = 0      //Ensure lane only = 1 or 0 when here!
-                                                sKLAllVehicles[i].indicator = .off
-                                                rtnT1Veh[i].indicator = .off
-                                                if printOvertake != 0 {
-                                                    print("\t\t\t\t\t\t\(i)   End Back\tLane \(sKLAllVehicles[i].lane.dp0)\tInd = \(sKLAllVehicles[i].indicator)")
-                                                }
-                                            }       //End endLane0 action
-                                            
-                                            let startMsg = SKAction.run {
-                                                if printOvertake != 0 {
-                                                    print("\t\t\t\t\t\t\(i) Start Back\tLane \(sKLAllVehicles[i].lane.dp0)\tInd = \(sKLAllVehicles[i].indicator)")
-                                                }
-                                            }
-                                            let goToLane0 = SKAction.customAction(withDuration: flashTime, actionBlock: {
-                                                (node, elapsedTime) in
-                                                sKLAllVehicles[i].lane = (1 - (elapsedTime / flashTime))
-//                                                rtnT1Veh[i].lane = (1 - (elapsedTime / flashTime))
-                                                rtnT1Veh[i].lane = sKLAllVehicles[i].lane
-                                                if printOvertake > 1 {  //
-                                                    if whichOT == i {
-                                                        print("\(i) \(sKLAllVehicles[i].lane.dp3)")
-                                                    }
-                                                }
-                                           })      //End goToLane0 action
-                                            let goLane0 = SKAction.group([goToLane0, flash0])
-                                            let laneFlash0 = SKAction.sequence([startMsg, goLane0, endLane0])
-                                            let lFlash0 = SKAction.sequence([goLane0, endLane0])
-
-                                            sKLAllVehicles[i].indicator = rtnT1Veh[i].indicator
-                                            sKLAllVehicles[i].startIndicator = rtnT1Veh[i].startIndicator
-                                            sKLAllVehicles[i].lane = rtnT1Veh[i].lane
-                                            
-//                                            async let newLanePos: Void = await sKLAllVehicles[i].childNode(withName: "leftInd\(i)")!.run(laneFlash0)
-                                            async let newLanePos: Void = await sKLAllVehicles[i].childNode(withName: "leftInd\(i)")!.run(laneFlash0)
-                                            async {guard let newF8LanePos: Void = await f8KLAllVehicles[i].childNode(withName: "leftInd\(i)")?.run(lFlash0) else { return }}
-
-                                        } else {    //.startIndicator was set BUT .indicator WASN'T O/T or endO/T!
-                                            if sKLAllVehicles[i].lane > 0.5 {
-                                                sKLAllVehicles[i].lane = 1      //Ensure lane only = 1 or 0 when here!
-                                            } else {
-                                                sKLAllVehicles[i].lane = 0      //Ensure lane only = 1 or 0 when here!
-                                            }
-                                            rtnT1Veh[i].lane = sKLAllVehicles[i].lane      //Ensure lane only = 1 or 0 when here!
-                                            sKLAllVehicles[i].indicator = .off  //Ensure 'goLeft' can run!
-                                            rtnT1Veh[i].indicator = .off
-                                        }
-                                    }
-//                                    rtnT1Veh[i].startIndicator = false
-                                }           //End startFlashing - End of .startIndicator was true routine
+                                let cLResult1 = nodeData.changeLanes(retnVeh: rtnT1Veh, i: i, kLTrack: true)
+                                rtnT1Veh = cLResult1
                                 
                             }               //End 'for' loop
                             //All vehicles on Track 1 (Keep Left Track) checked
@@ -885,6 +768,10 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                                     sOtherAllVehicles[i].laps += 1
                                 }
 
+                                //Code below starts lane change & indicators where required for the Keep Left track
+                                let cLResult2 = nodeData.changeLanes(retnVeh: rtnT2Veh, i: i, kLTrack: false)
+                                rtnT2Veh = cLResult2
+                                
                             }
                             //All vehicles on Track 2 (Other Track) checked
                             
