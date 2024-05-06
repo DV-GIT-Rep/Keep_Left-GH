@@ -1115,11 +1115,13 @@ struct NodeData {
                         let laneFlash1 = SKAction.sequence([startMsg1, laneChange, endLane1])
                         let newLanePos: Void = sKLAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(laneFlash1)
                         let lFlash1 = SKAction.sequence([laneChange, endLane1])
-                        let newF8LanePos: Void = f8KLAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(lFlash1)
+//                        let newF8LanePos: Void = f8KLAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(lFlash1)
+                        let newF8LanePos: Void = f8KLAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(flash1)
                     } else {
                         let laneFlash1 = SKAction.sequence([laneChange, endLane1])
                         let newLanePos: Void = sKLAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(laneFlash1)
-                        let newF8LanePos: Void = f8KLAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(laneFlash1)
+//                        let newF8LanePos: Void = f8KLAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(laneFlash1)
+                        let newF8LanePos: Void = f8KLAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(flash1)
                     }
                 
                 } else {    //Not KL Track
@@ -1134,9 +1136,12 @@ struct NodeData {
 //                        let lFlash1 = SKAction.sequence([laneChange, endLane1])
 //                        let newF8LanePos: Void = f8OtherAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(lFlash1) //Don't print Other Track
 //                    } else {                //Don't print
+                    let tmpP = printOvertake
+                    printOvertake = 0
                         let laneFlash1 = SKAction.sequence([laneChange, endLane1])
                         let newLanePos: Void = sOtherAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(laneFlash1)
                         let newF8LanePos: Void = f8OtherAllVehicles[i].childNode(withName: "rightInd\(i)")!.run(laneFlash1)
+                    printOvertake = tmpP
 //                    }   //end Print
                 }       //end KL Track
 
@@ -1211,16 +1216,21 @@ struct NodeData {
                     sKLAllVehicles[i].lane = rtnVeh[i].lane
                     
                     let newLanePos: Void = sKLAllVehicles[i].childNode(withName: "leftInd\(i)")!.run(laneFlash0)
-                    let newF8LanePos: Void = f8KLAllVehicles[i].childNode(withName: "leftInd\(i)")!.run(lFlash0)
-                        
+//                    let newF8LanePos: Void = f8KLAllVehicles[i].childNode(withName: "leftInd\(i)")!.run(lFlash0)
+                    let newF8LanePos: Void = f8KLAllVehicles[i].childNode(withName: "leftInd\(i)")!.run(flash0)
+
                     } else {        //Not KL Track
                         sOtherAllVehicles[i].indicator = rtnVeh[i].indicator
                         sOtherAllVehicles[i].startIndicator = rtnVeh[i].startIndicator
                         sOtherAllVehicles[i].lane = rtnVeh[i].lane
                         
+                        let tmpP = printOvertake
+                        printOvertake = 0
                         let newLanePos: Void = sOtherAllVehicles[i].childNode(withName: "leftInd\(i)")!.run(laneFlash0)
-                        let newF8LanePos: Void = f8OtherAllVehicles[i].childNode(withName: "leftInd\(i)")!.run(lFlash0)
-                            
+//                        let newF8LanePos: Void = f8OtherAllVehicles[i].childNode(withName: "leftInd\(i)")!.run(lFlash0)
+                        let newF8LanePos: Void = f8OtherAllVehicles[i].childNode(withName: "leftInd\(i)")!.run(flash0)
+                        printOvertake = tmpP
+
                     }               //end KL Track
 
                 } else {    //.startIndicator was set BUT .indicator WASN'T O/T or endO/T!

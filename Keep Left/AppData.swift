@@ -337,5 +337,5 @@ enum Indicator {
     case endOvertake       //Vehicle returning to normal (left) lane
 }
 
-let printOvertake = 0       //0 = Don't print. 1 = Print ea overtake & return. 2 = Show lane value throughout
+var printOvertake = 0       //0 = Don't print. 1 = Print ea overtake & return. 2 = Show lane value throughout
 var whichOT = 1             //Defines which unit no shown when printOvertake = 2
