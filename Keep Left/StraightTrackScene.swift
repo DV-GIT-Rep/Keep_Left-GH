@@ -463,6 +463,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             if gameStage < 0x40 {
                 
                 let noVehTest: Int = 0x40   //Test Flag
+                //gameStage Bit 6 = noVehTest. Set during Task & clr'd when Task complete.
+                //                  Prevents code running again during Task.
+
                 var testNo: Int
 
             //gameStage bit 40H set indicates below is in progress
@@ -480,8 +483,6 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                     //Changed 7/1/24
                 }   //End else
             
-                    gameStage = gameStage | noVehTest       //Set 2nd MSB. Don't clear until all below done!
-
                     var temp1 = sKLAllVehicles      //Straight Track Vehicles.
                     var nodeData: NodeData = NodeData() //Temp storage of data - NOT SKSpriteNode!!!
                     var t1xVehicle: [NodeData] = []
@@ -492,6 +493,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             nodeData.name = veh1Node.name!      //OR = (index + 1)?
                             nodeData.size = veh1Node.size
                             nodeData.position = veh1Node.position
+                            nodeData.lane = veh1Node.lane
                             nodeData.laps = veh1Node.laps
                             nodeData.preferredSpeed = veh1Node.preferredSpeed
                             nodeData.currentSpeed = abs(veh1Node.physicsBody!.velocity.dy * 3.6)      //  ????? x 3.6 for kph?
@@ -504,7 +506,6 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             nodeData.indicator = veh1Node.indicator
                             nodeData.startIndicator = veh1Node.startIndicator
                             
-                            nodeData.lane = veh1Node.lane
                         }   //end index zero check
                         t1xVehicle.append(nodeData)
                     }       //end For Loop
@@ -536,9 +537,10 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                             nodeData.startIndicator = veh2Node.startIndicator
                             
 //                nodeData.equivF8Name = not needed here!
-                        }
+                        }       //end index zero check
                         t2xVehicle.append(nodeData)
-                    }
+                    }           //end For loop
+                
                 var t2Vehicle = Array(t2xVehicle.dropFirst())       //Ignore 'All Vehicles'
 
 //                        print("\n1.\t\(sKLAllVehicles[1].speedMax.dp2)\t\(sKLAllVehicles[1].speedMin.dp2)")
@@ -554,6 +556,11 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         
 //MARK: - TASK
                     Task {
+                        
+                        gameStage = gameStage | noVehTest       //Set 2nd MSB. Don't clear until all below done!
+                    //gameStage Bit 6 = noVehTest. Set during Task & clr'd when Task complete.
+                    //                  Prevents code running again during Task.
+
                         let doT2: Int = 1
                         if (gameStage & doT2) == 0 {    //Bit 0 = 0 then update Keep Left Track
                             //***************  1. findObstacles + updateSpeeds  ***************

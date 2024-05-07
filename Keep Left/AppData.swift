@@ -92,7 +92,7 @@ var GS:CGFloat = 0
 var TEST: Int = 0
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 14 //28
+var numVehicles = 24 //28
 let minGap: CGFloat = 2.5     //Sets minimum permissible gap between vehicles in metres. MUST be >=1 metre!
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
