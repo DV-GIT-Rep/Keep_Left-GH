@@ -154,6 +154,7 @@ struct NodeData {
             
             nextIndex = index
             
+            var tmpIndex = (index - 1)
             while reerGap == 0 || oReerGap == 0 {
                 
                 nextIndex = nextIndex + 1       // same as nextIndex += 1
@@ -169,7 +170,6 @@ struct NodeData {
                 //                let sameLane = (vehNode.lane - 0.5) < 0 ? 0...(vehNode.lane + 0.5) : (vehNode.lane + 0.5) <= 1 ? (vehNode.lane - 0.5)...(vehNode.lane + 0.5) : (vehNode.lane - 0.5)...1   //Scan for vehicles within 0.5 lanes either side
                 let sameLap = (vehNode.position.y - (vehNode.size.height / 2)) - (tVehicle[nextIndex].position.y + (tVehicle[nextIndex].size.height / 2)) //Vehicle in front on same side of 1km boundary
                 let lastLap = ((vehNode.position.y + sTrackLength) - (vehNode.size.height / 2)) - (tVehicle[nextIndex].position.y + (tVehicle[nextIndex].size.height / 2))    //Vehicle in front is over the 1km boundary!
-                
                 
                 //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
                 if sameLane.contains(tVehicle[nextIndex].lane) {
@@ -200,22 +200,15 @@ struct NodeData {
                     }
                 }       //end lane check
                 
-                //                //@@@@@@@@@@@@ Old Lane Check - Start @@@@@@@
-                //                //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
-                //                if !sameLane.contains(tVehicle[nextIndex].lane) {
-                //                    //Both vehicles in different lanes
-                //                    oReerGap = (past1km == false) ? sameLap : lastLap
-                //                    if oReerGap <= 0 { oReerGap = 0.1 }
-                //                    //                    vehNode.oRearGap = oReerGap
-                //                    //                    } else {
-                //                    //                        //The two vehicles are in the same lane
-                //                    //                        nextIndex += 1  //Move onto next vehicle
-                //                    //                        if nextIndex == index {         //All other vehicles checked. oReerGap sb 0 here!
-                //                    //                            if oReerGap == 0 { oReerGap = 1000 }
-                //                    //                        }    //Continue until spacing for BOTH lanes != 0
-                //
-                //                }       //end lane check
-                //                //@@@@@@@@@@@@ Old Lane Check - End   @@@@@@@
+                //Code here checks if ALL vehicles checked in while loop
+                tmpIndex = (index - 1)
+                if index == 0 {
+                    tmpIndex = (tmpIndex + numVehicles)
+                }   //tmpIndex == test value
+                if nextIndex == tmpIndex {      //ALL vehicles checked - end while loop
+                    if reerGap == 0 { reerGap = sTrackLength }      //No other vehicles detected in this lane - end
+                    if oReerGap == 0 { oReerGap = sTrackLength }    //No vehicles detected in other lane - end
+                }
                 
             }               //end 'While' loop
             
@@ -252,6 +245,7 @@ struct NodeData {
             
             nextIndex = index
             
+            var tmpIndex = (index - 1)
             while gapp == 0 || othergapp == 0 {       //Find both gap & otherGap
                 
                 nextIndex = nextIndex + 1       // same as nextIndex += 1
@@ -298,7 +292,17 @@ struct NodeData {
                     }
                 }       //end lane check
                 
-            }               //end While
+                //Code here checks if ALL vehicles checked in while loop
+                tmpIndex = (index - 1)
+                if index == 0 {
+                    tmpIndex = (tmpIndex + numVehicles)
+                }   //tmpIndex == test value
+                if nextIndex == tmpIndex {      //ALL vehicles checked - end while loop
+                    if gapp == 0 { gapp = sTrackLength }      //No other vehicles detected in this lane - end
+                    if othergapp == 0 { othergapp = sTrackLength }    //No vehicles detected in other lane - end
+                }
+                
+            }               //end While loop
             
             tVehicle[index].gap = gapp              // same as vehNode.gap
             tVehicle[index].otherGap = othergapp    // same as vehNode.otherGap
