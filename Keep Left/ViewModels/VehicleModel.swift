@@ -10,7 +10,6 @@ import Foundation
 class VehicleModel: ObservableObject {
     
     @Published var txVehicle = [Vehicle]()
-//    @Published var t2Vehicle = [Vehicle]()
 
     init() {
         

@@ -92,7 +92,7 @@ var GS:CGFloat = 0
 var TEST: Int = 0
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 10 //28
+var numVehicles = 16 //28 - NOTE: NEVER set to 0! Illegal value.
 let minGap: CGFloat = 2.5     //Sets minimum permissible gap between vehicles in metres. MUST be >=1 metre!
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
@@ -169,7 +169,7 @@ enum runCondition {
     case stop, run
 }
 var runTimer: CGFloat = 0.5         //Timer increments once/sec (+0.5 every 500ms) when runStop != .stop
-let runTimerDelay: CGFloat = 2     //Seconds delay before speed can be acknowledged
+let runTimerDelay: CGFloat = 62     //Seconds delay before speed can be acknowledged
 var enableMinSpeed: Bool = false    //Minimum speed is only calculated after this flag is set
 ///runStop has 2 possible values, .stop & .run
 var runStop: runCondition = .stop
@@ -177,16 +177,14 @@ var ignoreSpd: Bool = true          //ignoreSpd set when vehicles stopped. Reset
 
 ///All but 8 LSBs cleared once all vehicles created. Value then dictates which code runs during 'update'
 var gameStage: Int = 0xFF   //0xFF = Max value
-//var gameStage: Int = 1024   //1024 = 100 0000 0000 H
-                            //Bit 7 = 1 UNTIL vehicles created then set to 0!
-                            //Bit 6 = noVehTest. Set during Task & clr'd when Task complete.
-                            //        Prevents code running again during Task.
-                            //Bits 5-2 = Not used (yet).
-                            //Bits 1-0 = Defines which code runs during Task.
-                            //           Track 1 when bit 0 = 0. Track 2 when bit 0 = 1.
+                            //Bit  7   = 1 UNTIL vehicles created then set to 0!
+                            //Bits 6-4 = Not used (yet).
+                            //Bits 3-2 = Clr'd when vehicles created. Not used (yet).
+                            //Bit  1   = Set during KLTask - clr'd at end.
+                            //Bit  0   = Set during OtherTask - clr'd at end.
 
 //Set ONLY to 01 or 11! Track 1 & 2 alternate based on value of bit 0!
-let noOfCycles = 0x03       //Calc speeds & f8Pos once every 'noOfCycles' 60ms periods.
+let noOfCycles = 0x03       //Calc speeds & f8Pos once every 'noOfCycles' 16.67ms (60Hz) periods.
                             //0 - No Delay                  60fps   (smoothest)
                             //1 - Run every 2nd 60ms cycle  30fps   (good)
                             //2 - Run every 3rd 60ms cycle  20fps   (a little jumpy)

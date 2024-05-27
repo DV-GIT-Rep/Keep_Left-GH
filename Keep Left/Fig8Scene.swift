@@ -31,7 +31,7 @@ class Fig8Scene: SKScene, SKPhysicsContactDelegate {
         //MARK: - Add 2x figure 8 roads to StraightTrackScene
         addF8Roads()
         
-        getKLVehicles()
+        get_KLVehicles()
         
     }
     
@@ -133,7 +133,7 @@ class Fig8Scene: SKScene, SKPhysicsContactDelegate {
 //     return
 // }
     
-    func getKLVehicles() {
+    func get_KLVehicles() {
 //        let node = "sKLVehicle_1"
 //        print("Vehicle 1 Node = \(childNode(withName: "sKLVehicle_1")!)")
 //        var node_1 = get_node(

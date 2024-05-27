@@ -1,57 +1,106 @@
-//  8 May 2024
+//  26 May 2024
 
-//nextIndex = index
-//
-//while reerGap == 0 || oReerGap == 0 {
+//public func createTrackLabels(labelParent: SKNode, topLabel: Bool) {
 //    
-//    nextIndex = nextIndex + 1       // same as nextIndex += 1
+//    let titleColour: SKColor = SKColor(red: 0, green: 0.12, blue: 0, alpha: 1)              //"Keep Left" or "Keep Right"
+//    let spdTitleColour: SKColor = SKColor(red: 0, green: 0.12, blue: 0, alpha: 1)           //"Avg Spd", "Avg Distance" & data
+//    let spdSubTitleColour: SKColor = SKColor(red: 0.26, green: 0.4, blue: 0.26, alpha: 1)   //"Min" & "Max" text & data
 //    
-//    if nextIndex >= numVehicles {
-//        
-//        nextIndex = 0       //Crossed 1km barrier. Continue search
-//        past1km = true      //Flag indicates vehicle behind is beyond 1km boundary
-//        
-//    }           //end nextIndex 'if' statement
+//    f8KLLabelTitle.text = "\(kLTitle)"
+//    f8KLLabelTitle.name = "line1"
+//    f8KLLabelTitle.fontSize = 17
+//    f8KLLabelTitle.fontColor = titleColour
+//    f8KLLabelTitle.horizontalAlignmentMode = .center
+//    f8KLLabelTitle.position = CGPoint(x: 0, y: 0.25 * f8CircleCentre)
+//    labelParent.addChild(f8KLLabelTitle)
 //    
-//    let sameLane = (vehNode.lane - laneMax)...(vehNode.lane + laneMax)   //Scan for vehicles within 0.8 lanes either side
-//    let sameLap = (vehNode.position.y - (vehNode.size.height / 2)) - (tVehicle[nextIndex].position.y + (tVehicle[nextIndex].size.height / 2)) //Vehicle in front on same side of 1km boundary
-//    let lastLap = ((vehNode.position.y + sTrackLength) - (vehNode.size.height / 2)) - (tVehicle[nextIndex].position.y + (tVehicle[nextIndex].size.height / 2))    //Vehicle in front is over the 1km boundary!
+//    f8KLLabelDescription.fontSize = 8.6
+//    f8KLLabelDescription.horizontalAlignmentMode = .center
+//    f8KLLabelDescription.position = CGPoint(x: 0, y: 0.13 * f8CircleCentre)
+//    labelParent.addChild(f8KLLabelDescription)
 //    
-//    //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
-//    if sameLane.contains(tVehicle[nextIndex].lane) {
-//        //Both vehicles in same lane
-//        if reerGap == 0 {
-//            reerGap = (past1km == false) ? sameLap : lastLap
-//            if reerGap <= 0 { reerGap = 0.1 } //Should NEVER happen! (due to self braking)
-//            //                    vehNode.spacing = gap
-//            tVehicle[index].rearUnit = tVehicle[nextIndex].name      //Save identity of rear unit (NOT Required?)
-//            tVehicle[index].rearPos = tVehicle[nextIndex].position   //Save position of rear unit (NOT Required?)
-//        }
-//        if midLanes.contains(tVehicle[nextIndex].lane) {
-//            //If this vehicle is mid-lane, set oRearGap = rearGap
-//            if oReerGap == 0 {
-//                oReerGap = (past1km == false) ? sameLap : lastLap
-//                if oReerGap <= 0 { oReerGap = 0.1 } //Could prevent -ve values by using <= here
-//                //                    vehNode.oRearGap = oReerGap
-//                tVehicle[index].oRearSpd = tVehicle[nextIndex].currentSpeed   //Save speed of oRear unit
-//            }
-//        }
-//    } else {
-//        //The two vehicles are in different lanes
-//        if oReerGap == 0 {
-//            oReerGap = (past1km == false) ? sameLap : lastLap
-//            if oReerGap <= 0 { oReerGap = 0.1 } //Could prevent -ve values by using <= here
-//            //                    vehNode.oRearGap = oReerGap
-//            tVehicle[index].oRearSpd = tVehicle[nextIndex].currentSpeed   //Save speed of oRear unit
-//        }
-//    }       //end lane check
+//    avgSpdDesc.text = "Avg Speed"
+//    avgSpdDesc.fontSize = 7.8
+//    avgSpdDesc.fontColor = UIColor(displayP3Red: 0.85, green: 0.9, blue: 0.7, alpha: 1)
+//    avgSpdDesc.horizontalAlignmentMode = .right
+//    avgSpdDesc.position = CGPoint(x: -0.01 * f8CircleCentre, y: 0.025 * f8CircleCentre)
+//    labelParent.addChild(avgSpdDesc)
 //    
-//}               //end 'While' loop
-//
-//tVehicle[index].rearGap = reerGap      // same as vehNode.rearGap
-//tVehicle[index].oRearGap = oReerGap    // same as vehNode.oRearGap
-//past1km = false
-//reerGap = 0
-//oReerGap = 0
-//
-//}               //end 1st 'For' loop
+//    var maxSpdDesc = SKLabelNode(text: "Max Speed")
+//    maxSpdDesc.fontSize = 7.8
+//    maxSpdDesc.fontName = "Helvetica Neue Light"
+//    maxSpdDesc.fontColor = spdSubTitleColour
+//    maxSpdDesc.horizontalAlignmentMode = .right
+//    maxSpdDesc.position = CGPoint(x: -0.01 * f8CircleCentre, y: -0.06 * f8CircleCentre)
+//    labelParent.addChild(maxSpdDesc)
+//    
+//    var minSpdDesc = SKLabelNode(text: "Min Speed")
+//    minSpdDesc.fontSize = 7.8
+//    minSpdDesc.fontName = "Helvetica Neue Light"
+//    minSpdDesc.fontColor = spdSubTitleColour
+//    minSpdDesc.horizontalAlignmentMode = .right
+//    minSpdDesc.position = CGPoint(x: -0.01 * f8CircleCentre, y: -0.145 * f8CircleCentre)
+//    labelParent.addChild(minSpdDesc)
+//    
+//    avgDistanceDesc.fontSize = 7.8
+//    avgDistanceDesc.fontColor = UIColor(displayP3Red: 0.85, green: 0.9, blue: 0.7, alpha: 1)
+//    avgDistanceDesc.horizontalAlignmentMode = .right
+//    avgDistanceDesc.position = CGPoint(x: -0.01 * f8CircleCentre, y: -0.23 * f8CircleCentre)
+//    labelParent.addChild(avgDistanceDesc)
+//    
+//    maxDistanceDesc.fontSize = 7.8
+//    maxDistanceDesc.fontName = f8DisplayDat == 0 ? "Helvetica Neue Light" : "Helvetica Neue Medium"
+//    maxDistanceDesc.fontColor = f8DisplayDat == 0 ? spdSubTitleColour : spdTitleColour
+//    maxDistanceDesc.horizontalAlignmentMode = .right
+//    maxDistanceDesc.position = CGPoint(x: -0.01 * f8CircleCentre, y: -0.315 * f8CircleCentre)
+//    labelParent.addChild(maxDistanceDesc)
+//    
+//    minDistanceDesc.fontSize = 7.8
+//    minDistanceDesc.fontColor = spdSubTitleColour
+//    minDistanceDesc.horizontalAlignmentMode = .right
+//    minDistanceDesc.position = CGPoint(x: -0.01 * f8CircleCentre, y: -0.4 * f8CircleCentre)
+//    labelParent.addChild(minDistanceDesc)
+//    
+//    var avgSpeed: CGFloat = CGFloat.random(in: 105...130)    //TEMP !!! Replace by actual reading !!!
+//    
+//    var maxSpeed = avgSpeed * 1.2   //TEMP
+//    var minSpeed = avgSpeed * 0.76  //TEMP !!!
+//    
+//    avgSpd.fontSize = 7.8
+//    avgSpd.fontColor = UIColor(displayP3Red: 0.6, green: 1, blue: 0.67, alpha: 1)
+//    avgSpd.horizontalAlignmentMode = .left
+//    avgSpd.position = CGPoint(x: -0.005 * f8CircleCentre, y: 0.025 * f8CircleCentre)
+//    labelParent.addChild(avgSpd)
+//    
+//    maxSpd.fontSize = 7.8
+//    maxSpd.fontColor = spdSubTitleColour
+//    maxSpd.horizontalAlignmentMode = .left
+//    maxSpd.position = CGPoint(x: -0.005 * f8CircleCentre, y: -0.06 * f8CircleCentre)
+//    labelParent.addChild(maxSpd)
+//    
+//    minSpd.fontSize = 7.8
+//    minSpd.fontColor = spdSubTitleColour
+//    minSpd.horizontalAlignmentMode = .left
+//    minSpd.position = CGPoint(x: -0.005 * f8CircleCentre, y: -0.145 * f8CircleCentre)
+//    labelParent.addChild(minSpd)
+//    
+//    avgDistance.fontSize = 7.8
+//    avgDistance.fontName = "Helvetica Neue Medium"
+//    avgDistance.fontColor = UIColor(displayP3Red: 0.6, green: 1, blue: 0.67, alpha: 1)
+//    avgDistance.horizontalAlignmentMode = .left
+//    avgDistance.position = CGPoint(x: -0.005 * f8CircleCentre, y: -0.23 * f8CircleCentre)
+//    labelParent.addChild(avgDistance)
+//    
+//    maxDistance.fontSize = 7.8
+//    maxDistance.fontName = f8DisplayDat == 0 ? "Helvetica Neue Light" : "Helvetica Neue Medium"
+//    maxDistance.fontColor = f8DisplayDat == 0 ? spdSubTitleColour : spdTitleColour
+//    maxDistance.horizontalAlignmentMode = .left
+//    maxDistance.position = CGPoint(x: -0.005 * f8CircleCentre, y: -0.315 * f8CircleCentre)
+//    labelParent.addChild(maxDistance)
+//    
+//    minDistance.fontSize = 7.8
+//    minDistance.fontColor = spdSubTitleColour
+//    minDistance.horizontalAlignmentMode = .left
+//    minDistance.position = CGPoint(x: -0.005 * f8CircleCentre, y: -0.4 * f8CircleCentre)
+//    labelParent.addChild(minDistance)
+//}

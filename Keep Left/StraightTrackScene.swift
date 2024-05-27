@@ -459,313 +459,352 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         if gameStage < 0x80 {           //Prevents code from running before vehicles are created.
                                         //MSB cleared when vehicles created ie. #7FH -> gameStage
             //Above changed from 0xFF to 0x80 7/1/24. Should make NO DIFFERENCE TO OPERATION!
-            //'noVehTest' flag (40H) set prior to 'Task' & set to 0 at end of Task.
-            if gameStage < 0x40 {
-                
-                let noVehTest: Int = 0x40   //Test Flag
-                //gameStage Bit 6 = noVehTest. Set during Task & clr'd when Task complete.
-                //                  Prevents code running again during Task.
 
-                var testNo: Int
-
-            //gameStage bit 40H set indicates below is in progress
-            //          bits 1 & 0 indicate stage: 10 -> 01 -> 00 -> 11
-//            testNo = (gameStage & noOfCycles)   //Only interested in 2 LSBs gameStage. Set other bits = 0.
-            testNo = (gameStage & 0x03)   //Only interested in 2 LSBs gameStage. Set other bits = 0.
-                //Changed from 'noOfCycles' to 0x03 7/1/24
-                                                //Result = 00, 01, 10 or 11
-                if testNo != 0 {
-                    gameStage -= 1      //Decrement gameStage only when > 0
-                } else {
-//                    gameStage = gameStage & 0xFC        //0 -> 2 LSBs. 2 LSBs ALREADY = 0!!!
-                    gameStage = gameStage | noOfCycles  //Set 2 LSBs = noOfCycles
-//                    gameStage = gameStage | 0x03      //Set 2 LSBs (same effect as above IF noOfCycles = 03).
-                    //Changed 7/1/24
-                }   //End else
-            
-                    var temp1 = sKLAllVehicles      //Straight Track Vehicles.
-                    var nodeData: NodeData = NodeData() //Temp storage of data - NOT SKSpriteNode!!!
-                    var t1xVehicle: [NodeData] = []
-                    
-                    for (index, veh1Node) in temp1.enumerated() {
-                        if index != 0 {       //Skip loop for element[0] = All Vehicles
-                            
-                            nodeData.name = veh1Node.name!      //OR = (index + 1)?
-                            nodeData.size = veh1Node.size
-                            nodeData.position = veh1Node.position
-                            nodeData.lane = veh1Node.lane
-                            nodeData.laps = veh1Node.laps
-                            nodeData.preferredSpeed = veh1Node.preferredSpeed
-                            nodeData.currentSpeed = abs(veh1Node.physicsBody!.velocity.dy * 3.6)      //  ????? x 3.6 for kph?
-                            nodeData.otherTrack = veh1Node.otherTrack
-                            nodeData.startPos = veh1Node.startPos
-                            nodeData.speedMax = veh1Node.speedMax
-                            nodeData.speedMin = veh1Node.speedMin
-                            nodeData.spdClk = veh1Node.spdClk
-                            nodeData.reachedSpd = veh1Node.reachedSpd
-                            nodeData.indicator = veh1Node.indicator
-                            nodeData.startIndicator = veh1Node.startIndicator
-                            
-                        }   //end index zero check
-                        t1xVehicle.append(nodeData)
-                    }       //end For Loop
-                
-                var t1Vehicle = Array(t1xVehicle.dropFirst())       //Ignore 'All Vehicles'
-                    
-                    var temp2 = sOtherAllVehicles           //Straight Track Vehicles: Ignore 'All Vehicles'
-                    //var nodeData: NodeData = NodeData()
-                    var t2xVehicle: [NodeData] = []
-                    
-                    for (index, veh2Node) in temp2.enumerated() {
-                        if index != 0 {       //Skip loop for element[0] = All Vehicles
-                            
-                            nodeData.name = veh2Node.name!      //OR = (index + 1)?
-                            nodeData.size = veh2Node.size
-                            nodeData.position.x = (1 - veh2Node.position.x)
-                            nodeData.position.y = (sTrackLength - veh2Node.position.y)
-                            nodeData.lane = veh2Node.lane
-                            nodeData.laps = veh2Node.laps
-                            nodeData.preferredSpeed = veh2Node.preferredSpeed
-                            nodeData.currentSpeed = abs(veh2Node.physicsBody!.velocity.dy * 3.6)      //  ????? x 3.6 for kph?
-                            nodeData.otherTrack = veh2Node.otherTrack
-                            nodeData.startPos = veh2Node.startPos
-                            nodeData.speedMax = veh2Node.speedMax
-                            nodeData.speedMin = veh2Node.speedMin
-                            nodeData.spdClk = veh2Node.spdClk
-                            nodeData.reachedSpd = veh2Node.reachedSpd
-                            nodeData.indicator = veh2Node.indicator
-                            nodeData.startIndicator = veh2Node.startIndicator
-                            
-//                nodeData.equivF8Name = not needed here!
-                        }       //end index zero check
-                        t2xVehicle.append(nodeData)
-                    }           //end For loop
-                
-                var t2Vehicle = Array(t2xVehicle.dropFirst())       //Ignore 'All Vehicles'
-
-//                        print("\n1.\t\(sKLAllVehicles[1].speedMax.dp2)\t\(sKLAllVehicles[1].speedMin.dp2)")
-//
-                    
-//                    var returnKL: [NodeData] = t1Vehicle        //Define here to ensure these persist throughout 'Task'
-//                    var returnOther: [NodeData] = t2Vehicle
-//                if runStop == .run {
-//                    allAtSpeed = true           //Flag cleared if ANY vehicle not yet up to speed!
+////'noVehTest' flag (40H) set prior to 'Task' & set to 0 at end of Task.
+//            if gameStage < 0x40 {
+//                
+//                let noVehTest: Int = 0x40   //Test Flag
+////gameStage Bit 6 = noVehTest. Set during Task & clr'd when Task complete.
+////                  Prevents code running again during Task.
+//                
+//                var testNo: Int
+//                
+////gameStage bit 40H set indicates below is in progress
+////          bits 1 & 0 indicate stage: 10 -> 01 -> 00 -> 11
+////            testNo = (gameStage & noOfCycles)   //Only interested in 2 LSBs gameStage. Set other bits = 0.
+//                testNo = (gameStage & 0x03)   //Only interested in 2 LSBs gameStage. Set other bits = 0.
+////Changed from 'noOfCycles' to 0x03 7/1/24
+////Result = 00, 01, 10 or 11
+//                if testNo != 0 {
+//                    gameStage -= 1      //Decrement gameStage only when > 0
 //                } else {
-//                    allAtSpeed = false
+////                    gameStage = gameStage & 0xFC        //0 -> 2 LSBs. 2 LSBs ALREADY = 0!!!
+//                    gameStage = gameStage | noOfCycles  //Set 2 LSBs = noOfCycles
+////                    gameStage = gameStage | 0x03      //Set 2 LSBs (same effect as above IF noOfCycles = 03).
+////Changed 7/1/24
+//                }   //End else
+            
+            var nodeDataKL: NodeData = NodeData() //Temp storage of data - NOT SKSpriteNode!!!
+
+            var bitTest: Int = 0x02      //~ = complement. Test for KL Track.
+            var bitResult = gameStage & bitTest
+            if bitResult == 0 {         //gameStage.1 = 0. Run Task for KL Track.
+//                print("KLTrack\t\tStart\tgameStage: \(gameStage)\tbitResult: \(bitResult)")
+                var temp1 = sKLAllVehicles      //Straight Track Vehicles.
+                var t1xVehicle: [NodeData] = []
+
+                
+//                //Code measures time it takes measured code to run in seconds...
+//                let clock = ContinuousClock()
+//                let result = clock.measure {    //Insert code in {...}
 //                }
+//                print("\(result)") // "eg. 0.534663798 seconds"
+
+//Avg time for the following loop is 168.5us in 12.9" iPad Pro on Simulator. 1st Pass has max of 709us.
+                    for (index, veh1Node) in temp1.enumerated() {
+                    if index != 0 {       //Skip loop for element[0] = All Vehicles
                         
-//MARK: - TASK
-                    Task {
+                        nodeDataKL.name = veh1Node.name!      //OR = (index + 1)?
+                        nodeDataKL.size = veh1Node.size
+                        nodeDataKL.position = veh1Node.position
+                        nodeDataKL.lane = veh1Node.lane
+                        nodeDataKL.laps = veh1Node.laps
+                        nodeDataKL.preferredSpeed = veh1Node.preferredSpeed
+                        nodeDataKL.currentSpeed = abs(veh1Node.physicsBody!.velocity.dy * 3.6)      //  ????? x 3.6 for kph?
+                        nodeDataKL.otherTrack = veh1Node.otherTrack
+                        nodeDataKL.startPos = veh1Node.startPos
+                        nodeDataKL.speedMax = veh1Node.speedMax
+                        nodeDataKL.speedMin = veh1Node.speedMin
+                        nodeDataKL.spdClk = veh1Node.spdClk
+                        nodeDataKL.reachedSpd = veh1Node.reachedSpd
+                        nodeDataKL.indicator = veh1Node.indicator
+                        nodeDataKL.startIndicator = veh1Node.startIndicator
                         
-                        gameStage = gameStage | noVehTest       //Set 2nd MSB. Don't clear until all below done!
-                    //gameStage Bit 6 = noVehTest. Set during Task & clr'd when Task complete.
-                    //                  Prevents code running again during Task.
-
-                        let doT2: Int = 1
-                        if (gameStage & doT2) == 0 {    //Bit 0 = 0 then update Keep Left Track
-                            //***************  1. findObstacles + updateSpeeds  ***************
-                            //Keep Left Track (Track 1)  = gameStage bit 0 = 0
-                            allAtSpeed1 = true
-                            
-                            var ret1urn: [NodeData] = t1Vehicle        //Used for both Track 1 & Track 2
-                            var result1 = await nodeData.findObstacles(tVehicle: &t1Vehicle)
-                            ret1urn = result1
-
-                            updateSpeeds(retVeh: result1, allVeh: &sKLAllVehicles)      //Update vehicle speeds
-                            
-                            //***************  2. Restore Array  ***************
-                            //NOT in Vehicle order! Arranged by Y Position!
-                            //Sort back into Vehicle No order. Note [0] is missing
-                            ret1urn.sort {
-                                $0.name.localizedStandardCompare($1.name) == .orderedAscending
-                            }                               //'localizedStandardCompare' ensures 21 sorted AFTER 3
-                            ret1urn.insert(t1xVehicle[0], at: 0)   //Copy All Vehicles into position [0].
-                            ret1urn[0].name = "All Vehicles"
-                            
-                            //***************  2a. KL Overtake  ***************
-                            var re1turnV: [NodeData] = await nodeData.goLeft(teeVeh: &ret1urn)
-
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        if printSpd == 1 {
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                                //  var WHICH = 1 (set in AppData so can be tweaked here - sets unit no.)
-            //Opt 1
-                                print("Veh\tgapT\tPrSpd\tSpeed\tGSpd\tgap\t\tFNo\tFSpd\tPos\t\tFPos\toGap")
-                                print(WHICH,"\t",PATH,"\t",re1turnV[WHICH].preferredSpeed.dp1,"\t",re1turnV[WHICH].currentSpeed.dp1,"\t",re1turnV[WHICH].goalSpeed.dp1,"\t",re1turnV[WHICH].gap.dp1,"\t",Int.extractNum(from: re1turnV[WHICH].frontUnit)!,"",re1turnV[WHICH].frontSpd.dp1,"\t",re1turnV[WHICH].position.y.dp1,"",re1turnV[WHICH].frontPos.y.dp1,"",re1turnV[WHICH].otherGap.dp1)
-
-            //Opt 2
-//                                print("Veh\tgapT\tPrSpd\tSpeed\tGSpd\tgap\t\tFNo\tFSpd\tCS\t\tFS\t\tGS")
-//                                print(WHICH,"\t",PATH,"\t",re1turnV[WHICH].preferredSpeed.dp1,"\t",re1turnV[WHICH].currentSpeed.dp1,"\t",re1turnV[WHICH].goalSpeed.dp1,"\t",re1turnV[WHICH].gap.dp1,"\t",Int.extractNum(from: re1turnV[WHICH].frontUnit)!,"",re1turnV[WHICH].frontSpd.dp1,"\t",CS.dp1,"\t",FS.dp1,"\t",GS.dp1)
-        }
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                            
-                            //***************  3. findF8Pos + updateF8Spots  ***************
-                            var f8T1Spots = await nodeData.findF8Pos(t1Veh: &re1turnV)
-                            
-                            updateF8TSpots(t1Vehicle: f8T1Spots, kLTrack: true)
-                            
-                            
-                            //***************  4. updateLabel  ***************
-                            //Once every 500-600ms sufficient for display calcs below
-                            var rtnT1Veh = await nodeData.calcAvgData(t1xVeh: &re1turnV)
-                            //                        //Sort back into Vehicle No order. Note [0] is missing
-                            //                        rtnT1Veh.sort {
-                            //                            $0.name.localizedStandardCompare($1.name) == .orderedAscending
-                            //                        }                               //'lacalizedStandardCompare' ensures 21 sorted AFTER 3
-                            //                        rtnT1Veh.insert(rtnT1Veh[2], at: 0)   //Copy dummy into position [0] (All Vehicles).
-                            //                        rtnT1Veh[0].name = "All Vehicles"
-                            
-                            for i in 1..<rtnT1Veh.count {
-                                if i == 0 {continue}       //Skip loop for element[0] = All Vehicles
-                                sKLAllVehicles[i].speedMax = rtnT1Veh[i].speedMax
-                                sKLAllVehicles[i].speedMin = rtnT1Veh[i].speedMin
-                                sKLAllVehicles[i].spdClk = rtnT1Veh[i].spdClk
-                                sKLAllVehicles[i].reachedSpd = rtnT1Veh[i].reachedSpd
-                                
-                                if rtnT1Veh[i].reachedSpd == false { allAtSpeed1 = false } //Flag cleared if ANY vehicle NOT up to speed
-                                
-                                //If vehicle crosses 1km boundary then subtract tracklength from the y position.
-                                if sKLAllVehicles[i].position.y >= sTrackLength {
-                                    //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
-                                    sKLAllVehicles[i].position.y = (sKLAllVehicles[i].position.y - sTrackLength)
-                                    sKLAllVehicles[i].laps += 1
-                                }
-
-//Code below starts lane change & indicators where required for the Keep Left track
-                                let cLResult1 = nodeData.changeLanes(retnVeh: rtnT1Veh, i: i, kLTrack: true)
-                                rtnT1Veh = cLResult1
-                                
-                            }               //End 'for' loop
-                            //All vehicles on Track 1 (Keep Left Track) checked
-
-                            //MARK: - Calculate distances & speeds for 'All Vehicles'
-                            //Note: Avg Speed = speed to drive Avg Distance.
-                            //      Max Speed = Avg Speed of vehicle that has driven furthest
-                            //      Min Speed = Avg Speed of vehicle that has driven the least distance
-                            rtnT1Veh[0].distance = klDistance0
-                            rtnT1Veh[0].distanceMax = klDistanceMax0
-                            rtnT1Veh[0].distanceMin = klDistanceMin0
-//                            sKLAllVehicles[0].speedAvg = (sKLAllVehicles[0].speedAvg + klSpeedAvg0) / 2
-                            sKLAllVehicles[0].speedAvg = klSpeedAvg0
-                            rtnT1Veh[0].speedAvg = sKLAllVehicles[0].speedAvg
-                            sKLAllVehicles[0].speedMax = max(sKLAllVehicles[0].speedMax, klSpeedMax0)
-                            rtnT1Veh[0].speedMax = sKLAllVehicles[0].speedMax
-                            if (sKLAllVehicles[0].speedMin < 500) || enableMinSpeed == true {         //Wait for ALL vehicles up to speed
-                                sKLAllVehicles[0].speedMin = min(sKLAllVehicles[0].speedMin, klSpeedMin0)
-                                rtnT1Veh[0].speedMin = sKLAllVehicles[0].speedMin
-                            } else {
-                                rtnT1Veh[0].speedMin = klSpeedMin0
-                            }
-
-                            topLabel.updateLabel(topLabel: true, vehicel: rtnT1Veh[f8DisplayDat])  //rtnT1Veh has no element 0!
-                            
-                        } else {            //Bit 0 = 1 then update Other Track
-                            //***************  1. findObstacles + updateSpeeds  ***************
-                            //Other Track (Track 2)  = gameStage bit 0 = 1
-                            allAtSpeed2 = true
-                            
-                            var ret2urn: [NodeData] = t2Vehicle        //Used for both Track 2
-                            var result2 = await nodeData.findObstacles(tVehicle: &t2Vehicle)
-                            ret2urn = result2
-
-                            updateSpeeds(retVeh: result2, allVeh: &sOtherAllVehicles)      //Update vehicle speeds
-                            
-                           //***************  2. Restore Array  ***************
-                            //NOT in Vehicle order! Arranged by Y Position!
-                            //Sort back into Vehicle No order. Note [0] is missing
-                            ret2urn.sort {
-                                $0.name.localizedStandardCompare($1.name) == .orderedAscending
-                            }                               //'localizedStandardCompare' ensures 21 sorted AFTER 3
-                            ret2urn.insert(t2xVehicle[0], at: 0)   //Copy All Vehicles into position [0].
-                            ret2urn[0].name = "All Vehicles"
-                            
-                            //***************  2a. KL Overtake  ***************
-                            //NOTE: Other Track doesn't Keep Left!
-                            var re2turnV: [NodeData] = await nodeData.goLeft(teeVeh: &ret2urn)
-//                            var re2turnV: [NodeData] = ret2urn
-                            //Toggle above 2 instructions to run or disable goLeft function! (currently only KL Track)
-
-                            //***************  3. findF8Pos + updateF8Spots  ***************
-                            var f8T2Spots = await nodeData.findF8Pos(t1Veh: &re2turnV)
-                            
-                            updateF8TSpots(t1Vehicle: f8T2Spots, kLTrack: false)
-                            
-                            
-                            //***************  4. updateLabel  ***************
-                            //Once every 500-600ms sufficient for display calcs below
-//                            var rtnT2Veh = await nodeData.calcAvgData(t1Veh: &f8T2Spots)
-                            var rtnT2Veh = await nodeData.calcAvgData(t1xVeh: &re2turnV)
-                            
-                            for i in 1..<rtnT2Veh.count {
-                                sOtherAllVehicles[i].speedMax = rtnT2Veh[i].speedMax
-                                sOtherAllVehicles[i].speedMin = rtnT2Veh[i].speedMin
-                                sOtherAllVehicles[i].spdClk = rtnT2Veh[i].spdClk
-                                sOtherAllVehicles[i].reachedSpd = rtnT2Veh[i].reachedSpd
-                                if rtnT2Veh[i].reachedSpd == false { allAtSpeed2 = false } //Flag cleared if ANY vehicle NOT up to speed
-                                
-                                //If vehicle crosses 1km boundary then add tracklength to the y position.
-                                if sOtherAllVehicles[i].position.y < 0 {
-                                    //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
-                                    sOtherAllVehicles[i].position.y = (sOtherAllVehicles[i].position.y + sTrackLength)
-                                    sOtherAllVehicles[i].laps += 1
-                                }
-
-                                //Code below starts lane change & indicators where required for the Keep Left track
-                                let cLResult2 = nodeData.changeLanes(retnVeh: rtnT2Veh, i: i, kLTrack: false)
-                                rtnT2Veh = cLResult2
-                                
-                            }
-                            //All vehicles on Track 2 (Other Track) checked
-                            
-//                            print("b4:\tMin: \(sOtherAllVehicles[0].speedMin.dp2)\tAvg: \((sOtherAllVehicles[0].speedAvg.dp2))\tMax: \(sOtherAllVehicles[0].speedMax.dp2)\tenableMinSpeed: \(enableMinSpeed)")
-                            //MARK: - Calculate distances & speeds for 'All Vehicles'
-                            //Note: Avg Speed = speed to drive Avg Distance.
-                            //      Max Speed = Avg Speed of vehicle that has driven furthest
-                            //      Min Speed = Avg Speed of vehicle that has driven the least distance
-                            rtnT2Veh[0].distance = oDistance0
-                            rtnT2Veh[0].distanceMax = oDistanceMax0
-                            rtnT2Veh[0].distanceMin = oDistanceMin0
-//                            sOtherAllVehicles[0].speedAvg = (sOtherAllVehicles[0].speedAvg + klSpeedAvg0) / 2
-                            sOtherAllVehicles[0].speedAvg = oSpeedAvg0
-                            rtnT2Veh[0].speedAvg = sOtherAllVehicles[0].speedAvg
-                            sOtherAllVehicles[0].speedMax = max(sOtherAllVehicles[0].speedMax, oSpeedMax0)
-                            rtnT2Veh[0].speedMax = sOtherAllVehicles[0].speedMax
-                            if (sOtherAllVehicles[0].speedMin < 500) || enableMinSpeed == true {         //Wait for ALL vehicles up to speed
-                                sOtherAllVehicles[0].speedMin = min(sOtherAllVehicles[0].speedMin, oSpeedMin0)
-                                rtnT2Veh[0].speedMin = sOtherAllVehicles[0].speedMin
-                            } else {
-                                rtnT2Veh[0].speedMin = oSpeedMin0
-                            }
-                            
-//                            print("af:\tMin: \(sOtherAllVehicles[0].speedMin.dp2)\tAvg: \((sOtherAllVehicles[0].speedAvg.dp2))\tMax: \(sOtherAllVehicles[0].speedMax.dp2)\tenableMinSpeed: \(enableMinSpeed)")
-                            
-                            bottomLabel.updateLabel(topLabel: false, vehicel: rtnT2Veh[f8DisplayDat])  //TEMP! Same data as Top Label!!!
-                            
-                        }   //Both tracks done
-                        
-//                        print("\nallAtSpd: \(allAtSpeed)\tignoreSpd: \(ignoreSpd)")
-                        //ignoreSpd set when vehicles stopped. Reset when started plus 2 secs (runTimerDelay)
-                        //allAtSpeed1 set when ALL KL Track vehicles up to speed. allAtSpeed2 set when ALL Other Track vehicles up to speed.
-                        if allAtSpeed1 == true && allAtSpeed2 == true && ignoreSpd == false {
-                            enableMinSpeed = true       //NOTE: Now each vehicle calculates its min Spd once it's reached speed itself.
-//                            print("!!! Run Timer Enabled !!!\n")
-                        }       //End enableMinSpd check
-
-                        //The following now done BEFORE Task ends as anything after can run immediately!!!
-                    gameStage = gameStage & (0xFF - noVehTest)       //Clear 2nd MSB. Don't clear until all above done!
-                    }       //End Task
+                    }   //end index zero check
+                    t1xVehicle.append(nodeDataKL)
+                }       //end For Loop
+            
+                var tKLVehicle = Array(t1xVehicle.dropFirst())       //Ignore 'All Vehicles'
+                
+//MARK: - KLTrack TASK
+                Task {
+                    gameStage = gameStage | 2               //1 -> gameStage.1. Remains set during Task!
+                    //Prevents code running again during Task.
                     
-                    }       //End gameStage < 0x40
+                    //***************  1. findObstacles + updateSpeeds  ***************
+                    //Keep Left Track (Track 1)  = gameStage bit 0 = 0
+                    allAtSpeed1 = true
                     
-        }           //End gameStage < 0xFF
-        
+                    await nodeDataKL.findObstacles(tVehicle: &tKLVehicle)
+                    
+//                    //***************  2. Restore Array  ***************
+                    //NOW DONE @ END OF 'findObstacles'
+//                    //NOT in Vehicle order! Arranged by Y Position!
+//                    //Sort back into Vehicle No order. Note [0] is missing
+//                    tKLVehicle.sort {
+//                        $0.name.localizedStandardCompare($1.name) == .orderedAscending
+//                    }                               //'localizedStandardCompare' ensures 21 sorted AFTER 3
+//                    tKLVehicle.insert(t1xVehicle[0], at: 0)   //Copy All Vehicles into position [0].
+//                    tKLVehicle[0].name = "All Vehicles"
+
+                    //***************  2a. KL Overtake  ***************
+                    //                        var re1turnV: [NodeData] = await nodeDataKL.goLeft(teeVeh: &tKLVehicle)
+                    await nodeDataKL.goLeft(teeVeh: &tKLVehicle)
+                    
+                    await MainActor.run {
+//                        updateSpeeds(retVeh: &tKLVehicle, allVeh: &sKLAllVehicles)      //Update vehicle speeds
+                        tKLVehicle = updateKLVehicles(rtVeh: tKLVehicle)
+                    }
+                    
+//                }   //end KLTask a  MAYBE ADD LATER IF DATA PREPARED!!!
+////MARK: - KLTrack TASK b Fig 8
+//                Task {
+                        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                        if printSpd == 1 {
+                            //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                            //  var WHICH = 1 (set in AppData so can be tweaked here - sets unit no.)
+                            //Opt 1
+                            print("Veh\tgapT\tPrSpd\tSpeed\tGSpd\tgap\t\tFNo\tFSpd\tPos\t\tFPos\toGap")
+                            print(WHICH,"\t",PATH,"\t",tKLVehicle[WHICH].preferredSpeed.dp1,"\t",tKLVehicle[WHICH].currentSpeed.dp1,"\t",tKLVehicle[WHICH].goalSpeed.dp1,"\t",tKLVehicle[WHICH].gap.dp1,"\t",Int.extractNum(from: tKLVehicle[WHICH].frontUnit)!,"",tKLVehicle[WHICH].frontSpd.dp1,"\t",tKLVehicle[WHICH].position.y.dp1,"",tKLVehicle[WHICH].frontPos.y.dp1,"",tKLVehicle[WHICH].otherGap.dp1)
+                            
+                            //Opt 2
+                            //                                print("Veh\tgapT\tPrSpd\tSpeed\tGSpd\tgap\t\tFNo\tFSpd\tCS\t\tFS\t\tGS")
+                            //                                print(WHICH,"\t",PATH,"\t",tKLVehicle[WHICH].preferredSpeed.dp1,"\t",tKLVehicle[WHICH].currentSpeed.dp1,"\t",tKLVehicle[WHICH].goalSpeed.dp1,"\t",tKLVehicle[WHICH].gap.dp1,"\t",Int.extractNum(from: tKLVehicle[WHICH].frontUnit)!,"",tKLVehicle[WHICH].frontSpd.dp1,"\t",CS.dp1,"\t",FS.dp1,"\t",GS.dp1)
+                        }
+                        //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                        
+                    //***************  3. findF8Pos + updateF8Spots  ***************
+                    await nodeDataKL.findF8Pos(t1Veh: &tKLVehicle)
+                        
+                    await MainActor.run {
+//                        let clock = ContinuousClock()     //Clock measures execution time Start to Stop
+//                        let result = clock.measure {      //Start Timer
+                            updateF8Vehicles(t1Vehicle: tKLVehicle, kLTrack: true)
+//                        }                                 //Stop Timer
+//                        print("KLResult: \(result)") // "0.534663798 seconds"
+                    }
+                        
+                    //***************  4. updateLabel  ***************
+                    //Once every 500-600ms sufficient for display calcs below
+                    var rtnT1Veh = await nodeDataKL.calcAvgData(t1xVeh: &tKLVehicle)
+                    //                        //Sort back into Vehicle No order. Note [0] is missing
+                    //                        rtnT1Veh.sort {
+                    //                            $0.name.localizedStandardCompare($1.name) == .orderedAscending
+                    //                        }                               //'lacalizedStandardCompare' ensures 21 sorted AFTER 3
+                    //                        rtnT1Veh.insert(rtnT1Veh[2], at: 0)   //Copy dummy into position [0] (All Vehicles).
+                    //                        rtnT1Veh[0].name = "All Vehicles"
+                    
+                    for i in 1..<rtnT1Veh.count {
+                        if i == 0 {continue}       //Skip loop for element[0] = All Vehicles
+                        sKLAllVehicles[i].speedMax = rtnT1Veh[i].speedMax
+                        sKLAllVehicles[i].speedMin = rtnT1Veh[i].speedMin
+                        sKLAllVehicles[i].spdClk = rtnT1Veh[i].spdClk
+                        sKLAllVehicles[i].reachedSpd = rtnT1Veh[i].reachedSpd
+                        
+                        if rtnT1Veh[i].reachedSpd == false { allAtSpeed1 = false } //Flag cleared if ANY vehicle NOT up to speed
+                        
+                        //If vehicle crosses 1km boundary then subtract tracklength from the y position.
+                        if sKLAllVehicles[i].position.y >= sTrackLength {
+                            //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
+                            sKLAllVehicles[i].position.y = (sKLAllVehicles[i].position.y - sTrackLength)
+                            sKLAllVehicles[i].laps += 1
+                        }
+                        
+                        //Code below starts lane change & indicators where required for the Keep Left track
+                        //                            await MainActor.run {
+                        //                                let cLResult1 = nodeDataKL.changeLanes(retnVeh: rtnT1Veh, i: i, kLTrack: true)
+                        //                                rtnT1Veh = cLResult1
+                        //                            }
+                        
+                    }               //End 'for' loop
+                    //All vehicles on Track 1 (Keep Left Track) checked
+                    
+                    //MARK: - Calculate distances & speeds for KL 'All Vehicles'
+                    //Note: Avg Speed = speed to drive Avg Distance.
+                    //      Max Speed = Avg Speed of vehicle that has driven furthest
+                    //      Min Speed = Avg Speed of vehicle that has driven the least distance
+                    rtnT1Veh[0].distance = klDistance0
+                    rtnT1Veh[0].distanceMax = klDistanceMax0
+                    rtnT1Veh[0].distanceMin = klDistanceMin0
+                    //                            sKLAllVehicles[0].speedAvg = (sKLAllVehicles[0].speedAvg + klSpeedAvg0) / 2
+                    sKLAllVehicles[0].speedAvg = klSpeedAvg0
+                    rtnT1Veh[0].speedAvg = sKLAllVehicles[0].speedAvg
+                    sKLAllVehicles[0].speedMax = max(sKLAllVehicles[0].speedMax, klSpeedMax0)
+                    rtnT1Veh[0].speedMax = sKLAllVehicles[0].speedMax
+                    if (sKLAllVehicles[0].speedMin < 500) || enableMinSpeed == true {         //Wait for ALL vehicles up to speed
+                        sKLAllVehicles[0].speedMin = min(sKLAllVehicles[0].speedMin, klSpeedMin0)
+                        rtnT1Veh[0].speedMin = sKLAllVehicles[0].speedMin
+                    } else {
+                        rtnT1Veh[0].speedMin = klSpeedMin0
+                    }
+                    
+                    //                    await MainActor.run {
+                    topLabel.updateLabel(topLabel: true, vehicel: rtnT1Veh[f8DisplayDat])  //rtnT1Veh has no element 0!
+                    //                    }
+                    
+                    //The following now done BEFORE Task ends as anything after can run immediately!!!
+                    gameStage = gameStage & ~2      //0 -> gameStage.1. Remains set during Task!
+                    //Prevents code running again during Task.
+                    
+                }       //End KL Task
+            }                           //gameStage.1 = 1 (if above not run). End KL Track Task
+//            print("KLTrack\tStop\tgameStage: \(gameStage)\tbitResult: \(bitResult)")
+
+            //Now check OtherTrack
+            bitTest = 0x01              //Bit 0 = 1 during Other Track Task!
+            bitResult = gameStage & bitTest
+//            bitResult = 1     //Prevents OtherTrack from running
+            if bitResult == 0 {         //gameStage.0 = 0. Run Task for Other Track.
+//                print("OtherTrack\tStart\tgameStage: \(gameStage)\tbitResult: \(bitResult)")
+                var temp2 = sOtherAllVehicles           //Straight Track Vehicles: Ignore 'All Vehicles'
+                var nodeDataO: NodeData = NodeData()
+                var t2xVehicle: [NodeData] = []
+                
+                for (index, veh2Node) in temp2.enumerated() {
+                    if index != 0 {       //Skip loop for element[0] = All Vehicles
+                        
+                        nodeDataO.name = veh2Node.name!      //OR = (index + 1)?
+                        nodeDataO.size = veh2Node.size
+                        nodeDataO.position.x = (1 - veh2Node.position.x)
+                        nodeDataO.position.y = (sTrackLength - veh2Node.position.y)
+                        nodeDataO.lane = veh2Node.lane
+                        nodeDataO.laps = veh2Node.laps
+                        nodeDataO.preferredSpeed = veh2Node.preferredSpeed
+                        nodeDataO.currentSpeed = abs(veh2Node.physicsBody!.velocity.dy * 3.6)      //  ????? x 3.6 for kph?
+                        nodeDataO.otherTrack = veh2Node.otherTrack
+                        nodeDataO.startPos = veh2Node.startPos
+                        nodeDataO.speedMax = veh2Node.speedMax
+                        nodeDataO.speedMin = veh2Node.speedMin
+                        nodeDataO.spdClk = veh2Node.spdClk
+                        nodeDataO.reachedSpd = veh2Node.reachedSpd
+                        nodeDataO.indicator = veh2Node.indicator
+                        nodeDataO.startIndicator = veh2Node.startIndicator
+                        
+//                nodeDataO.equivF8Name = not needed here!
+                    }       //end index zero check
+                    t2xVehicle.append(nodeDataO)
+                }           //end For loop
+            
+            var tOtVehicle = Array(t2xVehicle.dropFirst())       //Ignore 'All Vehicles'
+
+//MARK: - OtherTrack TASK
+                Task(priority: .high) {            //Bit 0 = 1 then update Other Track
+                    gameStage = gameStage | 1               //1 -> gameStage.0. Remains set during Task!
+                    //Prevents code running again during Task.
+                    
+                    //***************  1. findObstacles + updateSpeeds  ***************
+                    //Other Track (Track 2)  = gameStage bit 0 = 1
+                    allAtSpeed2 = true
+                    
+                    await nodeDataO.findObstacles(tVehicle: &tOtVehicle)
+                    
+//                    //***************  2. Restore Array  ***************
+//                    //NOT in Vehicle order! Arranged by Y Position!
+//                    //Sort back into Vehicle No order. Note [0] is missing
+//                    tOtVehicle.sort {
+//                        $0.name.localizedStandardCompare($1.name) == .orderedAscending
+//                    }                               //'localizedStandardCompare' ensures 21 sorted AFTER 3
+//                    tOtVehicle.insert(t2xVehicle[0], at: 0)   //Copy All Vehicles into position [0].
+//                    tOtVehicle[0].name = "All Vehicles"
+//                    
+                    //*************** 2a. Other Overtake ***************
+                    //NOTE: Other Track doesn't Keep Left!
+                    await nodeDataO.goLeft(teeVeh: &tOtVehicle)
+                    //                            var tOtVehicle: [NodeData] = tOtVehicle
+                    //Toggle above 2 instructions to run or disable goLeft function! (currently only KL Track)
+                    
+                    await MainActor.run {
+//                        updateSpeeds(retVeh: &tOtVehicle, allVeh: &sOtherAllVehicles)      //Update vehicle speeds
+//                        tOtVehicle = updateVehicles(rtVeh: tOtVehicle, allVeh: sOtherAllVehicles, allF8Veh: &f8OtherAllVehicles, kLTrack: false)
+                        tOtVehicle = updateOtherVehicles(rtVeh: tOtVehicle)
+                    }
+                    
+                    //***************  3. findF8Pos + updateF8Spots  ***************
+                    await nodeDataO.findF8Pos(t1Veh: &tOtVehicle)
+                    
+                    await MainActor.run {
+//                        let clock = ContinuousClock()     //Clock measures execution time Start to Stop
+//                        let result = clock.measure {      //Start Timer
+                        updateF8Vehicles(t1Vehicle: tOtVehicle, kLTrack: false)
+//                        }                                 //Stop Timer
+//                        print("OtResult: \(result)") // "0.534663798 seconds"
+                    }
+                    
+                    //***************  4. updateLabel  ***************
+                    //Once every 500-600ms sufficient for display calcs below
+                    //                            var rtnT2Veh = await nodeDataO.calcAvgData(t1Veh: &tOtVehicle)
+                    var rtnT2Veh = await nodeDataO.calcAvgData(t1xVeh: &tOtVehicle)
+                    
+                    for i in 1..<rtnT2Veh.count {
+                        sOtherAllVehicles[i].speedMax = rtnT2Veh[i].speedMax
+                        sOtherAllVehicles[i].speedMin = rtnT2Veh[i].speedMin
+                        sOtherAllVehicles[i].spdClk = rtnT2Veh[i].spdClk
+                        sOtherAllVehicles[i].reachedSpd = rtnT2Veh[i].reachedSpd
+                        if rtnT2Veh[i].reachedSpd == false { allAtSpeed2 = false } //Flag cleared if ANY vehicle NOT up to speed
+                        
+                        //If vehicle crosses 1km boundary then add tracklength to the y position.
+                        if sOtherAllVehicles[i].position.y < 0 {
+                            //IMPORTANT!!! ??? Prevent change to pos.y in other thread during the following instruction !!!
+                            sOtherAllVehicles[i].position.y = (sOtherAllVehicles[i].position.y + sTrackLength)
+                            sOtherAllVehicles[i].laps += 1
+                        }
+                        
+//                        //Code below starts lane change & indicators where required for the Keep Left track
+//                        let cLResult2 = nodeDataO.changeLanes(retnVeh: rtnT2Veh, i: i, kLTrack: false)
+//                        rtnT2Veh = cLResult2
+                        
+                    }
+                    //All vehicles on Track 2 (Other Track) checked
+                    
+                //                            print("b4:\tMin: \(sOtherAllVehicles[0].speedMin.dp2)\tAvg: \((sOtherAllVehicles[0].speedAvg.dp2))\tMax: \(sOtherAllVehicles[0].speedMax.dp2)\tenableMinSpeed: \(enableMinSpeed)")
+                                        //MARK: - Calculate distances & speeds for Other 'All Vehicles'
+                                        //Note: Avg Speed = speed to drive Avg Distance.
+                                        //      Max Speed = Avg Speed of vehicle that has driven furthest
+                                        //      Min Speed = Avg Speed of vehicle that has driven the least distance
+                                        rtnT2Veh[0].distance = oDistance0
+                                        rtnT2Veh[0].distanceMax = oDistanceMax0
+                                        rtnT2Veh[0].distanceMin = oDistanceMin0
+                //                            sOtherAllVehicles[0].speedAvg = (sOtherAllVehicles[0].speedAvg + klSpeedAvg0) / 2
+                                        sOtherAllVehicles[0].speedAvg = oSpeedAvg0
+                                        rtnT2Veh[0].speedAvg = sOtherAllVehicles[0].speedAvg
+                                        sOtherAllVehicles[0].speedMax = max(sOtherAllVehicles[0].speedMax, oSpeedMax0)
+                                        rtnT2Veh[0].speedMax = sOtherAllVehicles[0].speedMax
+                                        if (sOtherAllVehicles[0].speedMin < 500) || enableMinSpeed == true {         //Wait for ALL vehicles up to speed
+                                            sOtherAllVehicles[0].speedMin = min(sOtherAllVehicles[0].speedMin, oSpeedMin0)
+                                            rtnT2Veh[0].speedMin = sOtherAllVehicles[0].speedMin
+                                        } else {
+                                            rtnT2Veh[0].speedMin = oSpeedMin0
+                                        }
+                                        
+                //                            print("af:\tMin: \(sOtherAllVehicles[0].speedMin.dp2)\tAvg: \((sOtherAllVehicles[0].speedAvg.dp2))\tMax: \(sOtherAllVehicles[0].speedMax.dp2)\tenableMinSpeed: \(enableMinSpeed)")
+                                        
+                                        bottomLabel.updateLabel(topLabel: false, vehicel: rtnT2Veh[f8DisplayDat])  //TEMP! Same data as Top Label!!!
+                                        
+                    //The following now done BEFORE Task ends as anything after can run immediately!!!
+                    gameStage = gameStage & ~1      //0 -> gameStage.0. Remains set during Task!
+                                                    //Prevents code running again during Task.
+                                    }   //End OtherTrack Task!
+                                    
+            }                           //gameStage.0 = 1 (if above not run). End Other Track Task
+//            print("OtherTrack\tStop\tgameStage: \(gameStage)\tbitResult: \(bitResult)")
+
+                //                        print("\nallAtSpd: \(allAtSpeed)\tignoreSpd: \(ignoreSpd)")
+                                    //ignoreSpd set when vehicles stopped. Reset when started plus 2 secs (runTimerDelay)
+                                    //allAtSpeed1 set when ALL KL Track vehicles up to speed. allAtSpeed2 set when ALL Other Track vehicles up to speed.
+                                    if allAtSpeed1 == true && allAtSpeed2 == true && ignoreSpd == false {
+                                        enableMinSpeed = true       //NOTE: Now each vehicle calculates its min Spd once it's reached speed itself.
+                //                            print("!!! Run Timer Enabled !!!\n")
+                                    }       //End enableMinSpd check
+
+        }           //End gameStage < 0x80
+
 //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
     }   //End of override update
     
     //        //The following code can replace the above - it's easier to follow but I suspect
     //        //creating the extra array would have a time penalty
-    //        let dualArray = Array(zip(t1Vehicle, t2Vehicle))
+    //        let dualArray = Array(zip(tKLVehicle, tOtVehicle))
     //        for (sKLNode, sOtherNode) in dualArray  {
     //            if sKLNode.position.y >= (sTrackLength * sMetre1) {
     //                sKLNode.position.y = (sKLNode.position.y - (sTrackLength * sMetre1))
@@ -1016,7 +1055,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                     vWidth = 2.8
                 }
                 
-            } else {    //NumberedVehicles != 0 therefore display no's for vehicles!
+            } else {    //NumberedVehicles = true therefore display no's for vehicles!
                 switch randomVehicle {
                 case 1...maxCars:                       //Vehicle = Car
                     //                fName = "C\(randomVehicle)"
@@ -1224,7 +1263,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             }
         }
         
-        gameStage = gameStage & 0x3F    //Clear 2 MSBs when vehicles all exist (Int = 8 bits)
+        gameStage = gameStage & 0x70    //Clear MSB & 4 LSBs when vehicles all exist (Int = 8 bits)
                                         //  - allows processing of vehicle speeds etc.
 
 //        let sun = SKSpriteNode(color: UIColor(red: 255/255, green: 95/255, blue: 31/255, alpha: 1), size:
@@ -1408,7 +1447,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         case .run:
 
 //            sKLNode.preferredSpeed = 130
-            if randUnitNo == unitNo {
+            if randUnitNo == unitNo || sKLNode.preferredSpeed == 0 {
                 sKLNode.preferredSpeed = randNo
 //                sOtherNode.preferredSpeed = CGFloat.random(in: 82...150)
             }
@@ -1427,12 +1466,12 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 }       //end 500ms function
     
     //MARK: - Update speed of vehicles on Straight Track, braking for obstacles
-    @MainActor func updateSpeeds(retVeh: [NodeData], allVeh: inout [Vehicle]) {
+    func updateSpeeds(retVeh: inout [NodeData], allVeh: inout [Vehicle]) {
         var speedChange: CGFloat
         var newTime: CGFloat
         var newSpeed: CGFloat
         var action: SKAction
-        var unitNum: Int
+//        var unitNum: Int
 
         let printGoals = false
         if printGoals {
@@ -1440,87 +1479,354 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         }
     for (index, vehNode) in retVeh.enumerated() {            //index = 0 - (numVehicles - 1)
         
+        if index == 0 { continue }       //Skip loop for element[0] = All Vehicles
+        
         //THIS Vehicle = vehNode = sKLAllVehicles[unitNum] = retVeh[index]
 
-        unitNum = Int.extractNum(from: vehNode.name)!  //NOTE: Use [unitNum] for sKLAllVehicles. Use [index] for retVeh!
+//        unitNum = Int.extractNum(from: vehNode.name)!  //NOTE: Use [unitNum] for sKLAllVehicles. Use [index] for retVeh!
+//NOW THAT tVehicle RESORTED IN NUMERICAL ORDER, unitNum IS SAME AS 'index' SO NO NEED TO EXTRACT!
         
         speedChange = (vehNode.goalSpeed - vehNode.currentSpeed)
         newTime = vehNode.changeTime * (60 / (CGFloat(noOfCycles) + 1))     //newTime = no of cycles @60/30/20Hz in changeTime
-//        print("\(unitNum)\tvehNode.changeTime = \(vehNode.changeTime.dp2)\tnewTime = \(newTime.dp2)")
         newSpeed = vehNode.currentSpeed + (speedChange / newTime)
-        //print("1.\t\(unitNum)\t\t\(vehNode.preferredSpeed.dp2)\t\(vehNode.goalSpeed.dp2)\t\(vehNode.currentSpeed.dp2)\t\(newSpeed.dp2)\t\(vehNode.changeTime.dp2)\t\(vehNode.gap.dp2)\t\(newTime.dp2)")
-//        allVeh[unitNum].physicsBody?.velocity.dy = newSpeed / 3.6
+//        allVeh[index].physicsBody?.velocity.dy = newSpeed / 3.6 //Polarity varies subject to track!!! see below
         
 //        allVeh[1].lane = 0.8000001
         if vehNode.otherTrack == false {        //KL Track
-            allVeh[unitNum].physicsBody?.velocity.dy = newSpeed / 3.6
-//            allVeh[unitNum].physicsBody?.velocity.dx = 0
-            allVeh[unitNum].position.x = -((centreStrip/2) + shoulderWidth + shoulderLineWidth + (laneWidth / 2) + (laneWidth + lineWidth)) + (vehNode.lane * (laneWidth + lineWidth))  //Set vehicle position in lane - Straight Track Only!
-
-//            if vehNode.lane == 0 {         //Reinforce xPos when in centre of lane - sKLVehicle
-//                allVeh[unitNum].position.x = -((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2))
-//            } else if vehNode.lane == 1 {
-//                allVeh[unitNum].position.x = -((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2))
-//            }
+            allVeh[index].physicsBody?.velocity.dy = newSpeed / 3.6
+//            allVeh[index].physicsBody?.velocity.dx = 0
+            allVeh[index].position.x = -((centreStrip/2) + shoulderWidth + shoulderLineWidth + (laneWidth / 2) + (laneWidth + lineWidth)) + (vehNode.lane * (laneWidth + lineWidth))  //Set vehicle position in lane - Straight Track Only! DOESN'T APPEAR TO DO ANYTHING!!! - SEE changeLanes!!!
         } else {                                //Other Track
-            allVeh[unitNum].physicsBody?.velocity.dy = -(newSpeed / 3.6)
-//            allVeh[unitNum].physicsBody?.velocity.dx = 0
-            allVeh[unitNum].position.x = +((centreStrip/2) + shoulderWidth + shoulderLineWidth + (laneWidth / 2) + (laneWidth + lineWidth)) - (vehNode.lane * (laneWidth + lineWidth))  //Set vehicle position in lane - Straight Track Only!
-            
-//            if vehNode.lane == 0 {         //Reinforce xPos when in centre of lane - sKLVehicle
-//                allVeh[unitNum].position.x = +((roadWidth / 2) + (laneWidth / 2) + (lineWidth / 2) + (centreStrip/2))
-//            } else if vehNode.lane == 1 {
-//                allVeh[unitNum].position.x = +((roadWidth / 2) - (laneWidth / 2) - (lineWidth / 2) + (centreStrip/2))
-//            }
+            allVeh[index].physicsBody?.velocity.dy = -(newSpeed / 3.6)
+//            allVeh[index].physicsBody?.velocity.dx = 0
+            allVeh[index].position.x = +((centreStrip/2) + shoulderWidth + shoulderLineWidth + (laneWidth / 2) + (laneWidth + lineWidth)) - (vehNode.lane * (laneWidth + lineWidth))  //Set vehicle position in lane - Straight Track Only! DOESN'T APPEAR TO DO ANYTHING!!! - SEE changeLanes!!!
         }
 
-        if printGoals {
-            print("\(unitNum)\t\t\(vehNode.preferredSpeed.dp2)\t\(vehNode.goalSpeed.dp2)\t\(vehNode.currentSpeed.dp2)\t\(newSpeed.dp2)\t\(vehNode.changeTime.dp2)\t\(vehNode.gap.dp2)\t\(newTime.dp2)")
-        }
+//        if printGoals {
+//            print("\(index)\t\t\(vehNode.preferredSpeed.dp2)\t\(vehNode.goalSpeed.dp2)\t\(vehNode.currentSpeed.dp2)\t\(newSpeed.dp2)\t\(vehNode.changeTime.dp2)\t\(vehNode.gap.dp2)\t\(newTime.dp2)")
+//        }
     }
-    }       //end @MainActor func updateSpeeds
+    }       //end func 'updateSpeeds'
     
+
+    //############################################################################
+    //Code below starts lane change & indicators where required
+    func updateKLVehicles(rtVeh: [NodeData]) -> ([NodeData]) {
+        
+        var retVeh: [NodeData] = rtVeh
+        let halfFlash: CGFloat = 0.3    //Time indicators are ON or OFF
+        let numFlash = 6        //No of full indicator flashes
+        let flashTime: CGFloat = CGFloat(numFlash) * halfFlash * 1.8
+        let indicatorOn = SKAction.unhide() //Overtaking indicators ON
+        let indicatorOff = SKAction.hide()  //Overtaking indicators OFF
+        let deelay = SKAction.wait(forDuration: halfFlash)  //Delay halfFlash secs
+        let pulseIndicators = SKAction.sequence([indicatorOn, deelay, indicatorOff, deelay])
+        let flash = SKAction.repeat(pulseIndicators, count: numFlash)
+        
+        
+        var speedChange: CGFloat
+        var newTime: CGFloat
+        var newSpeed: CGFloat
+        
+        let leftLaneX = ((centreStrip/2) + shoulderWidth + shoulderLineWidth + (laneWidth / 2) + (laneWidth + lineWidth))
+        //leftLaneX defines X position of centre of left lane
+        let lane2Lane = laneWidth + lineWidth   //distance from centre of left lane to centre of the right lane
+        
+        for (index, vehNode) in retVeh.enumerated() {            //index = 0 - (numVehicles - 1)
+            
+            if index == 0 { continue }       //Skip loop for element[0] = All Vehicles
+            
+            //THIS Vehicle = vehNode = retVeh[index] = (sKLAllVehicles[unitNum] OR sOtherAllVehicles[unitNum])
+            //  unitNum = Int.extractNum(from: vehNode.name)!  //NOTE: Use [unitNum] for sKLAllVehicles. Use [index] for retVeh!
+            //NOW THAT tVehicle RESORTED IN NUMERICAL ORDER, unitNum IS SAME AS 'index' SO NO NEED TO EXTRACT!
+            
+            if retVeh[index].startIndicator == true { //Code only runs to Start Flashing
+                retVeh[index].startIndicator = false
+                sKLAllVehicles[index].startIndicator = false
+                
+                if retVeh[index].indicator == .overtake { //About to Overtake
+                    
+                    let startMsg = SKAction.run {       //Not used - may delete startMsg later!!!
+                        //                if printOvertake != 0 {
+                        //                    if kLTrack {    //KL Track
+                        //                    print("\t\t\t\t\t\t\(index) Start KLBack\tLane \(sKLAllVehicles[index].lane.dp0)\tInd = \(sKLAllVehicles[index].indicator)")
+                        //                    } else {    //Not KL Track
+                        //                        print("\t\t\t\t\t\t\(index) Start OtBack\tLane \(sOtherAllVehicles[index].lane.dp0)\tInd = \(sOtherAllVehicles[index].indicator)")
+                        //                    }       //end KL Track
+                        //                }           //end Optional Print
+                    }               //end SKAction.run
+                    
+                    let goToLane1 = SKAction.customAction(withDuration: flashTime, actionBlock: {
+                        (node, elapsedTime) in
+                        sKLAllVehicles[index].lane = (elapsedTime / flashTime)
+                        retVeh[index].lane = sKLAllVehicles[index].lane
+                    })               //End goToLane0 action
+                    
+                    let laneChange = SKAction.group([goToLane1, flash])
+                    
+                    let endLane1 = SKAction.run {
+                        retVeh[index].lane = 1      //Ensure lane only = 1 or 0 when here!
+                        retVeh[index].indicator = .off
+                        sKLAllVehicles[index].lane = 1      //Ensure lane only = 1 or 0 when here!
+                        sKLAllVehicles[index].indicator = .off
+                    }           //End endLane0 action
+                    
+                    let laneFlash1 = SKAction.sequence([startMsg, laneChange, endLane1])
+                    //            let lFlash0 = SKAction.sequence([laneChange, endLane0])
+                    
+                    sKLAllVehicles[index].indicator = retVeh[index].indicator
+                    sKLAllVehicles[index].startIndicator = retVeh[index].startIndicator
+                    sKLAllVehicles[index].lane = retVeh[index].lane
+                    
+                    let newLanePos: Void = sKLAllVehicles[index].childNode(withName: "rightInd\(index)")!.run(laneFlash1)
+                    //          let newF8LanePos: Void = f8KLAllVehicles[index].childNode(withName: "leftInd\(index)")!.run(lFlash0)
+                    let newF8LanePos: Void = f8KLAllVehicles[index].childNode(withName: "rightInd\(index)")!.run(flash)
+                    
+                } else {        //Assume .endOvertake = About to go back to left lane
+                    //            if retVeh[index].indicator == .endOvertake { }
+                    
+                    let startMsg = SKAction.run {       //Not used - may delete startMsg later!!!
+                        //                if printOvertake != 0 {
+                        //                    if kLTrack {    //KL Track
+                        //                    print("\t\t\t\t\t\t\(index) Start KLBack\tLane \(sKLAllVehicles[index].lane.dp0)\tInd = \(sKLAllVehicles[index].indicator)")
+                        //                    } else {    //Not KL Track
+                        //                        print("\t\t\t\t\t\t\(index) Start OtBack\tLane \(sOtherAllVehicles[index].lane.dp0)\tInd = \(sOtherAllVehicles[index].indicator)")
+                        //                    }       //end KL Track
+                        //                }           //end Optional Print
+                    }               //end SKAction.run
+                    
+                    let goToLane0 = SKAction.customAction(withDuration: flashTime, actionBlock: {
+                        (node, elapsedTime) in
+                        sKLAllVehicles[index].lane = (1 - (elapsedTime / flashTime))
+                        retVeh[index].lane = sKLAllVehicles[index].lane
+                    })               //End goToLane0 action
+                    
+                    let laneChange = SKAction.group([goToLane0, flash])
+                    
+                    let endLane0 = SKAction.run {
+                        retVeh[index].lane = 0      //Ensure lane only = 1 or 0 when here!
+                        retVeh[index].indicator = .off
+                        sKLAllVehicles[index].lane = 0      //Ensure lane only = 1 or 0 when here!
+                        sKLAllVehicles[index].indicator = .off
+                    }           //End endLane0 action
+                    
+                    let laneFlash0 = SKAction.sequence([startMsg, laneChange, endLane0])
+                    //            let lFlash0 = SKAction.sequence([laneChange, endLane0])
+                    
+                    sKLAllVehicles[index].indicator = retVeh[index].indicator
+                    sKLAllVehicles[index].startIndicator = retVeh[index].startIndicator
+                    sKLAllVehicles[index].lane = retVeh[index].lane
+                    
+                    let newLanePos: Void = sKLAllVehicles[index].childNode(withName: "leftInd\(index)")!.run(laneFlash0)
+                    //          let newF8LanePos: Void = f8KLAllVehicles[index].childNode(withName: "leftInd\(index)")!.run(lFlash0)
+                    let newF8LanePos: Void = f8KLAllVehicles[index].childNode(withName: "leftInd\(index)")!.run(flash)
+                    
+                }               //end of 'about to overtake OR back to left lane'
+            }           //End Lane Change Routine - End of .startIndicator was true routine
+            //  skips above & direct to here when .startIndicator not true
+            
+            
+            speedChange = (vehNode.goalSpeed - vehNode.currentSpeed)
+            newTime = vehNode.changeTime * (60 / (CGFloat(noOfCycles) + 1))     //newTime = no of cycles @60/30/20Hz in changeTime
+            newSpeed = vehNode.currentSpeed + (speedChange / newTime)
+            //        sKLAllVehicles[index].physicsBody?.velocity.dy = newSpeed / 3.6 //Polarity varies subject to track!!! see below
+            
+            //        sKLAllVehicles[1].lane = 0.8000001
+            if vehNode.otherTrack == false {        //KL Track
+                sKLAllVehicles[index].physicsBody?.velocity.dy = (newSpeed / 3.6)
+                //            sKLAllVehicles[index].physicsBody?.velocity.dx = 0
+                sKLAllVehicles[index].position.x = -leftLaneX + (vehNode.lane * (lane2Lane))  //Set vehicle position in lane - Straight Track Only! DOESN'T APPEAR TO DO ANYTHING!!! - SEE changeLanes!!!
+            } else {                                //Other Track
+                sKLAllVehicles[index].physicsBody?.velocity.dy = -(newSpeed / 3.6)
+                //            sKLAllVehicles[index].physicsBody?.velocity.dx = 0
+                sKLAllVehicles[index].position.x = +leftLaneX - (vehNode.lane * (lane2Lane))  //Set vehicle position in lane - Straight Track Only! DOESN'T APPEAR TO DO ANYTHING!!! - SEE changeLanes!!!
+            }                                       //end of 'If' for both tracks
+            
+        }       //end 'For' loop
+        
+        return retVeh
+        
+    }           //end of 'updateKLVehicles' function
+    //############################################################################
+
+    //############################################################################
+    //Code below starts lane change & indicators where required
+    func updateOtherVehicles(rtVeh: [NodeData]) -> ([NodeData]) {
+        
+        var retVeh: [NodeData] = rtVeh
+        let halfFlash: CGFloat = 0.3    //Time indicators are ON or OFF
+        let numFlash = 6        //No of full indicator flashes
+        let flashTime: CGFloat = CGFloat(numFlash) * halfFlash * 1.8
+        let indicatorOn = SKAction.unhide() //Overtaking indicators ON
+        let indicatorOff = SKAction.hide()  //Overtaking indicators OFF
+        let deelay = SKAction.wait(forDuration: halfFlash)  //Delay halfFlash secs
+        let pulseIndicators = SKAction.sequence([indicatorOn, deelay, indicatorOff, deelay])
+        let flash = SKAction.repeat(pulseIndicators, count: numFlash)
+        
+        
+        var speedChange: CGFloat
+        var newTime: CGFloat
+        var newSpeed: CGFloat
+        
+        let leftLaneX = ((centreStrip/2) + shoulderWidth + shoulderLineWidth + (laneWidth / 2) + (laneWidth + lineWidth))
+        //leftLaneX defines X position of centre of left lane
+        let lane2Lane = laneWidth + lineWidth   //distance from centre of left lane to centre of the right lane
+        
+        for (index, vehNode) in retVeh.enumerated() {            //index = 0 - (numVehicles - 1)
+            
+            if index == 0 { continue }       //Skip loop for element[0] = All Vehicles
+            
+            //THIS Vehicle = vehNode = retVeh[index] = (sOtherAllVehicles[unitNum] OR sOtherAllVehicles[unitNum])
+            //  unitNum = Int.extractNum(from: vehNode.name)!  //NOTE: Use [unitNum] for sOtherAllVehicles. Use [index] for retVeh!
+            //NOW THAT tVehicle RESORTED IN NUMERICAL ORDER, unitNum IS SAME AS 'index' SO NO NEED TO EXTRACT!
+            
+            if retVeh[index].startIndicator == true { //Code only runs to Start Flashing
+                retVeh[index].startIndicator = false
+                sOtherAllVehicles[index].startIndicator = false
+                
+                if retVeh[index].indicator == .overtake { //About to Overtake
+                    
+                    let startMsg = SKAction.run {       //Not used - may delete startMsg later!!!
+                        //                if printOvertake != 0 {
+                        //                    if kLTrack {    //KL Track
+                        //                    print("\t\t\t\t\t\t\(index) Start KLBack\tLane \(sOtherAllVehicles[index].lane.dp0)\tInd = \(sOtherAllVehicles[index].indicator)")
+                        //                    } else {    //Not KL Track
+                        //                        print("\t\t\t\t\t\t\(index) Start OtBack\tLane \(sOtherAllVehicles[index].lane.dp0)\tInd = \(sOtherAllVehicles[index].indicator)")
+                        //                    }       //end KL Track
+                        //                }           //end Optional Print
+                    }               //end SKAction.run
+                    
+                    let goToLane1 = SKAction.customAction(withDuration: flashTime, actionBlock: {
+                        (node, elapsedTime) in
+                        sOtherAllVehicles[index].lane = (elapsedTime / flashTime)
+                        retVeh[index].lane = sOtherAllVehicles[index].lane
+                    })               //End goToLane0 action
+                    
+                    let laneChange = SKAction.group([goToLane1, flash])
+                    
+                    let endLane1 = SKAction.run {
+                        retVeh[index].lane = 1      //Ensure lane only = 1 or 0 when here!
+                        retVeh[index].indicator = .off
+                        sOtherAllVehicles[index].lane = 1      //Ensure lane only = 1 or 0 when here!
+                        sOtherAllVehicles[index].indicator = .off
+                    }           //End endLane0 action
+                    
+                    let laneFlash1 = SKAction.sequence([startMsg, laneChange, endLane1])
+                    //            let lFlash0 = SKAction.sequence([laneChange, endLane0])
+                    
+                    sOtherAllVehicles[index].indicator = retVeh[index].indicator
+                    sOtherAllVehicles[index].startIndicator = retVeh[index].startIndicator
+                    sOtherAllVehicles[index].lane = retVeh[index].lane
+                    
+                    let newLanePos: Void = sOtherAllVehicles[index].childNode(withName: "rightInd\(index)")!.run(laneFlash1)
+                    //          let newF8LanePos: Void = f8OtherAllVehicles[index].childNode(withName: "leftInd\(index)")!.run(lFlash0)
+                    let newF8LanePos: Void = f8OtherAllVehicles[index].childNode(withName: "rightInd\(index)")!.run(flash)
+                    
+                } else {        //Assume .endOvertake = About to go back to left lane
+                    //            if retVeh[index].indicator == .endOvertake { }
+                    
+                    let startMsg = SKAction.run {       //Not used - may delete startMsg later!!!
+                        //                if printOvertake != 0 {
+                        //                    if kLTrack {    //KL Track
+                        //                    print("\t\t\t\t\t\t\(index) Start KLBack\tLane \(sOtherAllVehicles[index].lane.dp0)\tInd = \(sOtherAllVehicles[index].indicator)")
+                        //                    } else {    //Not KL Track
+                        //                        print("\t\t\t\t\t\t\(index) Start OtBack\tLane \(sOtherAllVehicles[index].lane.dp0)\tInd = \(sOtherAllVehicles[index].indicator)")
+                        //                    }       //end KL Track
+                        //                }           //end Optional Print
+                    }               //end SKAction.run
+                    
+                    let goToLane0 = SKAction.customAction(withDuration: flashTime, actionBlock: {
+                        (node, elapsedTime) in
+                        sOtherAllVehicles[index].lane = (1 - (elapsedTime / flashTime))
+                        retVeh[index].lane = sOtherAllVehicles[index].lane
+                    })               //End goToLane0 action
+                    
+                    let laneChange = SKAction.group([goToLane0, flash])
+                    
+                    let endLane0 = SKAction.run {
+                        retVeh[index].lane = 0      //Ensure lane only = 1 or 0 when here!
+                        retVeh[index].indicator = .off
+                        sOtherAllVehicles[index].lane = 0      //Ensure lane only = 1 or 0 when here!
+                        sOtherAllVehicles[index].indicator = .off
+                    }           //End endLane0 action
+                    
+                    let laneFlash0 = SKAction.sequence([startMsg, laneChange, endLane0])
+                    //            let lFlash0 = SKAction.sequence([laneChange, endLane0])
+                    
+                    sOtherAllVehicles[index].indicator = retVeh[index].indicator
+                    sOtherAllVehicles[index].startIndicator = retVeh[index].startIndicator
+                    sOtherAllVehicles[index].lane = retVeh[index].lane
+                    
+                    let newLanePos: Void = sOtherAllVehicles[index].childNode(withName: "leftInd\(index)")!.run(laneFlash0)
+                    //          let newF8LanePos: Void = f8OtherAllVehicles[index].childNode(withName: "leftInd\(index)")!.run(lFlash0)
+                    let newF8LanePos: Void = f8OtherAllVehicles[index].childNode(withName: "leftInd\(index)")!.run(flash)
+                    
+                }               //end of 'about to overtake OR back to left lane'
+            }           //End Lane Change Routine - End of .startIndicator was true routine
+            //  skips above & direct to here when .startIndicator not true
+            
+            
+            speedChange = (vehNode.goalSpeed - vehNode.currentSpeed)
+            newTime = vehNode.changeTime * (60 / (CGFloat(noOfCycles) + 1))     //newTime = no of cycles @60/30/20Hz in changeTime
+            newSpeed = vehNode.currentSpeed + (speedChange / newTime)
+            //        sOtherAllVehicles[index].physicsBody?.velocity.dy = newSpeed / 3.6 //Polarity varies subject to track!!! see below
+            
+            //        sOtherAllVehicles[1].lane = 0.8000001
+            if vehNode.otherTrack == false {        //KL Track
+                sOtherAllVehicles[index].physicsBody?.velocity.dy = (newSpeed / 3.6)
+                //            sOtherAllVehicles[index].physicsBody?.velocity.dx = 0
+                sOtherAllVehicles[index].position.x = -leftLaneX + (vehNode.lane * (lane2Lane))  //Set vehicle position in lane - Straight Track Only! DOESN'T APPEAR TO DO ANYTHING!!! - SEE changeLanes!!!
+            } else {                                //Other Track
+                sOtherAllVehicles[index].physicsBody?.velocity.dy = -(newSpeed / 3.6)
+                //            sOtherAllVehicles[index].physicsBody?.velocity.dx = 0
+                sOtherAllVehicles[index].position.x = +leftLaneX - (vehNode.lane * (lane2Lane))  //Set vehicle position in lane - Straight Track Only! DOESN'T APPEAR TO DO ANYTHING!!! - SEE changeLanes!!!
+            }                                       //end of 'If' for both tracks
+            
+        }       //end 'For' loop
+        
+        return retVeh
+        
+    }           //end of 'updateOtherVehicles' function
+    //############################################################################
+
+//    NOTE: updateF8TSpots OBSOLETE!!! updateF8Vehicles runs 50x faster!!!
+//    //MARK: - Update position of vehicles on Fig 8 Track based on Straight Track vehicles
+//    func updateF8TSpots(t1Vehicle: [NodeData], kLTrack: Bool) {
+//        var key: String = ""            //Create Unique key for each Fig 8 vehicle
+//        let actionTimeF8: CGFloat = 0.5 //SKAction time in seconds
+//        for (index, veh1Node) in t1Vehicle.enumerated() {            //index = 0 - (numVehicles - 1)
+//            if index == 0 {continue}        //Skip loop for element[0] = All Vehicles
+//            guard let f8Node = f8Background.childNode(withName: veh1Node.equivF8Name) else {
+//                print("f8Node NOT found!!! (see 'func updateF8TSpots')\t\(childNode(withName: veh1Node.equivF8Name))\t\(veh1Node.equivF8Name)")
+//                return
+//            }
+//            f8Node.position = veh1Node.f8Pos
+//            f8Node.zRotation = veh1Node.f8Rot
+//            f8Node.zPosition = veh1Node.f8zPos
+//        }   //end 'for' loop
+//    }       //end updateF8TSpots
+
     //MARK: - Update position of vehicles on Fig 8 Track based on Straight Track vehicles
-    @MainActor func updateF8TSpots(t1Vehicle: [NodeData], kLTrack: Bool) {
+    func updateF8Vehicles(t1Vehicle: [NodeData], kLTrack: Bool) {
         
         var key: String = ""            //Create Unique key for each Fig 8 vehicle
         let actionTimeF8: CGFloat = 0.5 //SKAction time in seconds
 
         for (index, veh1Node) in t1Vehicle.enumerated() {            //index = 0 - (numVehicles - 1)
             if index == 0 {continue}        //Skip loop for element[0] = All Vehicles
-            
-            key = String(veh1Node.name.suffix(3))     //Move these 2 lines to "MainActor"?
-            key = "keyF8\(key)"
-            
-            guard let f8Node = childNode(withName: veh1Node.equivF8Name) else {
-                print("f8Node NOT found!!! (see 'func updateF8TSpots')\t\(childNode(withName: veh1Node.equivF8Name))\t\(veh1Node.equivF8Name)")
-                return
+
+            if kLTrack {
+                f8KLAllVehicles[index].position = veh1Node.f8Pos
+                f8KLAllVehicles[index].zRotation = veh1Node.f8Rot
+                f8KLAllVehicles[index].zPosition = veh1Node.f8zPos
+            } else {
+                f8OtherAllVehicles[index].position = veh1Node.f8Pos
+                f8OtherAllVehicles[index].zRotation = veh1Node.f8Rot
+                f8OtherAllVehicles[index].zPosition = veh1Node.f8zPos
             }
             
-//            print("f8Node: \(f8Node)\tkey: \(key)")
-            
-            //DON'T USE FOLLOWING CODE!!! - DELETE!!! (left temp in case other issue found!)
-//            if kLTrack == true {
-//                sKLAllVehicles[index].lane = veh1Node.lane
-//            } else {
-//                sOtherAllVehicles[index].lane = veh1Node.lane
-//            }
-
-            f8Node.position = veh1Node.f8Pos
-            f8Node.zRotation = veh1Node.f8Rot
-            f8Node.zPosition = veh1Node.f8zPos
-            
-////            let newF8Pos = SKAction.move(to: veh1Node.f8Pos, duration: actionTimeF8)
-////            let newF8Rot = SKAction.rotate(toAngle: veh1Node.f8Rot, duration: actionTimeF8, shortestUnitArc: true)
-//            let newF8Pos = SKAction.move(to: veh1Node.f8Pos, duration: 0.06)
-//            let newF8Rot = SKAction.rotate(toAngle: veh1Node.f8Rot, duration: 0.06, shortestUnitArc: true)
-//          let group = SKAction.group([newF8Pos, newF8Rot])
-//            
-//            let f8Node = childNode(withName: veh1Node.equivF8Name)!
-//            f8Node.zPosition = veh1Node.f8zPos
-//            f8Node.run(group, withKey: key)
         }   //end 'for' loop
-    }       //end updateF8TSpots
+    }       //end updateF8Vehicles
 
 }           //end Class 'StraightTrackScene'
 

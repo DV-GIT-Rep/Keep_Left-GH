@@ -208,18 +208,23 @@ class LabelData: SKLabelNode, ObservableObject {
     }
     
     func updateLabel(topLabel: Bool, vehicel: NodeData) {
+        
         f8KLLabelTitle.text = topLabel ? "\(kLTitle)" : "Std Track"
         f8KLLabelDescription.text = f8DisplayDat == 0 ? "All Vehicles" : flashOffFlag ? "" : "Vehicle \(f8DisplayDat)"
         f8KLLabelDescription.fontColor = f8DisplayDat == 0 ? subTitleColour : UIColor(displayP3Red: 0.98, green: 1, blue: 0.84, alpha: 1)
+        
         avgDistanceDesc.text = f8DisplayDat == 0 ? "Avg \(Km)" : "Total \(Km)"
         maxDistanceDesc.text = f8DisplayDat == 0 ? "Max \(Km)" : ""
         minDistanceDesc.text = f8DisplayDat == 0 ? "Min \(Km)" : topLabel ? "Honda" : ""
+        
         avgSpd.text = f8DisplayDat == 0 ? "\(Int(vehicel.speedAvg)) \(kph)" : "\(Int(vehicel.speedAvg)) \(kph)"
         maxSpd.text = f8DisplayDat == 0 ? "\(Int(vehicel.speedMax)) \(kph)" : "\(Int(vehicel.speedMax)) \(kph)"
         minSpd.text = f8DisplayDat == 0 ? "\(vehicel.speedMin < 500 ? Int(vehicel.speedMin) : Int(vehicel.speedAvg)) \(kph)" : "\(vehicel.speedMin < 500 ? Int(vehicel.speedMin) : Int(vehicel.speedAvg)) \(kph)"
+        
 //        avgSpd.text = f8DisplayDat == 0 ? "\(Int(vehicel.speedAvg)) \(kph)" : "\(Int(vehicel.speedAvg)) \(kph)"
 //        maxSpd.text = f8DisplayDat == 0 ? "\(Int(vehicel.speedMax)) \(kph)" : "\(Int(vehicel.speedMax)) \(kph)"
 //        minSpd.text = f8DisplayDat == 0 ? "\(vehicel.speedMin < 500 ? Int(vehicel.speedMin) : Int(vehicel.speedAvg)) \(kph)" : "\(vehicel.speedMin < 500 ? Int(vehicel.speedMin) : Int(vehicel.speedAvg)) \(kph)"
+        
         avgDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distance).varDP)" : "\(abs(vehicel.distance).varDP)"
         maxDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distanceMax).varDP)" : ""
         minDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distanceMin).varDP)" : topLabel ? "S2000" : ""
@@ -229,7 +234,7 @@ class LabelData: SKLabelNode, ObservableObject {
 //        maxDistanceDesc.fontColor = f8DisplayDat == 0 ? spdSubTitleColour : spdTitleColour
 //        maxDistance.fontName = f8DisplayDat == 0 ? "Helvetica Neue Light" : "Helvetica Neue Medium"
 //        maxDistance.fontColor = f8DisplayDat == 0 ? spdSubTitleColour : spdTitleColour
-    }
+    }       //end updateLabel
     
 //    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        guard let touch = touches.first else {return}   //Exit if not first touch!

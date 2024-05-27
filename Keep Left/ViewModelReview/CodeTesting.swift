@@ -12,7 +12,7 @@ import SpriteKit
 //    for (indx, t1Node) in t1Veh.enumerated() {
 //
 //    //MARK: - Find name of Fig 8 Track equivalent to Straight Track Vehicle
-//    //          eg.stKL_8 -> f8KL_8 OR stOT_35 -> f8Ot_35
+//    //          eg.stKL_8 -> f8Sprite8 OR stOT_35 -> f8Sprite35
 //        f8EquivName = String(t1Node.name.dropFirst(2))        //Remove 'st' from start of name
 //        f8EquivName.insert(contentsOf: "//f8", at: f8EquivName.startIndex)
 //        t1Veh[indx].equivF8Name = f8EquivName
