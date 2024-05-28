@@ -92,7 +92,7 @@ var GS:CGFloat = 0
 var TEST: Int = 0
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 16 //28 - NOTE: NEVER set to 0! Illegal value.
+var numVehicles = 3 //28 - NOTE: NEVER set to 0! Illegal value.
 let minGap: CGFloat = 2.5     //Sets minimum permissible gap between vehicles in metres. MUST be >=1 metre!
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
@@ -169,11 +169,11 @@ enum runCondition {
     case stop, run
 }
 var runTimer: CGFloat = 0.5         //Timer increments once/sec (+0.5 every 500ms) when runStop != .stop
-let runTimerDelay: CGFloat = 62     //Seconds delay before speed can be acknowledged
+let runTimerDelay: CGFloat = 10      //Secs delay before minSpeed is calc'd. Accel of 4.5m/s2 to 130kph takes ~8secs
 var enableMinSpeed: Bool = false    //Minimum speed is only calculated after this flag is set
 ///runStop has 2 possible values, .stop & .run
 var runStop: runCondition = .stop
-var ignoreSpd: Bool = true          //ignoreSpd set when vehicles stopped. Reset when started plus 2 secs (runTimerDelay)
+var ignoreSpd: Bool = true          //Set when veh's stopped. Rst when started plus 10 secs (runTimerDelay)
 
 ///All but 8 LSBs cleared once all vehicles created. Value then dictates which code runs during 'update'
 var gameStage: Int = 0xFF   //0xFF = Max value
@@ -183,15 +183,14 @@ var gameStage: Int = 0xFF   //0xFF = Max value
                             //Bit  1   = Set during KLTask - clr'd at end.
                             //Bit  0   = Set during OtherTask - clr'd at end.
 
-//Set ONLY to 01 or 11! Track 1 & 2 alternate based on value of bit 0!
-let noOfCycles = 0x03       //Calc speeds & f8Pos once every 'noOfCycles' 16.67ms (60Hz) periods.
-                            //0 - No Delay                  60fps   (smoothest)
-                            //1 - Run every 2nd 60ms cycle  30fps   (good)
-                            //2 - Run every 3rd 60ms cycle  20fps   (a little jumpy)
-                            //3 - Run every 4th 60ms cycle  15fps
-                            //NOTE: Larger no. here quickens speed change in vehicles! Compensates
-                            //      for fact that routine runs less often! (also set by this constant)
-//WEIRD!!! IF SET TO 0, FIG 8 SCREEN DOESN'T FULLY LOAD!!!
+////Set ONLY to 01 or 11! Track 1 & 2 alternate based on value of bit 0!
+//let noOfCycles = 0x00       //Calc speeds & f8Pos once every 'noOfCycles' 16.67ms (60Hz) periods.
+//                            //0 - No Delay                  60fps   (smoothest)
+//                            //1 - Run every 2nd 60ms cycle  30fps   (good)
+//                            //2 - Run every 3rd 60ms cycle  20fps   (a little jumpy)
+//                            //3 - Run every 4th 60ms cycle  15fps
+//                            //NOTE: Larger no. here quickens speed change in vehicles! Compensates
+//                            //      for fact that routine runs less often! (also set by this constant)
 
 //MARK: - These values are for the straight line auto track
 //var sMetre1: CGFloat = 0.0       //Multiply metres by this constant to get display points

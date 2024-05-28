@@ -552,13 +552,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                     await nodeDataKL.goLeft(teeVeh: &tKLVehicle)
                     
                     await MainActor.run {
-//                        updateSpeeds(retVeh: &tKLVehicle, allVeh: &sKLAllVehicles)      //Update vehicle speeds
                         tKLVehicle = updateKLVehicles(rtVeh: tKLVehicle)
                     }
                     
-//                }   //end KLTask a  MAYBE ADD LATER IF DATA PREPARED!!!
-////MARK: - KLTrack TASK b Fig 8
-//                Task {
                         //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                         if printSpd == 1 {
                             //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -710,12 +706,10 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                     //*************** 2a. Other Overtake ***************
                     //NOTE: Other Track doesn't Keep Left!
                     await nodeDataO.goLeft(teeVeh: &tOtVehicle)
-                    //                            var tOtVehicle: [NodeData] = tOtVehicle
+//                            var tOtVehicle: [NodeData] = tOtVehicle
                     //Toggle above 2 instructions to run or disable goLeft function! (currently only KL Track)
                     
                     await MainActor.run {
-//                        updateSpeeds(retVeh: &tOtVehicle, allVeh: &sOtherAllVehicles)      //Update vehicle speeds
-//                        tOtVehicle = updateVehicles(rtVeh: tOtVehicle, allVeh: sOtherAllVehicles, allF8Veh: &f8OtherAllVehicles, kLTrack: false)
                         tOtVehicle = updateOtherVehicles(rtVeh: tOtVehicle)
                     }
                     
@@ -789,7 +783,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //            print("OtherTrack\tStop\tgameStage: \(gameStage)\tbitResult: \(bitResult)")
 
                 //                        print("\nallAtSpd: \(allAtSpeed)\tignoreSpd: \(ignoreSpd)")
-                                    //ignoreSpd set when vehicles stopped. Reset when started plus 2 secs (runTimerDelay)
+                                    //ignoreSpd set when vehicles stopped. Reset when started plus 8 secs (runTimerDelay)
                                     //allAtSpeed1 set when ALL KL Track vehicles up to speed. allAtSpeed2 set when ALL Other Track vehicles up to speed.
                                     if allAtSpeed1 == true && allAtSpeed2 == true && ignoreSpd == false {
                                         enableMinSpeed = true       //NOTE: Now each vehicle calculates its min Spd once it's reached speed itself.
@@ -1045,14 +1039,14 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             
             if NumberedVehicles == false {  //false = normal else display numbers instead of vehicles!
                 switch randomVehicle {
-                case 1...maxCars:                       //Vehicle = Car
+                case 1...maxCars:                       //Vehicle = Car. Width defined above! (2.8m for now!)
                 fName = "C\(randomVehicle)"
                 case (maxCars+1)...(maxCars+maxTrucks): //Vehicle = Truck
                 fName = "T\(randomVehicle-maxCars)"
-                    vWidth = 2.8
+                    vWidth = 2.8                        //Set Trucks = 2.8m wide
                 default:                                //Vehicle = Bus
                 fName = "B\(randomVehicle-maxCars-maxTrucks)"
-                    vWidth = 2.8
+                    vWidth = 2.8                        //Set buses = 2.8m wide
                 }
                 
             } else {    //NumberedVehicles = true therefore display no's for vehicles!
@@ -1417,8 +1411,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //        let timeMx: CGFloat = 3600 / runTimer
         
         if (Int(runTimer * 2) & 0x0F) == 0x08 {    //every 10 seconds
-            randNo = CGFloat.random(in: 98...180)
+            randNo = CGFloat.random(in: 80...180)
             randUnitNo = Int.random(in: 1...numVehicles)
+//            print("randNo: \(randNo.dp1)\trandUnitNo: \(randUnitNo)\tprefSpd: \(t1Vehicle[randUnitNo].preferredSpeed.dp1)\tcurrSpd: \((t1Vehicle[randUnitNo].physicsBody!.velocity.dy * 3.6).dp1)")
         }
         
         var unitNo: Int = 0
@@ -1449,6 +1444,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //            sKLNode.preferredSpeed = 130
             if randUnitNo == unitNo || sKLNode.preferredSpeed == 0 {
                 sKLNode.preferredSpeed = randNo
+                sKLAllVehicles[unitNo].preferredSpeed = randNo
 //                sOtherNode.preferredSpeed = CGFloat.random(in: 82...150)
             }
 //            sKLNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 2.7
@@ -1457,6 +1453,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             
 //            sOtherNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 2.2
             sOtherNode.preferredSpeed = sKLNode.preferredSpeed
+            sOtherAllVehicles[unitNo].preferredSpeed = sKLNode.preferredSpeed
         }
 
     }   //End of 'for' loop
@@ -1465,50 +1462,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         
 }       //end 500ms function
     
-    //MARK: - Update speed of vehicles on Straight Track, braking for obstacles
-    func updateSpeeds(retVeh: inout [NodeData], allVeh: inout [Vehicle]) {
-        var speedChange: CGFloat
-        var newTime: CGFloat
-        var newSpeed: CGFloat
-        var action: SKAction
-//        var unitNum: Int
-
-        let printGoals = false
-        if printGoals {
-            print("\nUnit\tprefSpd\tgoalSpd\tcurrSpd\tnewSpd\tchTm\tgap\t\tnewT")
-        }
-    for (index, vehNode) in retVeh.enumerated() {            //index = 0 - (numVehicles - 1)
-        
-        if index == 0 { continue }       //Skip loop for element[0] = All Vehicles
-        
-        //THIS Vehicle = vehNode = sKLAllVehicles[unitNum] = retVeh[index]
-
-//        unitNum = Int.extractNum(from: vehNode.name)!  //NOTE: Use [unitNum] for sKLAllVehicles. Use [index] for retVeh!
-//NOW THAT tVehicle RESORTED IN NUMERICAL ORDER, unitNum IS SAME AS 'index' SO NO NEED TO EXTRACT!
-        
-        speedChange = (vehNode.goalSpeed - vehNode.currentSpeed)
-        newTime = vehNode.changeTime * (60 / (CGFloat(noOfCycles) + 1))     //newTime = no of cycles @60/30/20Hz in changeTime
-        newSpeed = vehNode.currentSpeed + (speedChange / newTime)
-//        allVeh[index].physicsBody?.velocity.dy = newSpeed / 3.6 //Polarity varies subject to track!!! see below
-        
-//        allVeh[1].lane = 0.8000001
-        if vehNode.otherTrack == false {        //KL Track
-            allVeh[index].physicsBody?.velocity.dy = newSpeed / 3.6
-//            allVeh[index].physicsBody?.velocity.dx = 0
-            allVeh[index].position.x = -((centreStrip/2) + shoulderWidth + shoulderLineWidth + (laneWidth / 2) + (laneWidth + lineWidth)) + (vehNode.lane * (laneWidth + lineWidth))  //Set vehicle position in lane - Straight Track Only! DOESN'T APPEAR TO DO ANYTHING!!! - SEE changeLanes!!!
-        } else {                                //Other Track
-            allVeh[index].physicsBody?.velocity.dy = -(newSpeed / 3.6)
-//            allVeh[index].physicsBody?.velocity.dx = 0
-            allVeh[index].position.x = +((centreStrip/2) + shoulderWidth + shoulderLineWidth + (laneWidth / 2) + (laneWidth + lineWidth)) - (vehNode.lane * (laneWidth + lineWidth))  //Set vehicle position in lane - Straight Track Only! DOESN'T APPEAR TO DO ANYTHING!!! - SEE changeLanes!!!
-        }
-
-//        if printGoals {
-//            print("\(index)\t\t\(vehNode.preferredSpeed.dp2)\t\(vehNode.goalSpeed.dp2)\t\(vehNode.currentSpeed.dp2)\t\(newSpeed.dp2)\t\(vehNode.changeTime.dp2)\t\(vehNode.gap.dp2)\t\(newTime.dp2)")
-//        }
-    }
-    }       //end func 'updateSpeeds'
     
-
+    //'updateSpeeds' replaced by 'updateKLVehicles' & 'updateOtherVehicles'
     //############################################################################
     //Code below starts lane change & indicators where required
     func updateKLVehicles(rtVeh: [NodeData]) -> ([NodeData]) {
@@ -1627,9 +1582,11 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             
             
             speedChange = (vehNode.goalSpeed - vehNode.currentSpeed)
-            newTime = vehNode.changeTime * (60 / (CGFloat(noOfCycles) + 1))     //newTime = no of cycles @60/30/20Hz in changeTime
+            newTime = vehNode.changeTime * 60       //changeTime in secs. Runs 60 times/sec.
+//            newTime = vehNode.changeTime * (60 / (CGFloat(noOfCycles) + 1))     //newTime = no of cycles @60/30/20Hz in changeTime
             newSpeed = vehNode.currentSpeed + (speedChange / newTime)
             //        sKLAllVehicles[index].physicsBody?.velocity.dy = newSpeed / 3.6 //Polarity varies subject to track!!! see below
+//            if index == 1 && vehNode.goalSpeed != 0 {print("changeTime: ,\(vehNode.changeTime.dp2),speedChange: ,\(speedChange.dp1),newSpeed: ,\(newSpeed.dp1),goal: ,\(vehNode.goalSpeed.dp1),Spd: ,\(vehNode.currentSpeed.dp1)")}
             
             //        sKLAllVehicles[1].lane = 0.8000001
             if vehNode.otherTrack == false {        //KL Track
@@ -1767,7 +1724,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             
             
             speedChange = (vehNode.goalSpeed - vehNode.currentSpeed)
-            newTime = vehNode.changeTime * (60 / (CGFloat(noOfCycles) + 1))     //newTime = no of cycles @60/30/20Hz in changeTime
+            newTime = vehNode.changeTime * 60       //changeTime in secs. Runs 60 times/sec.
+//            newTime = vehNode.changeTime * (60 / (CGFloat(noOfCycles) + 1))     //newTime = no of cycles @60/30/20Hz in changeTime
             newSpeed = vehNode.currentSpeed + (speedChange / newTime)
             //        sOtherAllVehicles[index].physicsBody?.velocity.dy = newSpeed / 3.6 //Polarity varies subject to track!!! see below
             
