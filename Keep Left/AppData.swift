@@ -92,7 +92,7 @@ var GS:CGFloat = 0
 var TEST: Int = 0
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 3 //28 - NOTE: NEVER set to 0! Illegal value.
+var numVehicles = 16 //28 - NOTE: NEVER set to 0! Illegal value.
 let minGap: CGFloat = 2.5     //Sets minimum permissible gap between vehicles in metres. MUST be >=1 metre!
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
@@ -168,12 +168,18 @@ var F8YZero: CGFloat = 0.0
 enum runCondition {
     case stop, run
 }
-var runTimer: CGFloat = 0.5         //Timer increments once/sec (+0.5 every 500ms) when runStop != .stop
-let runTimerDelay: CGFloat = 10      //Secs delay before minSpeed is calc'd. Accel of 4.5m/s2 to 130kph takes ~8secs
+var runTimer: CGFloat = 0.0         //Timer increments once/sec (+0.5 every 500ms) when runStop != .stop
+let runTimerDelay: CGFloat = 14      //Secs delay before minSpeed is calc'd. Accel of 4.5m/s2 to 130kph takes ~8secs
 var enableMinSpeed: Bool = false    //Minimum speed is only calculated after this flag is set
 ///runStop has 2 possible values, .stop & .run
 var runStop: runCondition = .stop
 var ignoreSpd: Bool = true          //Set when veh's stopped. Rst when started plus 10 secs (runTimerDelay)
+var kISpd2: Bool = true             //Used with ignoreSpd for KL Track avg, min & max spd calculations
+var kISpd3: Bool = true             //Used with ignoreSpd for KL Track avg, min & max spd calculations
+var oISpd2: Bool = true             //Used with ignoreSpd for Other Track avg, min & max spd calculations
+var oISpd3: Bool = true             //Used with ignoreSpd for Other Track avg, min & max spd calculations
+var tempCount: Int = 100         //Used for temp print display - delete!
+
 
 ///All but 8 LSBs cleared once all vehicles created. Value then dictates which code runs during 'update'
 var gameStage: Int = 0xFF   //0xFF = Max value

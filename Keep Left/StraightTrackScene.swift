@@ -413,7 +413,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //    }
     
     override func update(_ currentTime: TimeInterval) {
-        //ideally occurs every 60ms
+        //ideally occurs every 60Hz = 16.67ms
+        
 //        var whichWay: String
         
 //        f8Background.alpha = ((whichScene == .figure8) ? 1.0 : 0)
@@ -513,6 +514,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         nodeDataKL.currentSpeed = abs(veh1Node.physicsBody!.velocity.dy * 3.6)      //  ????? x 3.6 for kph?
                         nodeDataKL.otherTrack = veh1Node.otherTrack
                         nodeDataKL.startPos = veh1Node.startPos
+                        nodeDataKL.preDistance = veh1Node.preDistance
                         nodeDataKL.speedMax = veh1Node.speedMax
                         nodeDataKL.speedMin = veh1Node.speedMin
                         nodeDataKL.spdClk = veh1Node.spdClk
@@ -530,6 +532,11 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                 Task {
                     gameStage = gameStage | 2               //1 -> gameStage.1. Remains set during Task!
                     //Prevents code running again during Task.
+                    
+                    if runStop == .run {
+                        runTimer += (1/60)             //Add 16.7ms to runTimer. Used to calculate average speeds
+                    }
+            //        print("enableMinSpeed: \(enableMinSpeed)\t\trunTimer: \(runTimer)")
                     
                     //***************  1. findObstacles + updateSpeeds  ***************
                     //Keep Left Track (Track 1)  = gameStage bit 0 = 0
@@ -592,8 +599,11 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                     
                     for i in 1..<rtnT1Veh.count {
                         if i == 0 {continue}       //Skip loop for element[0] = All Vehicles
+                        sKLAllVehicles[i].preDistance = rtnT1Veh[i].preDistance
                         sKLAllVehicles[i].speedMax = rtnT1Veh[i].speedMax
                         sKLAllVehicles[i].speedMin = rtnT1Veh[i].speedMin
+                        sKLAllVehicles[i].startPos = rtnT1Veh[i].startPos
+                        sKLAllVehicles[i].laps = rtnT1Veh[i].laps            //in case clr'd @ 10secs
                         sKLAllVehicles[i].spdClk = rtnT1Veh[i].spdClk
                         sKLAllVehicles[i].reachedSpd = rtnT1Veh[i].reachedSpd
                         
@@ -669,6 +679,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         nodeDataO.currentSpeed = abs(veh2Node.physicsBody!.velocity.dy * 3.6)      //  ????? x 3.6 for kph?
                         nodeDataO.otherTrack = veh2Node.otherTrack
                         nodeDataO.startPos = veh2Node.startPos
+                        nodeDataO.preDistance = veh2Node.preDistance
                         nodeDataO.speedMax = veh2Node.speedMax
                         nodeDataO.speedMin = veh2Node.speedMin
                         nodeDataO.spdClk = veh2Node.spdClk
@@ -730,8 +741,11 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                     var rtnT2Veh = await nodeDataO.calcAvgData(t1xVeh: &tOtVehicle)
                     
                     for i in 1..<rtnT2Veh.count {
+                        sOtherAllVehicles[i].preDistance = rtnT2Veh[i].preDistance
                         sOtherAllVehicles[i].speedMax = rtnT2Veh[i].speedMax
                         sOtherAllVehicles[i].speedMin = rtnT2Veh[i].speedMin
+                        sOtherAllVehicles[i].startPos = rtnT2Veh[i].startPos
+                        sOtherAllVehicles[i].laps = rtnT2Veh[i].laps            //in case clr'd @ 10secs
                         sOtherAllVehicles[i].spdClk = rtnT2Veh[i].spdClk
                         sOtherAllVehicles[i].reachedSpd = rtnT2Veh[i].reachedSpd
                         if rtnT2Veh[i].reachedSpd == false { allAtSpeed2 = false } //Flag cleared if ANY vehicle NOT up to speed
@@ -1398,9 +1412,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
     //MARK: - the function below runs every 500ms
     @objc func every500ms() {
         
-        if runStop == .run {
-            runTimer += 0.5             //Add 500ms to runTimer. Used to calculate average speeds
-        }
+//        if runStop == .run {
+//            runTimer += 0.5             //Add 500ms to runTimer. Used to calculate average speeds
+//        }
 //        print("enableMinSpeed: \(enableMinSpeed)\t\trunTimer: \(runTimer)")
         
     let t1Vehicle = sKLAllVehicles   //Straight Track Vehicles

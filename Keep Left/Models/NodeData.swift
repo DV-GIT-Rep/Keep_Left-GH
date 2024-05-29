@@ -51,6 +51,8 @@ struct NodeData {
     var distance: CGFloat
     var distanceMin: CGFloat
     var distanceMax: CGFloat
+    var preDistance: CGFloat     //Records distance for 1st 10secs of travel
+
     var speedAvg: CGFloat
     var speedMin: CGFloat
     var speedMax: CGFloat
@@ -97,6 +99,7 @@ struct NodeData {
         distance = 0
         distanceMin = 0
         distanceMax = 0
+        preDistance = 0
         speedAvg = 0
         speedMin = 999999       //Set to >500 to start
         speedMax = 0
@@ -664,12 +667,19 @@ struct NodeData {
         t1xVeh[0].minSumKL = 99999
         
         //MARK: - Set timeMx = hours of vehicle run time to now!
-        let timeMx: CGFloat = 3600 / runTimer
+        var timeMx: CGFloat = 0
+        if runTimer != 0 { timeMx = 3600 / runTimer } else { timeMx = 3600 / 0.01 }
         
         var yPos: CGFloat = 0
         var yStrtPos: CGFloat = 0
         var unitNo: Int = 0
         var uNum: Int = 0
+        
+        if ignoreSpd == false {     //see Avg, Min & Max Speed calculations description in readme.md
+            kISpd2 = false
+            oISpd2 = false
+        }
+        
         //Loop through both arrays simultaneously. Move back 1km when they've travelled 1km!
         //IF OTHER TRACK RUN SEPARATELY THIS MAY CHANGE! NOTE TOO THAT ARRAYS NOT IN ORDER!
         for (innDex, sKLNode) in t1xVeh.enumerated() {
@@ -684,8 +694,8 @@ struct NodeData {
             //            //MARK: - Flash vehicle when data displayed for single vehicle only
             //            flashVehicle(thisVehicle: sKLNode)
             
-            t1xVeh[innDex].distance = (t1xVeh[innDex].position.y - yStrtPos) / sTrackLength + t1xVeh[innDex].laps                //Distance travelled in km
-            //            t1xVeh[innDex].distance = (yPos - yStrtPos) / sTrackLength + t1Veh[innDex].laps                //Distance travelled in km
+            t1xVeh[innDex].distance = ((t1xVeh[innDex].position.y - yStrtPos) / sTrackLength + t1xVeh[innDex].laps)                //Distance travelled in km
+//            t1xVeh[innDex].distance = (yPos - yStrtPos) / sTrackLength + t1Veh[innDex].laps                //Distance travelled in km
             
             if firstThru == true {                  //Ensures initial reading > max possible speed
                 t1xVeh[innDex].speedMin = 900
@@ -693,17 +703,45 @@ struct NodeData {
             }
 
 //Only ever use currentSpd for temporary display of currentSpeed!
-            if ignoreSpd {
-                t1xVeh[innDex].speedAvg = CGFloat(Int(t1xVeh[innDex].currentSpeed))    //Average speed for vehicle
-            } else {
-                t1xVeh[innDex].speedAvg = CGFloat(Int(t1xVeh[innDex].distance * timeMx))    //Average speed for vehicle
-            }
+            if t1xVeh[innDex].otherTrack == false { //Keep Left Track
+                if kISpd2 == true {         //xISpd2: true = 10s NOT up yet. Use currentSpeed
+                    t1xVeh[innDex].speedAvg = CGFloat(t1xVeh[innDex].currentSpeed)    //Average speed for vehicle
+                } else {                    //xISpd2: false
+                    if kISpd3 == false {    //xISpd2: false, xISpd3: false = Normal Avg'd display
+//                        t1xVeh[innDex].speedAvg = CGFloat(((t1xVeh[innDex].distance + t1xVeh[innDex].preDistance) * timeMx))    //Average speed for vehicle
+                        t1xVeh[innDex].speedAvg = CGFloat((t1xVeh[innDex].distance) * timeMx)    //Average speed for vehicle
+                    } else {                //xISpd2: false, xISpd3: true = 10s just up, save preDistance etc
+                        t1xVeh[innDex].speedAvg = CGFloat(t1xVeh[innDex].currentSpeed)    //Average speed for vehicle
+//                        t1xVeh[innDex].preDistance = t1xVeh[innDex].distance
+//                        t1xVeh[innDex].startPos = t1xVeh[innDex].position.y
+//                        t1xVeh[innDex].distance = 0
+//                        t1xVeh[innDex].laps = 0
+                    }   //end xISpd3 test
+                }       //end xISpd2 test
+            } else {                                //Other Track
+                if oISpd2 == true {         //xISpd2: true = 10s NOT up yet. Use currentSpeed
+                    t1xVeh[innDex].speedAvg = CGFloat((t1xVeh[innDex].currentSpeed))    //Average speed for vehicle
+                } else {                    //xISpd2: false
+                    if oISpd3 == false {    //xISpd2: false, xISpd3: false = Normal Avg'd display
+                        t1xVeh[innDex].speedAvg = CGFloat((t1xVeh[innDex].distance) * timeMx)    //Average speed for vehicle
+                    } else {                //xISpd2: false, xISpd3: true = 10s just up, save preDistance etc
+                        t1xVeh[innDex].speedAvg = CGFloat(Int(t1xVeh[innDex].currentSpeed))    //Average speed for vehicle
+//                        t1xVeh[innDex].preDistance = t1xVeh[innDex].distance
+//                        t1xVeh[innDex].startPos = t1xVeh[innDex].position.y
+//                        t1xVeh[innDex].distance = 0
+//                        t1xVeh[innDex].laps = 0
+                    }   //end xISpd3 test
+                }       //end xISpd2 test
+            }                                       //end KL or Other Track test
+                        
             //+++++++++ Changed below to use currentSpeed instead of speedAvg. +++++++++
             //+++++++++ CHANGED BACK! NEED MIN & MAX AVG SPEED FOR EACH VEHICLE! +++++++++
-            t1xVeh[innDex].speedMax = max(t1xVeh[innDex].speedMax, t1xVeh[innDex].speedAvg)  //Max avg speed for vehicle
+//            t1xVeh[innDex].speedMax = max(t1xVeh[innDex].speedMax, t1xVeh[innDex].speedAvg)  //Max avg speed for vehicle
+            t1xVeh[innDex].speedMax = max(t1xVeh[innDex].speedMax, t1xVeh[innDex].currentSpeed)  //Max avg speed for vehicle
             if enableMinSpeed == true {         //Wait for ALL vehicles up to speed
                 //            if t1Veh[innDex].reachedSpd == true {         //Wait for individual vehicles up to speed
-                t1xVeh[innDex].speedMin = min(t1xVeh[innDex].speedMin, t1xVeh[innDex].speedAvg)
+//                t1xVeh[innDex].speedMin = min(t1xVeh[innDex].speedMin, t1xVeh[innDex].speedAvg)
+                t1xVeh[innDex].speedMin = min(t1xVeh[innDex].speedMin, t1xVeh[innDex].currentSpeed)
             }           //Min avg speed for vehicle. Ignores acceleration period.
             //+++++++++ Changed above to use currentSpeed instead of speedAvg - NO! +++++++++
             //USE AVG SPEED FOR ALL CALCS!
@@ -728,7 +766,29 @@ struct NodeData {
         //      Min Speed = Avg Speed of vehicle that has driven the least distance
         //(Note: @ present (24/8/22) avg, max & min the same as all vehicles driven at same speed over same distance.
         
-        if t1xVeh[1].otherTrack == false {
+        if t1xVeh[1].otherTrack == false {      //Keep Left Track
+            
+            if (kISpd3 || tempCount != 0) && runStop == .run {
+//                print("\(t1xVeh[1].currentSpeed.dp1), Avg:,\(t1xVeh[1].speedAvg.dp2), Max:,\(t1xVeh[1].speedMax.dp2), Min:,\(t1xVeh[1].speedMin.dp0), km:,\(t1xVeh[1].distance.dp2), t:,\(runTimer.dp1), tx:,\(timeMx.dp1), tC:,\(tempCount)")
+                let date = Date()
+                let formatter = DateFormatter()
+//                var iso8601withFractionalSeconds: Date.ISO8601FormatStyle { .secs }
+//                formatter.dateFormat = "yyyy-MM-dd hh:mm a"
+                formatter.dateFormat = "ss"
+                let result = formatter.string(from: date)
+//                print(result) // 2020–04–15 10:11 PM
+
+                print("\(t1xVeh[1].currentSpeed.dp1), Avg:,\(t1xVeh[1].speedAvg.dp2), km:,\(t1xVeh[1].distance.dp3), s:,\(result), t:,\(runTimer.dp3), tx:,\(timeMx.dp3), tC:,\(tempCount)")
+                if tempCount != 0 && kISpd3 == false { tempCount = tempCount - 1 } //Add 10 extra prints
+            }
+            
+            //Condition true if 10 secs (runTimerDelay) since vehicles 1st started
+            if kISpd2 == false && kISpd3 == true {  //End of 1st pass thru calcAvgData 10secs after veh's started
+                kISpd3 = false
+//                runTimer = 0.0  //Will also set to 0.5 for Other Track - sb OK as within 16.7ms.
+                runTimer = (3600 / (t1xVeh[1].speedAvg / t1xVeh[1].distance)) //One-off adjustment after 10secs
+//                runTimer = runTimer - ((3600 * t1xVeh[1].distance) / t1xVeh[1].currentSpeed) //* 2 //One-off adjustment after 10secs
+            }
             
             //Keep Left Track
             klDistance0 = t1xVeh[0].sumKL / CGFloat(numVehicles)
@@ -739,7 +799,13 @@ struct NodeData {
             klSpeedMax0 = t1xVeh[0].maxSumKL * timeMx
             klSpeedMin0 = t1xVeh[0].minSumKL * timeMx
             
-        } else {
+        } else {        //Other Track
+            
+            //Condition true if 10 secs (runTimerDelay) since vehicles 1st started
+            if oISpd2 == false && oISpd3 == true {  //End of 1st pass thru calcAvgData 10secs after veh's started
+                oISpd3 = false
+//                runTimer = 0.5  //Will also set to 0.5 for Keep Left Track - sb OK as within 16.7ms.
+            }
             
             //Other Track
             oDistance0 = t1xVeh[0].sumKL / CGFloat(numVehicles)
@@ -1222,3 +1288,8 @@ struct NodeData {
     }   //end of changeLanes function
     
 }       //end of struct NodeData
+
+extension Date.ISO8601FormatStyle {
+    static let secs: Self = .init(includingFractionalSeconds: true)
+}
+

@@ -100,6 +100,7 @@
 		9D85C157280552650035332C /* F8Vehicle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = F8Vehicle.swift; sourceTree = "<group>"; };
 		9D89A5C9284ABE26009D41D0 /* UserGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserGuideView.swift; sourceTree = "<group>"; };
 		9D96CE7328ED6784005F77FD /* NodeData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeData.swift; sourceTree = "<group>"; };
+		9DBD9DED2C06B3C300F54401 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9DD199D527901F8500866318 /* Keep Left.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Keep Left.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DD199D827901F8500866318 /* KeepLeftApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeepLeftApp.swift; sourceTree = "<group>"; };
 		9DD199DA27901F8500866318 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -245,6 +246,7 @@
 				9DD199DC27901F8700866318 /* Assets.xcassets */,
 				9DD199DE27901F8700866318 /* Preview Content */,
 				9DD199EA2797AF4300866318 /* AppData.swift */,
+				9DBD9DED2C06B3C300F54401 /* README.md */,
 			);
 			path = "Keep Left";
 			sourceTree = "<group>";

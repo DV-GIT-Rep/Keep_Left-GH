@@ -38,9 +38,9 @@ class StartStop: SKSpriteNode {
             self.texture = SKTexture(imageNamed: "stopIcon")
             
             //The following will enable the runTimer after a delay
-            let delayRun = SKAction.wait(forDuration: runTimerDelay)    //runTimerDelay ~ 8 secs?
+            let delayRun = SKAction.wait(forDuration: runTimerDelay)    //runTimerDelay ~ 8-10 secs?
             let setRun = SKAction.run {
-                ignoreSpd = false       //ignoreSpd set when vehicles stopped. Reset when started plus 8 secs (runTimerDelay)
+                ignoreSpd = false       //Set when vehicles stopped. Rst when started plus 10 secs (runTimerDelay)
 //                enableMinSpeed = true
 //                print("runTimer Enabled !!!")
             }
@@ -50,7 +50,13 @@ class StartStop: SKSpriteNode {
 //        case .run:
         default:
             runStop = .stop
-            ignoreSpd = true            //ignoreSpd set when vehicles stopped. Reset when started plus 8 secs (runTimerDelay)
+//            ignoreSpd = true            //Set when vehicles stopped. Rst when started plus 10 secs (runTimerDelay)
+//            kISpd2 = true             //Used with ignoreSpd for KL Track avg, min & max spd calculations
+//            kISpd3 = true             //Used with ignoreSpd for KL Track avg, min & max spd calculations
+//            oISpd2 = true             //Used with ignoreSpd for Other Track avg, min & max spd calculations
+//            oISpd3 = true             //Used with ignoreSpd for Other Track avg, min & max spd calculations
+////Only set above prior to 1st start???
+            
             self.texture = SKTexture(imageNamed: "runIcon")
 
             removeAction(forKey: "delayRun")    //Disable delay to prevent runTimerEnabled setting!

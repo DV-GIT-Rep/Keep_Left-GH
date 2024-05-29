@@ -24,6 +24,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
     @Published var distance: CGFloat        //Distance travelled in km
     @Published var distanceMax: CGFloat     //Distance travelled in km
     @Published var distanceMin: CGFloat     //Distance travelled in km
+    @Published var preDistance: CGFloat     //Records distance for 1st 10secs of travel
 
     @Published var otherTrack: Bool
     
@@ -66,6 +67,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
         distance = 0.0
         distanceMax = 0.0
         distanceMin = 0.0
+        preDistance = 0.0
         startPos = 0.0
         otherTrack = false
         speedAvg = 0.0
