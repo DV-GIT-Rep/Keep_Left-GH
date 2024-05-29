@@ -169,7 +169,7 @@ enum runCondition {
     case stop, run
 }
 var runTimer: CGFloat = 0.0         //Timer increments once/sec (+0.5 every 500ms) when runStop != .stop
-let runTimerDelay: CGFloat = 14      //Secs delay before minSpeed is calc'd. Accel of 4.5m/s2 to 130kph takes ~8secs
+let runTimerDelay: CGFloat = 15      //Secs delay before minSpeed is calc'd. Accel of 4.5m/s2 to 130kph takes ~8secs
 var enableMinSpeed: Bool = false    //Minimum speed is only calculated after this flag is set
 ///runStop has 2 possible values, .stop & .run
 var runStop: runCondition = .stop
