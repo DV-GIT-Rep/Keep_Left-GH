@@ -31,6 +31,8 @@ class StartStop: SKSpriteNode {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else {return}   //Exit if not first touch!
 
+        runSwitched = .switched     //Indicates run/stop state just changed
+
         //MARK: - Toggle Vehicle Operation
         switch runStop {
         case .stop:

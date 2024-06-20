@@ -1,4 +1,5 @@
 ## Avg, Min & Max Speed Calculations
+    NOTE: Operation altered from below but doc not updated!!!
 
 ### AppData
     define ignoreSpd, kISpd2, kISpd3, oISpd2 & oISpd3 all = true to start

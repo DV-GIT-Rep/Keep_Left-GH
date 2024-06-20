@@ -92,8 +92,19 @@ var GS:CGFloat = 0
 var TEST: Int = 0
 
 //This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 16 //28 - NOTE: NEVER set to 0! Illegal value.
+var numVehicles = 15 //28 - NOTE: NEVER set to 0! Illegal value.
 let minGap: CGFloat = 2.5     //Sets minimum permissible gap between vehicles in metres. MUST be >=1 metre!
+
+enum Zone: CaseIterable {               //Define Zone with different speed limits, L/R Hand Drive etc
+    case NSW, Vic, Qld, SA, Tas, WA, NT //May make a subset of AUS
+    case Cal, Nev, NY                   //May make a subset of US
+}
+
+//enum SpdLimit: CaseIterable {         //CAN'T create an enum with Ints!
+//    case 40, 50, 60, 70, 80, 90, 100, 110, 120, 130
+//}
+let spdLimits = [40, 50, 60, 70, 80, 90, 100, 110, 120, 130]    //Available speed limits (120 & 130 NT ONLY!)
+let spdLimit = CGFloat(spdLimits[6]) + 0.5       //Set Speed Limit = 100 kph for now (won't get there without +0.5)
 
 var sKLAllVehicles: [Vehicle] = []      //Array of vehicles on Keep Left Straight Track
 var sOtherAllVehicles: [Vehicle] = []   //Array of vehicles on Other Straight Track
@@ -145,6 +156,19 @@ let shoulderWidth: CGFloat = 0.25    //Sets width of bitumen outside of shoulder
 let roadWidth = (laneWidth * 2) + lineWidth + (shoulderLineWidth * 2) + (shoulderWidth * 2)
 let linePeriod: CGFloat = (lineLength + lineGap)
 
+let numFlash: Int = 6           //Sets no of flashes during a Lane Change
+let halfFlash: CGFloat = 0.3        //On/Off time for indicators during Lane Change
+let laneChangeTime: CGFloat = CGFloat(numFlash) * halfFlash * 1.8
+                                    //Time each vehicle takes to change lanes
+///Average speed (kph) required to change lanes in 'laneChangeTime'
+/// - Distance between lanes = (laneWidth + lineWidth)
+/// - xLaneVelocity used to calculate vehicle rotation during a Lane Change
+/// - - Angle = atan(xLaneVelocity / velocity)
+let xLaneVelocity: CGFloat = ((laneWidth + lineWidth) * 3.6) / laneChangeTime
+let rotFudgeFactor: CGFloat = 0.2     //Amplify rotation angle when changing lanes
+                                    //NOTE: Max level at half way
+//May reduce further for long vehicles (0.15?) & increase for shorter vehicles (0.3?)
+
 //MARK: - Colours of 1st Fig 8 image:
 //                  R       G       B
 //          Grey    168     168     168
@@ -168,20 +192,30 @@ var F8YZero: CGFloat = 0.0
 enum runCondition {
     case stop, run
 }
+enum runCondSwitch {
+    case switched, stable
+}
+
 var runTimer: CGFloat = 0.0         //Timer increments once/sec (+0.5 every 500ms) when runStop != .stop
 let runTimerDelay: CGFloat = 15      //Secs delay before minSpeed is calc'd. Accel of 4.5m/s2 to 130kph takes ~8secs
 var enableMinSpeed: Bool = false    //Minimum speed is only calculated after this flag is set
 ///runStop has 2 possible values, .stop & .run
-var runStop: runCondition = .stop
+var runStop: runCondition = .run
+var runSwitched: runCondSwitch = .switched  //Indicates run/stop condition just changed
 var ignoreSpd: Bool = true          //Set when veh's stopped. Rst when started plus 10 secs (runTimerDelay)
 var kISpd2: Bool = true             //Used with ignoreSpd for KL Track avg, min & max spd calculations
 var kISpd3: Bool = true             //Used with ignoreSpd for KL Track avg, min & max spd calculations
 var oISpd2: Bool = true             //Used with ignoreSpd for Other Track avg, min & max spd calculations
 var oISpd3: Bool = true             //Used with ignoreSpd for Other Track avg, min & max spd calculations
-var tempCount: Int = 100         //Used for temp print display - delete!
 
 
 ///All but 8 LSBs cleared once all vehicles created. Value then dictates which code runs during 'update'
+/// - 0xFF = Max value
+///   - Bit  7   = 1 UNTIL vehicles created then set to 0!
+///   - Bits 6-4 = Not used (yet).
+///   - Bits 3-2 = Clr'd when vehicles created. Not used (yet).
+///   - Bit  1   = Set during KLTask then Rst. Flags operation in progress
+///   - Bit  0   = Set during OtherTask then Rst. Flags operation in progress
 var gameStage: Int = 0xFF   //0xFF = Max value
                             //Bit  7   = 1 UNTIL vehicles created then set to 0!
                             //Bits 6-4 = Not used (yet).
@@ -277,6 +311,14 @@ var oSpeedMax0: CGFloat = 0
 var oSpeedMin0: CGFloat = 99999999
 
 extension CGFloat {
+    ///Formats number as string with maximum of 5 decimal places
+    var dp5: String {
+        return String(format: "%.5f", self)
+    }
+    ///Formats number as string with maximum of 4 decimal places
+    var dp4: String {
+        return String(format: "%.4f", self)
+    }
     ///Formats number as string with maximum of 3 decimal places
     var dp3: String {
         return String(format: "%.3f", self)
@@ -326,6 +368,18 @@ extension Int {
         //Cld probably hv used Int(String(string.dropFirst(x))) //where x = num of digits to remove
     }
 }
+
+extension String {
+    static func minSec(from num: CGFloat) -> String {
+        return String("\(Int(num / 60))m\(String(format: "%02d", Int(num.truncatingRemainder(dividingBy: 60))))")
+    }
+}
+
+//extension CGFloat {
+//    static func minSec(_: CGFloat) -> String? {
+//        return String("\(Int(self) / 60)m\(String(format: "%2.0f", self.truncatingRemainder(dividingBy: 60)))")
+//    }
+//}
 
 var randNo: CGFloat = 120
 var randUnitNo: Int = 1

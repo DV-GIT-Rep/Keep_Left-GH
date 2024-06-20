@@ -13,7 +13,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
     
 //    @Published var txVehicle = [Vehicle]()
     
-    open var preferredSpeed: CGFloat  //Vehicle speed without obstacles (kph)
+    @Published var preferredSpeed: CGFloat  //Vehicle speed without obstacles (kph)
     @Published var currentSpeed: CGFloat    //Vehicle speed NOW
     
     @Published var speedKPH: CGFloat
@@ -46,11 +46,39 @@ class Vehicle: SKSpriteNode, ObservableObject {
     @Published var goalSpeed: CGFloat   //Used to temp store immediate goal speed following proximity check
     @Published var changeTime: CGFloat  //Time in seconds for next SKAction on Straight Track vehicles
     
-    @Published var spdClk: Int          //Clk decs every 'findObstacles'. reachedSpd set when spdClk times out.
-    var reachedSpd: Bool     //Set for each vehicle when it reaches speed. Cleared when vehicles stopped.
+    @Published var spdClk: Int          //Clk decs every 'findObstacles'. upToSpd set when spdClk times out.
+    var upToSpd: Bool     //Set for each vehicle when it reaches speed. Cleared when vehicles stopped.
     
     var indicator: Indicator
     var startIndicator: Bool    //Triggers start of lane change
+    
+    /// Use for Trucks & Buses - 100kph limit in NSW. Full spdLimit range for Cars.
+    enum VType {
+        case car, truck, bus
+    }        //Ref from sKL vehicles ONLY! OtherTrack types match!
+    @Published var vehType = VType.car
+    
+    /// -1 to +1 sets distribution in randomValue. Calc spdPref with +1 for cars, +0.6? for trucks & +0.25? for buses.
+    @Published var spdPref: CGFloat = 1            //Ref from sKL vehicles ONLY! OtherTrack speeds match!
+    /// % of spdLimit used for 'max' in 'randomValue' to calc preferredSpeed = 40-105%
+    @Published var topRange: CGFloat = 1.05        //Ref from sKL vehicles ONLY! OtherTrack speeds match!
+    /// % of spdLimit used for 'min' in 'randomValue' to calc preferredSpeed = 25-topRange%
+    @Published var lowRange: CGFloat = 0.25        //Ref from sKL vehicles ONLY! OtherTrack speeds match!
+    /// -1 to +1. Actively sets time to next speed change for this vehicle. varTime = fixed probability.
+    /// - Time range = minChangeTime to maxChangeTime (initially 1 to 180 seconds)
+    /// - eg. randomValue(distribution: sKLVehicle[x].varTime, min: minChangeTime, max: maxChangeTime)
+    @Published var varTime: CGFloat = 1            //-1 to +1. Ref from sKL vehicles ONLY! OtherTrack speeds match!
+    
+    /// -1 to +1. Actively sets delay between speed changes for this vehicle. holdTime = fixed probability.
+    /// - Time range = minChangeTime to maxChangeTime (initially 1 to 180 seconds)
+    /// - eg. randomValue(distribution: sKLVehicle[x].varTime, min: minChangeTime, max: maxChangeTime)
+    @Published var holdTime: CGFloat = -1          //-1 to +1. Ref from sKL vehicles ONLY! OtherTrack speeds match!
+
+    //Create variables used in 'setVariables'
+//    @Published var strtSpd: CGFloat = 0             //Capture preferredSpeed @ start of action sequence
+//    @Published var adjustTime: CGFloat = 0          //Defines time preferredSpeed takes to get from strtSpd to targetSpd
+//    @Published var targetSpd: CGFloat = 110         //Value of preferredSpeed @ end of adjustTime period
+//    @Published var fixedTime: CGFloat = 2           //Time that preferredSpeed remains unchanged after being altered
 
 //    @Published var indicate: String
 //    @Published var lights: Bool
@@ -83,7 +111,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
         goalSpeed = 0.0     //Overwritten later!
         changeTime = 1.0    //seconds. Overwritten later!
         spdClk = 600         //Dummy value to start. 0.083sec * 600 = 5 secs
-        reachedSpd = false
+        upToSpd = false
         
         indicator = .off
         startIndicator = false
@@ -326,12 +354,125 @@ class Vehicle: SKSpriteNode, ObservableObject {
 //        await self.run(plusLane)
 //    }
 //
+    
+
+    /// Creates a new value of preferredSpeed, sets it over a random period, holds it over a new random period, and then repeats with new random values indefinitely
+    /// - Parameters:
+    ///   - vehicle: To be setup - Straight Keep Left Track ONLY! Others are copied
+    ///   - vehNo: Number of this vehicle
+    func setVehicleSpeed() {
+        let vehNo = Int.extractNum(from: self.name ?? "999")! //vehicle = sKLAllVehicles[vehNo]
+        //var fixedTime: CGFloat = 2 //Time preferredSpeed is held steady after being altered (to be overwritten)
+        //var adjustTime: CGFloat = 1
+        //adjustTime = period preferredSpeed changed over
+        //fixedTime  = time period where preferredSpeed remains unchanged. Alternates with adjustTime.
+        let strtSpd = preferredSpeed  //Set to preferredSpeed @ start
+        var adjustTime: CGFloat = 5
+        if strtSpd < 10 || runStop == .stop {   //Limit initial acceleration time & stop time
+            if runStop == .run {    //Starting
+                adjustTime = randomValue(distribution: -0.6, min: 1, max: 30) //1 through 30 secs skew faster
+            } else {                //Stopping
+                adjustTime = randomValue(distribution: -0.6, min: 1, max: 5) //1 through 5 secs skew faster
+            }
+        } else {
+            adjustTime = randomValue(distribution: self.varTime, min: 1, max: 180) //1 through 180 secs
+        }
+        var targetSpd: CGFloat
+        if runStop == .run {
+            targetSpd = randomValue(distribution: spdPref, min: (lowRange * CGFloat(spdLimit)), max: (topRange * CGFloat(spdLimit))) //Intended 'preferredSpeed' @ end of 'adjustTime'
+        } else {
+            targetSpd = 0  //Set preferredSpeed = 0 when not running
+        }
+        let fixedTime: CGFloat = randomValue(distribution: self.holdTime, min: 1, max: 180) //1 through 180 secs
+//        let fixedTime: CGFloat = 0.01 //TEST - All time spent adjusting preferredSpeed
+        let tote2 = String.minSec(from: CGFloat(adjustTime + fixedTime))
+        let date = Date()
+        let calendar = Calendar.current
+        let nowS = String(format: "%02d", calendar.component(.second, from: date))
+        let nowM = String(format: "%2d", calendar.component(.minute, from: date))
+        let now: String = ("\(nowM):\(nowS)")
+        let sS1 = String(format: "%3.f", strtSpd)
+        let tS1 = String(format: "%3.f", targetSpd)
+        //        let aT1 = String(format: "%5.1f", adjustTime)
+        //        let fT1 = String(format: "%5.1f", fixedTime)
+        let aT2 = String.minSec(from: adjustTime)
+        let fT2 = String.minSec(from: fixedTime)
+        let lR1 = String(format: "%3.f", lowRange * 100)
+        let tR1 = String(format: "%3.f", topRange * 100)
+        var vTipe: String = ""
+        if self.vehType == .bus { vTipe = "b" } else if self.vehType == .truck { vTipe = "t" } else { vTipe = "Car" }
+        if vehNo == 1 { print("\nVeh\tkph\t ->\tkph\t\tadTim\tHold\tTotal\t Now\tlowR\t topR\tType") }
+        print("\(vehNo)\t\(sS1)\t\t\(tS1)\t\t\(aT2)\t\(fT2)\t\(tote2)\t\(now)\t\(lR1)%\t \(tR1)%\t\(vTipe)")
+//        if vehNo == numVehicles { print("\n")}
+        
+        //Updates preferredSpeed with next calculated value over period 'adjustTime'
+        //FUTURE REF: Duration can't be subset of node as value will NEVER change!
+        let setSpeed = SKAction.customAction(withDuration: TimeInterval(adjustTime)) {
+            (node, elapsedTime) in
+//            if let node = node as? Vehicle {          //for this case, 'node' is identical to 'self'
+                let intTime = elapsedTime / adjustTime
+                self.preferredSpeed = (targetSpd - strtSpd) * intTime + strtSpd
+//            sKLAllVehicles[vehNo].preferredSpeed = (targetSpd - strtSpd) * intTime + strtSpd
+                sOtherAllVehicles[vehNo].preferredSpeed = self.preferredSpeed
+            
+//            } //end of 'if let node = node as? Vehicle {'
+        }       //end setSpeed action
+        
+        //Delay of 'fixedTime' where preferredSpeed remains unchanged
+        let delay = SKAction.wait(forDuration: TimeInterval(fixedTime)) //Time when preferredSpeed held steady
+        //FUTURE REF: Duration can't be subset of node as value will NEVER change!
+
+        //########################
+//        let a1 = SKAction.run {
+//            let date = Date()
+//            let calendar = Calendar.current
+//            let now = calendar.component(.second, from: date)
+//            print("\(vehNo)\ta1. Start\t\t\t\t\t\t\tTime: \(now)") }
+//        let a2 = SKAction.run {
+//            let date = Date()
+//            let calendar = Calendar.current
+//            let nowS = calendar.component(.second, from: date)
+//            let nowM = calendar.component(.minute, from: date)
+//            let now: String = ("\(nowM):\(nowS)")
+//            print("\(vehNo)\ta2. Speed Next\ttS: \(targetSpd.dp1)\t\t\tTime: \(now) \taT: \(adjustTime.dp1)") }
+//        let a3 = SKAction.run {
+//            let date = Date()
+//            let calendar = Calendar.current
+//            let nowS = calendar.component(.second, from: date)
+//            let nowM = calendar.component(.minute, from: date)
+//            let now: String = ("\(nowM):\(nowS)")
+//            print("\(vehNo)\ta3. Delay Nxt\ttS: \(targetSpd.dp1)\tfT: \(fixedTime.dp1)\tTime: \(now) \taT: \(adjustTime.dp1)") }
+//        let a4 = SKAction.run {
+//            let date = Date()
+//            let calendar = Calendar.current
+//            let nowS = calendar.component(.second, from: date)
+//            let nowM = calendar.component(.minute, from: date)
+//            let now: String = ("\(nowM):\(nowS)")
+//            print("\(vehNo)\ta4. Delay Done\t fT: \(fixedTime.dp1)\t\t\tTime: \(now)\taT: \(adjustTime.dp1)\n") }
+
+//        //Sequence of SKActions
+//        let spdSequence = SKAction.sequence([setSpeed, delay]) //Alter preferredSpeed slowly followed by 'delay'
+//
+//        run(spdSequence, withKey: "spdAct\(vehNo)")
+//        
+        //Sequence of SKActions
+        let reRun = SKAction.run { self.setVehicleSpeed() }    //Recursion here! Call func again @ end of current call
+        let spdSequence = SKAction.sequence([setSpeed, delay, reRun]) //Alter preferredSpeed slowly followed by 'delay'
+
+        run(spdSequence, withKey: "spdAct\(vehNo)")
+        
+    }           //end of setVehicleSpeed function
+
+    
 }           //End of Vehicle class
 
 class F8Vehicle: Vehicle {
 //    self.physicsBody.rotationEffect(.degrees(45))
 //    static var straightName: String = replacingCharacters(in: name, with: <#T##String#>)
     
+    var f8RotTweak: CGFloat = 0
+
+
 }
 
 //extension Vehicle {

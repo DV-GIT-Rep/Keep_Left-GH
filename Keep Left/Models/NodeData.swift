@@ -65,7 +65,7 @@ struct NodeData {
     var minSumSpd: CGFloat
 
     var spdClk: Int
-    var reachedSpd: Bool     //Set for each vehicle when it reaches speed. Cleared when vehicles stopped.
+    var upToSpd: Bool     //Set for each vehicle when it reaches speed. Cleared when vehicles stopped.
     var startIndicator:Bool
     var indicator: Indicator
     
@@ -115,7 +115,7 @@ struct NodeData {
         minSumSpd = 99999999    //Used to hold the MIN speed ANY vehicle on THIS track has travelled.
 
         spdClk = 600         //Dummy value to start. 0.083sec * 600 = 5 secs
-        reachedSpd = false
+        upToSpd = false
         
         startIndicator = false
         indicator = .off
@@ -325,6 +325,8 @@ struct NodeData {
             var accel: CGFloat = 4.5    // m per sec2 (use 2?)
             var accelMin: CGFloat = accel   //NOT USED YET! Use to determine spdClk.
             //    var truckAccel: CGFloat = 1.0
+            accel = 1       //temp!!
+            accelMin = 0.5  //temp!!
             var decelMax: CGFloat = 8 // m/sec2
             var decelMin: CGFloat = 4  // m/sec2
             var decelCoast: CGFloat = 0.01       // m/sec2. Rate when vehicle in front is faster
@@ -404,8 +406,8 @@ struct NodeData {
                             if decel == 0 {decel = decelCoast} //Ensure decel CAN'T = 0!
                         }
                         
-                        if tVehicle[index].frontSpd >= 0.001 {
-                            golSpeed = tVehicle[index].frontSpd - 0.001
+                        if tVehicle[index].frontSpd >= 0.01 {
+                            golSpeed = tVehicle[index].frontSpd - 0.01
                         } else {
                             golSpeed = 0    //Ensure value can't be negative
                         }
@@ -430,24 +432,24 @@ struct NodeData {
             let spdChange = abs(golSpeed - vehNode.currentSpeed)
             
             //*****************************
-            //findObstacles Flowchart Page 4 of 4     :Determine 'reachedSpd', changeTime & save values etc
+            //findObstacles Flowchart Page 4 of 4     :Determine 'upToSpd', changeTime & save values etc
             //*****************************
             let maxPreferredSpd: CGFloat = 120    //Set maxPreferredSpd = 120kph for now!
             
             if ignoreSpd == true || vehNode.preferredSpeed == 0 {   //ignoreSpd = true OR preferredSpeed = 0
                 tVehicle[index].spdClk = Int((maxPreferredSpd/30)/accelMin) //Set spdClk = no of 120ms cycles
                 
-                tVehicle[index].reachedSpd = false  //reachedSpd cleared when vehicle NOT up to speed
+                tVehicle[index].upToSpd = false  //upToSpd cleared when vehicle NOT up to speed
                 
             } else {                                //ignoreSpd = false AND preferredSpeed != 0
                 if vehNode.currentSpeed < 3 {               //currentSpeed < 3 kph
                     tVehicle[index].spdClk = Int((vehNode.preferredSpeed/30)/accelMin) //Set spdClk = no of 120ms cycles
                     
-                    tVehicle[index].reachedSpd = false  //reachedSpd cleared when vehicle NOT up to speed
+                    tVehicle[index].upToSpd = false  //upToSpd cleared when vehicle NOT up to speed
                     
                 } else {                                //currentSpeed >= 3 kph
                     if tVehicle[index].spdClk == 0 {    //spdClk timed out
-                        tVehicle[index].reachedSpd = true   //reachedSpd set when vehicle up to speed
+                        tVehicle[index].upToSpd = true   //upToSpd set when vehicle up to speed
                     } else {                            //spdClk NOT timed out
                         tVehicle[index].spdClk = tVehicle[index].spdClk - 1 //Decrement spdClk
                     }                                   //End spdClk check
@@ -477,9 +479,9 @@ struct NodeData {
             othergapp = 0
             
             //            if tVehicle[index].otherTrack == false {
-            //                print("kVeh \(index):\tReached Speed?: \(tVehicle[index].reachedSpd)")
+            //                print("kVeh \(index):\tReached Speed?: \(tVehicle[index].upToSpd)")
             //            } else {
-            //                print("oVeh \(index):\tReached Speed?: \(tVehicle[index].reachedSpd)")
+            //                print("oVeh \(index):\tReached Speed?: \(tVehicle[index].upToSpd)")
             //            }
             
         }           //end 2nd For loop
@@ -712,23 +714,19 @@ struct NodeData {
                 //                sOtherNode.speedMin = 900
             }
 
+//Calc speedAvg for each vehicle
 //Only ever use currentSpd for temporary display of currentSpeed!
-            if t1xVeh[innDex].otherTrack == false { //Keep Left Track
+            if t1xVeh[innDex].otherTrack == false { //Calc speedAvg for Keep Left Track
                 if kISpd2 == true {         //xISpd2: true = 10s NOT up yet. Use currentSpeed
                     t1xVeh[innDex].speedAvg = CGFloat(t1xVeh[innDex].currentSpeed)    //Average speed for vehicle
                 } else {                    //xISpd2: false
                     if kISpd3 == false {    //xISpd2: false, xISpd3: false = Normal Avg'd display
-//                        t1xVeh[innDex].speedAvg = CGFloat(((t1xVeh[innDex].distance + t1xVeh[innDex].preDistance) * timeMx))    //Average speed for vehicle
                         t1xVeh[innDex].speedAvg = CGFloat((t1xVeh[innDex].distance) * timeMx)    //Average speed for vehicle
                     } else {                //xISpd2: false, xISpd3: true = 10s just up, save preDistance etc
                         t1xVeh[innDex].speedAvg = CGFloat(t1xVeh[innDex].currentSpeed)    //Average speed for vehicle
-//                        t1xVeh[innDex].preDistance = t1xVeh[innDex].distance
-//                        t1xVeh[innDex].startPos = t1xVeh[innDex].position.y
-//                        t1xVeh[innDex].distance = 0
-//                        t1xVeh[innDex].laps = 0
                     }   //end xISpd3 test
                 }       //end xISpd2 test
-            } else {                                //Other Track
+            } else {                                //Calc speedAvg for Other Track
                 if oISpd2 == true {         //xISpd2: true = 10s NOT up yet. Use currentSpeed
                     t1xVeh[innDex].speedAvg = CGFloat((t1xVeh[innDex].currentSpeed))    //Average speed for vehicle
                 } else {                    //xISpd2: false
@@ -736,20 +734,16 @@ struct NodeData {
                         t1xVeh[innDex].speedAvg = CGFloat((t1xVeh[innDex].distance) * timeMx)    //Average speed for vehicle
                     } else {                //xISpd2: false, xISpd3: true = 10s just up, save preDistance etc
                         t1xVeh[innDex].speedAvg = CGFloat(Int(t1xVeh[innDex].currentSpeed))    //Average speed for vehicle
-//                        t1xVeh[innDex].preDistance = t1xVeh[innDex].distance
-//                        t1xVeh[innDex].startPos = t1xVeh[innDex].position.y
-//                        t1xVeh[innDex].distance = 0
-//                        t1xVeh[innDex].laps = 0
                     }   //end xISpd3 test
                 }       //end xISpd2 test
-            }                                       //end KL or Other Track test
+            }                                       //end Calc speedAvg for KL or Other Track
                         
             //+++++++++ Changed below to use currentSpeed instead of speedAvg. +++++++++
             //+++++++++ CHANGED BACK! NEED MIN & MAX AVG SPEED FOR EACH VEHICLE! +++++++++
 //            t1xVeh[innDex].speedMax = max(t1xVeh[innDex].speedMax, t1xVeh[innDex].speedAvg)  //Max avg speed for vehicle
             t1xVeh[innDex].speedMax = max(t1xVeh[innDex].speedMax, t1xVeh[innDex].currentSpeed, t1xVeh[innDex].speedAvg)  //Max avg speed for vehicle
             if enableMinSpeed == true {         //Wait for ALL vehicles up to speed
-                //            if t1Veh[innDex].reachedSpd == true {         //Wait for individual vehicles up to speed
+                //            if t1Veh[innDex].upToSpd == true {         //Wait for individual vehicles up to speed
 //                t1xVeh[innDex].speedMin = min(t1xVeh[innDex].speedMin, t1xVeh[innDex].speedAvg)
                 t1xVeh[innDex].speedMin = min(t1xVeh[innDex].speedMin, t1xVeh[innDex].currentSpeed)
             }           //Min avg speed for vehicle. Ignores acceleration period.
@@ -757,7 +751,7 @@ struct NodeData {
             //USE AVG SPEED FOR ALL CALCS!
 //            t1xVeh[innDex].speedMax = max(t1xVeh[innDex].speedMax, t1xVeh[innDex].currentSpeed)  //Max avg speed for vehicle
 //            if enableMinSpeed == true {         //Wait for ALL vehicles up to speed
-//                //            if t1Veh[innDex].reachedSpd == true {         //Wait for individual vehicles up to speed
+//                //            if t1Veh[innDex].upToSpd == true {         //Wait for individual vehicles up to speed
 //                t1xVeh[innDex].speedMin = min(t1xVeh[innDex].speedMin, t1xVeh[innDex].currentSpeed)
 //            }           //Min avg speed for vehicle. Ignores acceleration period.
             //+++++++++ Changed above to use currentSpeed instead of speedAvg - NO! +++++++++
@@ -780,27 +774,17 @@ struct NodeData {
         //      Min Speed = Avg Speed of vehicle that has driven the least distance
         //(Note: @ present (24/8/22) avg, max & min the same as all vehicles driven at same speed over same distance.
         
-        if t1xVeh[1].otherTrack == false {      //Keep Left Track
-            
-            if (kISpd3 || tempCount != 0) && runStop == .run {
-//                print("\(t1xVeh[1].currentSpeed.dp1), Avg:,\(t1xVeh[1].speedAvg.dp2), Max:,\(t1xVeh[1].speedMax.dp2), Min:,\(t1xVeh[1].speedMin.dp0), km:,\(t1xVeh[1].distance.dp2), t:,\(runTimer.dp1), tx:,\(timeMx.dp1), tC:,\(tempCount)")
-                let date = Date()
-                let formatter = DateFormatter()
-//                var iso8601withFractionalSeconds: Date.ISO8601FormatStyle { .secs }
-//                formatter.dateFormat = "yyyy-MM-dd hh:mm a"
-                formatter.dateFormat = "ss"
-                let result = formatter.string(from: date)
-//                print(result) // 2020–04–15 10:11 PM
-
-                print("\(t1xVeh[1].currentSpeed.dp1), Avg:,\(t1xVeh[1].speedAvg.dp2), km:,\(t1xVeh[1].distance.dp3), s:,\(result), t:,\(runTimer.dp3), tx:,\(timeMx.dp3), eMS:,\(enableMinSpeed), tC:,\(tempCount)")
-                if tempCount != 0 && kISpd3 == false { tempCount = tempCount - 1 } //Add 10 extra prints
-            }
-            
+        if t1xVeh[1].otherTrack == false {      //Calculate distances & speeds for 'All Vehicles' on Keep Left Track
+                        
             //Condition true if 10 secs (runTimerDelay) since vehicles 1st started
             if kISpd2 == false && kISpd3 == true {  //End of 1st pass thru calcAvgData 10secs after veh's started
                 kISpd3 = false
 //                runTimer = 0.0  //Will also set to 0.5 for Other Track - sb OK as within 16.7ms.
-                runTimer = (3600 / (t1xVeh[1].speedAvg / t1xVeh[1].distance)) //One-off adjustment after 10secs
+                if t1xVeh[1].speedAvg != 0 && t1xVeh[1].distance != 0 {
+                    runTimer = (3600 / (t1xVeh[1].speedAvg / t1xVeh[1].distance)) //One-off adjustment after 10secs
+                } else {
+                    runTimer = 999999999
+                }
 //                runTimer = runTimer - ((3600 * t1xVeh[1].distance) / t1xVeh[1].currentSpeed) //* 2 //One-off adjustment after 10secs
             }
             
@@ -816,7 +800,7 @@ struct NodeData {
             klSpeedMax0 = t1xVeh[0].maxSumSpd
             klSpeedMin0 = t1xVeh[0].minSumSpd
 
-        } else {        //Other Track
+        } else {        //Calculate distances & speeds for 'All Vehicles' on Other Track
             
             //Condition true if 10 secs (runTimerDelay) since vehicles 1st started
             if oISpd2 == false && oISpd3 == true {  //End of 1st pass thru calcAvgData 10secs after veh's started
@@ -836,7 +820,7 @@ struct NodeData {
             oSpeedMax0 = t1xVeh[0].maxSumSpd
             oSpeedMin0 = t1xVeh[0].minSumSpd
 
-        }
+        }   //end Calculating distances & speeds for 'All Vehicles' on both tracks
         
         return t1xVeh
     }       //end calcAvgData
@@ -862,8 +846,10 @@ struct NodeData {
         
         var bigGap: CGFloat = 0             //bigGap = 110% of 3 sec gap. Calc'd for each vehicle during loop.
         //        print("\n")
-        let minChangeLaneSpd: CGFloat = 2.5 //Minimum speed where lane change permitted!
-        
+        let minChangeLaneSpdL: CGFloat = 16 //Minimum speed where lane change permitted!
+        let minChangeLaneSpdR: CGFloat = 28 //Minimum speed where lane change permitted!
+        //NOTE: May have to reduce the above when 'numVehicles' becomes large!!!
+
         for indx in teeVeh.indices {
             //        for (indx, vehc) in teeVeh.enumerated() {
             if indx == 0 { continue }       //Skip loop for element[0] = All Vehicles
@@ -928,7 +914,7 @@ struct NodeData {
             
             //****************  Test for permissible oFrontGap /\  ****************
             //*********  Test for minimum speed to permit lane change \/  ****************
-            if teeVeh[indx].currentSpeed < minChangeLaneSpd { continue }     //Don't permit lane change when vehicle speed < 2.5? kph.
+//            if teeVeh[indx].currentSpeed < minChangeLaneSpdR { continue }     //Don't permit lane change when vehicle speed < 2.5? kph.
             
             //*********  Test for minimum speed to permit lane change /\  ****************
             
@@ -936,6 +922,7 @@ struct NodeData {
             
             if teeVeh[indx].lane == 0 {             //Preferred lane (Left)
                 //****************  Test for permissible gap/otherGap from lane 0 \/  ****************
+                if teeVeh[indx].currentSpeed < minChangeLaneSpdR { continue }     //Don't permit lane change when vehicle speed < 2.5? kph.
                 if teeVeh[indx].frontSpd >= teeVeh[indx].currentSpeed {
                     continue        //Stay in left lane
                 } else {            //Going faster than vehicle in front
@@ -976,11 +963,12 @@ struct NodeData {
             
             if teeVeh[indx].lane == 1 {             //Overtaking lane (Right)
                 //****************  Test for permissible gap/otherGap from lane 1 \/  ****************
+                if teeVeh[indx].currentSpeed < minChangeLaneSpdL { continue }     //Don't permit lane change when vehicle speed < 2.5? kph.
                 if teeVeh[indx].otherGap > bigGap {
                     //                    print("indicator \(indicator)")
                     //                    print("ta 0\t\(indx)\t\(teeVeh[indx].lane)")
                     //                    if teeVeh[indx].otherTrack == false {
-                    //                        print("Spd1: \(allAtSpeed1)\tSpd2: \(allAtSpeed2)\tignoreSpd: \(ignoreSpd)\t\(indx): \(teeVeh[indx].reachedSpd)")   //allAtSpeed1 == true && allAtSpeed2 == true && ignoreSpd == false. rtnT2Veh[i].reachedSpd
+                    //                        print("Spd1: \(allAtSpeed1)\tSpd2: \(allAtSpeed2)\tignoreSpd: \(ignoreSpd)\t\(indx): \(teeVeh[indx].upToSpd)")   //allAtSpeed1 == true && allAtSpeed2 == true && ignoreSpd == false. rtnT2Veh[i].upToSpd
                     //                    }
                     
                     //                    if enableMinSpeed == false {
@@ -1102,10 +1090,11 @@ struct NodeData {
             } else {        //Not KL Track
                 sOtherAllVehicles[i].startIndicator = false
             }               //end KL Track
+            
             if rtnVeh[i].indicator == .overtake { //About to Overtake
-                let halfFlash: CGFloat = 0.3    //Time indicators are ON or OFF
-                let numFlash = 6        //No of full indicator flashes
-                let flashTime: CGFloat = CGFloat(numFlash) * halfFlash * 1.8
+//                let halfFlash: CGFloat = 0.3    //Time indicators are ON or OFF
+//                let numFlash = 6        //No of full indicator flashes
+//                let laneChangeTime: CGFloat = CGFloat(numFlash) * halfFlash * 1.8
                 let indicatorOn = SKAction.unhide() //Overtaking indicators ON
                 let indicatorOff = SKAction.hide()  //Overtaking indicators OFF
                 let deelay = SKAction.wait(forDuration: halfFlash)  //Delay halfFlash secs
@@ -1113,6 +1102,7 @@ struct NodeData {
                 let flash1 = SKAction.repeat(pulseIndicators, count: numFlash)
                 let endLane1 = SKAction.run {
                     if kLTrack {    //KL Track
+//                        Int(truncating: mounths as NSNumber)
                         sKLAllVehicles[i].lane = 1      //Ensure lane only = 1 or 0 when here!
                         sKLAllVehicles[i].indicator = .off
                         if printOvertake != 0 {
@@ -1129,19 +1119,19 @@ struct NodeData {
                     rtnVeh[i].indicator = .off
                 }                   //end SKAction.run
                 
-                let goToLane1 = SKAction.customAction(withDuration: flashTime, actionBlock: {
+                let goToLane1 = SKAction.customAction(withDuration: laneChangeTime, actionBlock: {
                     (node, elapsedTime) in
                     if kLTrack {    //KL Track
-                        sKLAllVehicles[i].lane = elapsedTime / flashTime
-                        rtnVeh[i].lane = sKLAllVehicles[i].lane //rtnVeh[i].lane = elapsedTime / flashTime
+                        sKLAllVehicles[i].lane = elapsedTime / laneChangeTime
+                        rtnVeh[i].lane = sKLAllVehicles[i].lane //rtnVeh[i].lane = elapsedTime / laneChangeTime
                         if printOvertake > 1 {  //
                             if whichOT == i {
                                 print("\(i) KL\(sKLAllVehicles[i].lane)") //All dig's. EndOT set to 3.
                             }
                         }
                     } else {        //Not KL Track
-                        sOtherAllVehicles[i].lane = elapsedTime / flashTime
-                        rtnVeh[i].lane = sOtherAllVehicles[i].lane //rtnVeh[i].lane = elapsedTime / flashTime
+                        sOtherAllVehicles[i].lane = elapsedTime / laneChangeTime
+                        rtnVeh[i].lane = sOtherAllVehicles[i].lane //rtnVeh[i].lane = elapsedTime / laneChangeTime
                         //                        if printOvertake > 1 {  //
                         //                            if whichOT == i {
                         //                                print("\(i) Ot\(sOtherAllVehicles[i].lane)") //All dig's. EndOT set to 3.
@@ -1193,9 +1183,9 @@ struct NodeData {
                 
             } else {        //About to go back to left lane
                 if rtnVeh[i].indicator == .endOvertake {
-                    let halfFlash: CGFloat = 0.3    //Time indicators are ON or OFF
-                    let numFlash = 6        //No of full indicator flashes
-                    let flashTime: CGFloat = CGFloat(numFlash) * halfFlash * 1.8
+//                    let halfFlash: CGFloat = 0.3    //Time indicators are ON or OFF
+//                    let numFlash = 6        //No of full indicator flashes
+//                    let laneChangeTime: CGFloat = CGFloat(numFlash) * halfFlash * 1.8
                     let indicatorOn = SKAction.unhide() //Overtaking indicators ON
                     let indicatorOff = SKAction.hide()  //Overtaking indicators OFF
                     let deelay = SKAction.wait(forDuration: halfFlash)  //Delay halfFlash secs
@@ -1229,20 +1219,20 @@ struct NodeData {
                         }           //end Print
                     }               //end SKAction.run
                     
-                    let goToLane0 = SKAction.customAction(withDuration: flashTime, actionBlock: {
+                    let goToLane0 = SKAction.customAction(withDuration: laneChangeTime, actionBlock: {
                         (node, elapsedTime) in
                         if kLTrack {    //KL Track
-                            sKLAllVehicles[i].lane = (1 - (elapsedTime / flashTime))
-                            //  rtnVeh[i].lane = (1 - (elapsedTime / flashTime))
+                            sKLAllVehicles[i].lane = (1 - (elapsedTime / laneChangeTime))
+                            //  rtnVeh[i].lane = (1 - (elapsedTime / laneChangeTime))
                             rtnVeh[i].lane = sKLAllVehicles[i].lane
                             if printOvertake > 1 {  //
                                 if whichOT == i {
-                                    print("\(i) KL\(sKLAllVehicles[i].lane.dp3)")
+                                    print("\(i) KL\(sKLAllVehicles[i].lane.dp3)\teT: \(elapsedTime)\ttT: \(laneChangeTime)")
                                 }
                             }
                         } else {    //Not KL Track
-                            sOtherAllVehicles[i].lane = (1 - (elapsedTime / flashTime))
-                            //  rtnVeh[i].lane = (1 - (elapsedTime / flashTime))
+                            sOtherAllVehicles[i].lane = (1 - (elapsedTime / laneChangeTime))
+                            //  rtnVeh[i].lane = (1 - (elapsedTime / laneChangeTime))
                             rtnVeh[i].lane = sOtherAllVehicles[i].lane
                             //                            if printOvertake > 1 {  //
                             //                                if whichOT == i {

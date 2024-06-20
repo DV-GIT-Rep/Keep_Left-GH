@@ -12,13 +12,24 @@ import UIKit
 
 //Convert Degrees to Radians
 //Usage eg. spriteNode.zRotation = CGFloat(30).degrees()
+
+
 public extension CGFloat {
+    /// Convert this value from Degrees to Radians
+    /// - Returns: in Radians!
+    /// - eg. node.zRotation = CGFloat(30).degrees(): saves 30deg in radians
     func degrees() -> CGFloat {
         return self * CGFloat.pi / 180
     }
+    /// Convert this value from Radians to Degrees
+    /// - Returns: in Degrees!
+    /// - eg. angleDeg = atan(10 / 10).radians(): returns angle in degrees (45º)
+    func radians() -> CGFloat {
+        return self / (CGFloat.pi / 180)
+    }
 }
 
-var toggleSpeed: Int = 1    //Temp for vehicle speed
+//var toggleSpeed: Int = 1    //Temp for vehicle speed
 var firstThru = true        //Set to false after all vehicle speeds evaluated once
 
 var f8SwitchView: SwitchView = SwitchView()   //Move between Straight Track and Figure 8 Track views.
@@ -384,12 +395,14 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
         let ms500Timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(every500ms), userInfo: nil, repeats: true)
         
+        //setVehicleSpeeds
+        
 //        let isLandscape = (view.bounds.size.width > view.bounds.size.height)  //NOTE: Doesn't recognise UIDevice rotation here!!!
 //        let rotation = isLandscape ? CGFloat.pi/2 : 0
 //        print("Rotation = \(rotation) : isLandscape = \(isLandscape)\nsContainer.frame.width = \(view.bounds.size.width)\nsContainer.frame.height = \(view.bounds.size.height)")
 ////        sContainer.zRotation = rotation //Normally done in StraightTrackView.swift. Required here 1st time only when starting in landscape.
 //
-    }
+    }       //end of 'didMove' to View
     
     ///////////////////////////////////////////
 //    override func viewDidLoad() {
@@ -518,7 +531,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         nodeDataKL.speedMax = veh1Node.speedMax
                         nodeDataKL.speedMin = veh1Node.speedMin
                         nodeDataKL.spdClk = veh1Node.spdClk
-                        nodeDataKL.reachedSpd = veh1Node.reachedSpd
+                        nodeDataKL.upToSpd = veh1Node.upToSpd
                         nodeDataKL.indicator = veh1Node.indicator
                         nodeDataKL.startIndicator = veh1Node.startIndicator
                         
@@ -605,9 +618,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         sKLAllVehicles[i].startPos = rtnT1Veh[i].startPos
                         sKLAllVehicles[i].laps = rtnT1Veh[i].laps            //in case clr'd @ 10secs
                         sKLAllVehicles[i].spdClk = rtnT1Veh[i].spdClk
-                        sKLAllVehicles[i].reachedSpd = rtnT1Veh[i].reachedSpd
+                        sKLAllVehicles[i].upToSpd = rtnT1Veh[i].upToSpd
                         
-                        if rtnT1Veh[i].reachedSpd == false { allAtSpeed1 = false } //Flag cleared if ANY vehicle NOT up to speed
+                        if rtnT1Veh[i].upToSpd == false { allAtSpeed1 = false } //Flag cleared if ANY vehicle NOT up to speed
                         
                         //If vehicle crosses 1km boundary then subtract tracklength from the y position.
                         if sKLAllVehicles[i].position.y >= sTrackLength {
@@ -683,7 +696,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         nodeDataO.speedMax = veh2Node.speedMax
                         nodeDataO.speedMin = veh2Node.speedMin
                         nodeDataO.spdClk = veh2Node.spdClk
-                        nodeDataO.reachedSpd = veh2Node.reachedSpd
+                        nodeDataO.upToSpd = veh2Node.upToSpd
                         nodeDataO.indicator = veh2Node.indicator
                         nodeDataO.startIndicator = veh2Node.startIndicator
                         
@@ -747,8 +760,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         sOtherAllVehicles[i].startPos = rtnT2Veh[i].startPos
                         sOtherAllVehicles[i].laps = rtnT2Veh[i].laps            //in case clr'd @ 10secs
                         sOtherAllVehicles[i].spdClk = rtnT2Veh[i].spdClk
-                        sOtherAllVehicles[i].reachedSpd = rtnT2Veh[i].reachedSpd
-                        if rtnT2Veh[i].reachedSpd == false { allAtSpeed2 = false } //Flag cleared if ANY vehicle NOT up to speed
+                        sOtherAllVehicles[i].upToSpd = rtnT2Veh[i].upToSpd
+                        if rtnT2Veh[i].upToSpd == false { allAtSpeed2 = false } //Flag cleared if ANY vehicle NOT up to speed
                         
                         //If vehicle crosses 1km boundary then add tracklength to the y position.
                         if sOtherAllVehicles[i].position.y < 0 {
@@ -826,86 +839,62 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else {return}   //Exit if not first touch!
         
+    // \\\\\\\\\\\\\\\\\\\\\\\\\\ Code below flashes selected vehicle //////////////////////////
+    // FOR TESTING ONLY! Due to layering, may not see vehicle!!!
+        let touchLocation = touch.location(in: self)
+        var targetNode: SKSpriteNode
+        targetNode = SKSpriteNode(color: SKColor(red: 0, green: 0, blue: 0, alpha: 0), size: CGSize(width: 1, height: 1))
+        var ggg: String
+        var targName = "No Name!"
+        if let targetNode = atPoint(touchLocation) as? SKSpriteNode {
+            ggg = targetNode.name ?? "dummy666"
+        } else {
+            ggg = "dummy666"
+        }
+        targName = ggg
+        ggg = String(ggg.suffix(3))
+        var targetNodeNum: Int = Int.extractNum(from: ggg) ?? 666 //If not a vehicle set to 666
+
+        if targetNodeNum < 200 && ggg != "dummy666" {    //if vehicle touched flash & display vehicle data. See code on swipe too!
+            print("Just selected vehicle \(targName ?? "Nothing")")
+            f8DisplayDat = targetNodeNum
+            let delay5 = SKAction.wait(forDuration: oneVehicleDisplayTime)
+            let backToAll = SKAction.run { f8DisplayDat = 0 }
+            let backToAllSequence = SKAction.sequence([delay5, backToAll])
+            run(backToAllSequence, withKey: "backToAll")
+        }
+    // ////////////////////////// Code above flashes selected vehicle \\\\\\\\\\\\\\\\\\\\\\\\\\
+
+        
+        
         var kph: CGFloat = 130
         let multiplier: CGFloat = 1000 / 3600  //Value by kph gives m/sec
         
-        toggleSpeed += 1
-//        switch toggleSpeed {
-//        case 0:
-//        for i in 1...numVehicles {
-//            sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//            sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//        }
-//        case 1:
-//            for i in 1...numVehicles {
-//                sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dy = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-////                sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour. (NOTE: THE INSTRUCTIONS COMMENTED OUT DON'T CHANGE THE SPEED!)
-//            }
-//        case 2:
-//            for i in 1...numVehicles {
-//                sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dy = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//                sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dy = -(0.9 * kph) * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//            }   //$$$$$$$$$$$$$$$     !!! Other lane slowed above to create difference !!!     $$$$$$$$$$$$$$$$$$$$$$$$$$$$
-//        case 3:
-//            for i in 1...numVehicles {
-//                sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-////                sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dy = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//            }
-//        default:
-//            for i in 1...numVehicles {
-////                sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dy = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//                sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dy = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//            }
-//        }
+//        toggleSpeed += 1
 //
-/*        switch toggleSpeed {
-        case 0:
-        for i in 1...numVehicles {
-            sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dx = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-            sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dx = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-        }
-        case 1:
-            for i in 1...numVehicles {
-                sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dx = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//                sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dx = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour. (NOTE: THE INSTRUCTIONS COMMENTED OUT DON'T CHANGE THE SPEED!)
-            }
-        case 2:
-            for i in 1...numVehicles {
-                sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dx = kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-                sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dx = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-            }
-        case 3:
-            for i in 1...numVehicles {
-                sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dx = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-//                sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dx = -kph * multiplier   //1000 = metres in km. 3600 = secs in hour.
-            }
-        default:
-            for i in 1...numVehicles {
-//                sBackground.childNode(withName: "stKL_\(i)")?.physicsBody?.velocity.dx = 0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-                sBackground.childNode(withName: "stOt_\(i)")?.physicsBody?.velocity.dx = -0 * multiplier   //1000 = metres in km. 3600 = secs in hour.
-            }
-        }   */
+//
+//        
+////            toggleSpeed = -1
+////        print("Vehicle 1 Node = \(childNode(withName: "sKLVehicle_1")!)")
+//
+//        if toggleSpeed == 4 {
+////            toggleSpeed = -1
+//            toggleSpeed = 0 // WAS toggleSpeed = 0 when Fig8Scene accessed from here!!!
+//            ////            var scene = Fig8Scene(fileNamed: "Fig8Scene")!
+//            //            var scene = Fig8Scene()
+//            ////            var transition: SKTransition = SKTransition.moveIn(with: .right, duration: 2)
+//            //            var transition: SKTransition = SKTransition.fade(withDuration: 2)
+//            //            self.view?.presentScene(scene, transition: transition)
+//////            print("toggleSpeed = \(toggleSpeed)")
+//        } else if toggleSpeed == 6 {
+//            toggleSpeed = 0
+////            var transition: SKTransition = SKTransition.fade(withDuration: 2)
+////            var scene = StraightTrackScene()
+////            self.view?.presentScene(scene)
+//        }
+////        toggleSpeed = toggleSpeed + 1
         
-//            toggleSpeed = -1
-//        print("Vehicle 1 Node = \(childNode(withName: "sKLVehicle_1")!)")
-
-        if toggleSpeed == 4 {
-//            toggleSpeed = -1
-            toggleSpeed = 0 // WAS toggleSpeed = 0 when Fig8Scene accessed from here!!!
-            ////            var scene = Fig8Scene(fileNamed: "Fig8Scene")!
-            //            var scene = Fig8Scene()
-            ////            var transition: SKTransition = SKTransition.moveIn(with: .right, duration: 2)
-            //            var transition: SKTransition = SKTransition.fade(withDuration: 2)
-            //            self.view?.presentScene(scene, transition: transition)
-////            print("toggleSpeed = \(toggleSpeed)")
-        } else if toggleSpeed == 6 {
-            toggleSpeed = 0
-//            var transition: SKTransition = SKTransition.fade(withDuration: 2)
-//            var scene = StraightTrackScene()
-//            self.view?.presentScene(scene)
-        }
-//        toggleSpeed = toggleSpeed + 1
-    } // //ZZZ
+    }       //end of touchesBegan
     
     func addRoads() {
         createKLSRoad()
@@ -1045,21 +1034,34 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         f8OtherAll.name = "f8Ot_0"
         f8OtherAll.distance = 0.0
         f8OtherAllVehicles.append(f8OtherAll)
+        
+        var sL = Vehicle.VType.car              //Temp 'Speed Limited' variable
+        var tempDist: CGFloat = 0
+        var timeDistribution: CGFloat
 
         for i in 1...numVehicles {
             var randomVehicle = Int.random(in: 1...maxVehicles)
 //            var vWidth: CGFloat = 2.3   //Car width. Set truck & bus width = 2.5m (allow 300mm for side mirrors?)
             var vWidth: CGFloat = 2.8   //Car width. Set truck & bus width = 2.5m (allow 300mm for side mirrors?) SET ALL = 2.5M FOR NOW!!!
-            
+//Below were for testing randomValue ONLY!
+// print(randomValue(distribution: 1, min: -1, max: +1).dp2)      //Test code: I/P = 0-1
+// testRun(distribution: 0, min: 500, max: 2000)      //Test code: I/P = 0-1
+
             if NumberedVehicles == false {  //false = normal else display numbers instead of vehicles!
                 switch randomVehicle {
                 case 1...maxCars:                       //Vehicle = Car. Width defined above! (2.8m for now!)
                 fName = "C\(randomVehicle)"
+                    sL = Vehicle.VType.car              //Cars AREN'T speed limited
+                    tempDist = 1.0                      //Favour higher spdPref for cars
                 case (maxCars+1)...(maxCars+maxTrucks): //Vehicle = Truck
                 fName = "T\(randomVehicle-maxCars)"
+                    sL = Vehicle.VType.truck            //Trucks ARE speed limited
+                    tempDist = 0.45                     //Average slightly lower spdPref for trucks
                     vWidth = 2.8                        //Set Trucks = 2.8m wide
                 default:                                //Vehicle = Bus
                 fName = "B\(randomVehicle-maxCars-maxTrucks)"
+                    sL = Vehicle.VType.bus              //Buses ARE speed limited
+                    tempDist = 0.0                      //Average much lower spdPref for buses
                     vWidth = 2.8                        //Set buses = 2.8m wide
                 }
                 
@@ -1086,6 +1088,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             
             sKLVehicle.zPosition = +50
             sKLVehicle.name = "stKL_\(i)"   //stKL_x -> Straight Track 1, f8KL_x -> Figure 8 Track 1, gKL_x -> Game Track 1.
+            sKLVehicle.vehType = sL         //Error if .vehType not Published! vehType = car, truck or bus
+                                            //Note: OtherTrack references KL Track!
 //            sKLVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: sKLVehicle.size.width, height: (sKLVehicle.size.height + minGap)))   //Make rectangle same size as sprite + 0.75m front and back!
             sKLVehicle.physicsBody = SKPhysicsBody(rectangleOf: sKLVehicle.size)   //Make rectangle same size as sprite + 0.75m front and back!
             sKLVehicle.physicsBody?.friction = 0
@@ -1185,7 +1189,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //            sOtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: secSize.width, height: secSize.height + minGap))   //Make rectangle same size as sprite + 0.5m front and back!
             sOtherVehicle.physicsBody = SKPhysicsBody(rectangleOf: secSize)   //Make rectangle same size as sprite + 0.5m front and back!
             sOtherVehicle.physicsBody?.friction = 0
-            sOtherVehicle.zRotation = CGFloat(Double.pi)  //rotate 180 degrees //XXXXXXXXXX
+            sOtherVehicle.zRotation = CGFloat(180).degrees()  //rotate 180 degrees //XXXXXXXXXX
+//            sOtherVehicle.zRotation = CGFloat(Double.pi)  //rotate 180 degrees //XXXXXXXXXX
             sOtherVehicle.physicsBody?.restitution = 0
             sOtherVehicle.physicsBody?.linearDamping = 0
             sOtherVehicle.physicsBody?.angularDamping = 0
@@ -1259,17 +1264,49 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
             f8KLAllVehicles.append(f8KLVehicle)
             f8OtherAllVehicles.append(f8OtherVehicle)
+            
+            //_________________________________________________________________
+            //Following sets up parameters to alter vehicle preferred speed etc
+            //_________________________________________________________________ start
+            //Higher spdPref prefers > speed probability within range for next speed calculation
+            // tempDist = 1.0 for Cars, 0.45 for Trucks & 0 for Buses
+            sKLVehicle.spdPref = randomValue(distribution: tempDist, min: -1, max: +1)
+            
+//Preferred Spd will be set to 30% - topRange% of spdLimit for this type of vehicle.
+            //Skewed to faster end: tempDist = 1.0 for Cars, 0.45 for Trucks & 0 for Buses
+            sKLVehicle.lowRange = randomValue(distribution: tempDist, min: 0.3, max: 0.95)
+
+//Preferred Spd will be set to 40% - 105% of spdLimit for this type of vehicle.
+            //Skewed to faster end
+            sKLVehicle.topRange = randomValue(distribution: tempDist, min: (0.05 + sKLVehicle.lowRange), max: 1.05)
+            //Later spd calc =
+            //randomValue(d: sKLVehicle.spdPref, min: (sKLAllVehicles[x].lowRange * spdLimit), max: (sKLAllVehicles[x].topRange * spdLimit)) & hold for next .varTime seconds (1-180)
+            
+//            timeDistribution = randomValue(distribution: sKLVehicle.spdPref, min: -1, max: +1)
+            //Leave above for now & JUST use below (May tweak later!)
+            //varTime sets distribution for randomly changing time between speed variances. Skewed high
+            sKLVehicle.varTime = randomValue(distribution: sKLVehicle.spdPref, min: -1, max: +1)
+
+            //varTime sets distribution for randomly changing time between speed variances. Skewed low
+            sKLVehicle.holdTime = randomValue(distribution: -sKLVehicle.spdPref, min: -1, max: +1)
+
+            //_________________________________________________________________ end
 
             sKLVehicle = placeVehicle(sKLVehicle: sKLVehicle, sOtherVehicle: sOtherVehicle)
 
+            //UNSURE OF RELEVANCE OF BELOW - MAY BE REDUNDANT & UNUSED!!!
             t1Stats["Name"]?.append(sKLVehicle.name!)
             t1Stats["Actual Speed"]?.append(0.0)
-            if let unwrapped = t1Stats["Name"]?[i] {
+            if let unwrapped = t1Stats["Name"]?[i] {        //Not used???
 //                if let speed = t1Stats["Actual Speed"]?[i] {
 ////                print("Name in Dictionary = \(unwrapped) : Speed = \(speed)")
 //                }
-            }
-        }
+            }           //IS THE ABOVE REDUNDANT???
+            
+            //Start another SKAction cycle of setting 'preferredSpeed'. Now starts @500ms
+//            sKLVehicle.setVehicleSpeed()   //Randomly calculate & load preferredSpeed for each vehicle
+            
+        }                       //end makeVehicle 'for' loop. Loop to create the next vehicle, exit when done
         
         gameStage = gameStage & 0x70    //Clear MSB & 4 LSBs when vehicles all exist (Int = 8 bits)
                                         //  - allows processing of vehicle speeds etc.
@@ -1283,7 +1320,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
         return              //Should this return anything in particular???
 //        return sKLVehicle
-    }
+    }                       //end makeVehicle
     
 //Function will randomly place vehicles onscreen.
     func placeVehicle(sKLVehicle: Vehicle, sOtherVehicle: Vehicle) -> Vehicle {
@@ -1412,9 +1449,25 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
     //MARK: - the function below runs every 500ms
     @objc func every500ms() {
         
-//        if runStop == .run {
-//            runTimer += 0.5             //Add 500ms to runTimer. Used to calculate average speeds
+        var newRun: Bool
+        if runSwitched == .switched {   //Indicates run/stop state just changed
+            newRun = true
+            var currState: String
+            switch runStop {
+            case .run: currState = "Start"
+            case .stop: currState = "Stop"
+            }
+            print("\(currState) just occurred!")
+            runSwitched = .stable
+        } else {
+            newRun = false
+//            print("Run State hasn't changed!\t\(newRun)")
+        }
+        
+//        if runStop == .run {          //runTimer now increments 60 times per sec
+//            runTimer += 0.5           //Add 500ms to runTimer. Used to calculate average speeds
 //        }
+        
 //        print("enableMinSpeed: \(enableMinSpeed)\t\trunTimer: \(runTimer)")
         
     let t1Vehicle = sKLAllVehicles   //Straight Track Vehicles
@@ -1427,6 +1480,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         if (Int(runTimer * 2) & 0x0F) == 0x08 {    //every 10 seconds
             randNo = CGFloat.random(in: 80...180)
             randUnitNo = Int.random(in: 1...numVehicles)
+            
 //            print("randNo: \(randNo.dp1)\trandUnitNo: \(randUnitNo)\tprefSpd: \(t1Vehicle[randUnitNo].preferredSpeed.dp1)\tcurrSpd: \((t1Vehicle[randUnitNo].physicsBody!.velocity.dy * 3.6).dp1)")
         }
         
@@ -1448,30 +1502,46 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             //MARK: - Flash vehicle when data displayed for single vehicle only
             flashVehicle(thisVehicle: sKLNode)
 
-        switch runStop {   //Wait until vehicles started
-        case .stop:
-            sKLNode.preferredSpeed = 0
-            sOtherNode.preferredSpeed = 0
+//        switch runStop {   //Wait until vehicles started
+//        case .stop:
+//            sKLNode.preferredSpeed = 0
+//            sOtherNode.preferredSpeed = 0
+//
+//        case .run:
+//
+////            sKLNode.preferredSpeed = 130
+//            if randUnitNo == unitNo || sKLNode.preferredSpeed == 0 {
+//                sKLNode.preferredSpeed = randNo
+//                sKLAllVehicles[unitNo].preferredSpeed = randNo
+////                sOtherNode.preferredSpeed = CGFloat.random(in: 82...150)
+//            }
+////            sKLNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 2.7
+////            sKLNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 3.5
+////            sOtherNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 0.6
+//            
+////            sOtherNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 2.2
+//            sOtherNode.preferredSpeed = sKLNode.preferredSpeed
+//            sOtherAllVehicles[unitNo].preferredSpeed = sKLNode.preferredSpeed
+//        }
 
-        case .run:
-
-//            sKLNode.preferredSpeed = 130
-            if randUnitNo == unitNo || sKLNode.preferredSpeed == 0 {
-                sKLNode.preferredSpeed = randNo
-                sKLAllVehicles[unitNo].preferredSpeed = randNo
-//                sOtherNode.preferredSpeed = CGFloat.random(in: 82...150)
+            //MARK: - Ensure vehicle speeds are constantly calculated for each vehicle
+            //          setVehicleSpeed recursive. Called within 1/2s of Start/Stop
+            if newRun == true {             //Call setVehicleSpeed after Start/Stop
+                sKLNode.setVehicleSpeed()   //Randomly calculate & load preferredSpeed for each vehicle
             }
-//            sKLNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 2.7
-//            sKLNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 3.5
-//            sOtherNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 0.6
+
+
+            //OLD CODE BELOW!
+//            if sKLNode.action(forKey: "spdAct\(unitNo)") == nil {   //SKAction hasn't begun or has ended!
+//                //Start another SKAction cycle of setting 'preferredSpeed'
+//                sKLNode.setVehicleSpeed()   //Randomly calculate & load preferredSpeed for each vehicle
+//            } else {    //runs if action is active
+//                //                print("SKAction spdAct\(unitNo) is running!")
+//            }
+// The above worked perfectly but now use recursion in setVehicleSpeed func instead
             
-//            sOtherNode.preferredSpeed = (tempSpd + CGFloat(unitNo * 4)) * 2.2
-            sOtherNode.preferredSpeed = sKLNode.preferredSpeed
-            sOtherAllVehicles[unitNo].preferredSpeed = sKLNode.preferredSpeed
-        }
-
     }   //End of 'for' loop
-
+        
 //        firstThru = false       //NEVER = true again !!!
         
 }       //end 500ms function
@@ -1483,9 +1553,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
     func updateKLVehicles(rtVeh: [NodeData]) -> ([NodeData]) {
         
         var retVeh: [NodeData] = rtVeh
-        let halfFlash: CGFloat = 0.3    //Time indicators are ON or OFF
-        let numFlash = 6        //No of full indicator flashes
-        let flashTime: CGFloat = CGFloat(numFlash) * halfFlash * 1.8
+//        let halfFlash: CGFloat = 0.3    //Time indicators are ON or OFF
+//        let numFlash = 6        //No of full indicator flashes
+//        let laneChangeTime: CGFloat = CGFloat(numFlash) * halfFlash * 1.8
         let indicatorOn = SKAction.unhide() //Overtaking indicators ON
         let indicatorOff = SKAction.hide()  //Overtaking indicators OFF
         let deelay = SKAction.wait(forDuration: halfFlash)  //Delay halfFlash secs
@@ -1513,6 +1583,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                 retVeh[index].startIndicator = false
                 sKLAllVehicles[index].startIndicator = false
                 
+                let maxVehicleAngle: CGFloat = (atan(xLaneVelocity / sKLAllVehicles[index].physicsBody!.velocity.dy)).radians() //Result in radians -> degrees
+                //maxVehicleAngle value fixed for duration of lane change
+
                 if retVeh[index].indicator == .overtake { //About to Overtake
                     
                     let startMsg = SKAction.run {       //Not used - may delete startMsg later!!!
@@ -1525,10 +1598,24 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         //                }           //end Optional Print
                     }               //end SKAction.run
                     
-                    let goToLane1 = SKAction.customAction(withDuration: flashTime, actionBlock: {
+                    let goToLane1 = SKAction.customAction(withDuration: laneChangeTime, actionBlock: {
                         (node, elapsedTime) in
-                        sKLAllVehicles[index].lane = (elapsedTime / flashTime)
+                        sKLAllVehicles[index].lane = (elapsedTime / laneChangeTime)
                         retVeh[index].lane = sKLAllVehicles[index].lane
+                        //_____________
+                        //goToLane1 needs -ve rotation angle
+                        //_____________
+//                        let rotFudgeFactor = 0.3 //GLOBAL variable
+                        var rotAngle = sKLAllVehicles[index].lane * 2   //set initial value to 0-2
+                        if rotAngle > 1 {                               //Leave 0-1 as is (1st half way)
+                            rotAngle = 1 - (rotAngle - 1)               //1-2 -> 1-0 (2nd half of lane change)
+                        }                                               //= 0...1...0 multiplier
+                        rotAngle = -rotAngle * maxVehicleAngle          //maxVehicleAngle already in degrees
+                        rotAngle = rotAngle * rotFudgeFactor            //Fudge for greater angle mid-way
+                        f8KLAllVehicles[index].f8RotTweak = rotAngle    //Saved in degrees
+                        sKLAllVehicles[index].zRotation = (elapsedTime / laneChangeTime) * rotAngle.degrees() //Convert back to radians
+//                        if index == 1 {print("\(index)\tmaxAngle: \(maxVehicleAngle.dp2)\tAngle: \(rotAngle.dp2)\tKeepLeft Overtake")}
+                        //-------------
                     })               //End goToLane0 action
                     
                     let laneChange = SKAction.group([goToLane1, flash])
@@ -1564,10 +1651,25 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         //                }           //end Optional Print
                     }               //end SKAction.run
                     
-                    let goToLane0 = SKAction.customAction(withDuration: flashTime, actionBlock: {
+                    let goToLane0 = SKAction.customAction(withDuration: laneChangeTime, actionBlock: {
                         (node, elapsedTime) in
-                        sKLAllVehicles[index].lane = (1 - (elapsedTime / flashTime))
+                        sKLAllVehicles[index].lane = (1 - (elapsedTime / laneChangeTime))
                         retVeh[index].lane = sKLAllVehicles[index].lane
+                        //_____________
+                        //goToLane0 needs +ve rotation angle
+                        //_____________
+//                        let rotFudgeFactor = 0.3 //GLOBAL variable
+                        var rotAngle = sKLAllVehicles[index].lane * 2
+                        if rotAngle > 1 {
+                            rotAngle = 1 - (rotAngle - 1)
+                        }
+//                        rotAngle = (rotAngle * maxVehicleAngle).degrees()//Convert from radians to degrees
+                        rotAngle = rotAngle * maxVehicleAngle           //maxVehicleAngle already in degrees
+                        rotAngle = rotAngle * rotFudgeFactor            //Fudge for greater angle mid-way
+                        f8KLAllVehicles[index].f8RotTweak = rotAngle    //Saved in degrees
+                        sKLAllVehicles[index].zRotation = (elapsedTime / laneChangeTime) * rotAngle.degrees() //Convert back to radians
+//                        if index == 1 {print("\(index)\tmaxAngle: \(maxVehicleAngle.dp2)\tAngle: \(rotAngle.dp2)\tKeepLeft Return")}
+                        //-------------
                     })               //End goToLane0 action
                     
                     let laneChange = SKAction.group([goToLane0, flash])
@@ -1625,9 +1727,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
     func updateOtherVehicles(rtVeh: [NodeData]) -> ([NodeData]) {
         
         var retVeh: [NodeData] = rtVeh
-        let halfFlash: CGFloat = 0.3    //Time indicators are ON or OFF
-        let numFlash = 6        //No of full indicator flashes
-        let flashTime: CGFloat = CGFloat(numFlash) * halfFlash * 1.8
+//        let halfFlash: CGFloat = 0.3    //Time indicators are ON or OFF
+//        let numFlash = 6        //No of full indicator flashes
+//        let laneChangeTime: CGFloat = CGFloat(numFlash) * halfFlash * 1.8
         let indicatorOn = SKAction.unhide() //Overtaking indicators ON
         let indicatorOff = SKAction.hide()  //Overtaking indicators OFF
         let deelay = SKAction.wait(forDuration: halfFlash)  //Delay halfFlash secs
@@ -1655,6 +1757,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                 retVeh[index].startIndicator = false
                 sOtherAllVehicles[index].startIndicator = false
                 
+                let maxVehicleAngle: CGFloat = (atan(xLaneVelocity / sOtherAllVehicles[index].physicsBody!.velocity.dy)).radians()
+                //maxVehicleAngle value fixed for duration of lane change
+                
                 if retVeh[index].indicator == .overtake { //About to Overtake
                     
                     let startMsg = SKAction.run {       //Not used - may delete startMsg later!!!
@@ -1667,10 +1772,25 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         //                }           //end Optional Print
                     }               //end SKAction.run
                     
-                    let goToLane1 = SKAction.customAction(withDuration: flashTime, actionBlock: {
+                    let goToLane1 = SKAction.customAction(withDuration: laneChangeTime, actionBlock: {
                         (node, elapsedTime) in
-                        sOtherAllVehicles[index].lane = (elapsedTime / flashTime)
+                        sOtherAllVehicles[index].lane = (elapsedTime / laneChangeTime)
                         retVeh[index].lane = sOtherAllVehicles[index].lane
+                        //_____________
+                        //goToLane1 needs -ve rotation angle
+                        //_____________
+//                        let rotFudgeFactor = 0.3 //GLOBAL variable
+                        var rotAngle = sOtherAllVehicles[index].lane * 2
+                        if rotAngle > 1 {
+                            rotAngle = 1 - (rotAngle - 1)
+                        }
+//                        rotAngle = (rotAngle * maxVehicleAngle).degrees()//Convert from radians to degrees
+                        rotAngle = rotAngle * maxVehicleAngle           //maxVehicleAngle already in degrees
+                        rotAngle = rotAngle * rotFudgeFactor            //Fudge for greater angle mid-way
+                        f8OtherAllVehicles[index].f8RotTweak = rotAngle //Saved in degrees
+                        sOtherAllVehicles[index].zRotation = ((elapsedTime / laneChangeTime) * rotAngle.degrees()) + CGFloat(180).degrees() //Convert to radians
+//                        if index == 1 {print("\(index)\tmaxAngle: \(maxVehicleAngle.dp2)\tAngle: \(rotAngle.dp2)\tOtherTrack Overtake")}
+                        //-------------
                     })               //End goToLane0 action
                     
                     let laneChange = SKAction.group([goToLane1, flash])
@@ -1706,10 +1826,25 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         //                }           //end Optional Print
                     }               //end SKAction.run
                     
-                    let goToLane0 = SKAction.customAction(withDuration: flashTime, actionBlock: {
+                    let goToLane0 = SKAction.customAction(withDuration: laneChangeTime, actionBlock: {
                         (node, elapsedTime) in
-                        sOtherAllVehicles[index].lane = (1 - (elapsedTime / flashTime))
+                        sOtherAllVehicles[index].lane = (1 - (elapsedTime / laneChangeTime))
                         retVeh[index].lane = sOtherAllVehicles[index].lane
+                        //_____________
+                        //goToLane0 needs +ve rotation angle
+                        //_____________
+//                        let rotFudgeFactor = 0.3 //GLOBAL variable
+                        var rotAngle = sOtherAllVehicles[index].lane * 2
+                        if rotAngle > 1 {
+                            rotAngle = 1 - (rotAngle - 1)
+                        }
+//                        rotAngle = (rotAngle * maxVehicleAngle).degrees()//Convert from radians to degrees
+                        rotAngle = -rotAngle * maxVehicleAngle          //maxVehicleAngle already in degrees
+                        rotAngle = rotAngle * rotFudgeFactor            //Fudge for greater angle mid-way
+                        f8OtherAllVehicles[index].f8RotTweak = rotAngle //Saved in degrees
+                        sOtherAllVehicles[index].zRotation = ((elapsedTime / laneChangeTime) * rotAngle.degrees() * rotFudgeFactor) + CGFloat(180).degrees() //Convert to radians
+//                        if index == 1 {print("\(index)\tmaxAngle: \(maxVehicleAngle.dp2)\tAngle: \(rotAngle.dp2)\tOtherTrack Return")}
+                        //-------------
                     })               //End goToLane0 action
                     
                     let laneChange = SKAction.group([goToLane0, flash])
@@ -1789,11 +1924,16 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
             if kLTrack {
                 f8KLAllVehicles[index].position = veh1Node.f8Pos
-                f8KLAllVehicles[index].zRotation = veh1Node.f8Rot
+                f8KLAllVehicles[index].zRotation = veh1Node.f8Rot + (f8KLAllVehicles[index].f8RotTweak.degrees()) //Convert to radians
                 f8KLAllVehicles[index].zPosition = veh1Node.f8zPos
+//                if index == 2 { //Print for single unit ONLY (#2)
+//                    if abs(f8KLAllVehicles[index].f8RotTweak) > 0.000009 {  //Don't print when zero!
+//                        print("\(index)\tRotTweak: \(f8KLAllVehicles[index].f8RotTweak.dp3)º")
+//                    }
+//                }
             } else {
                 f8OtherAllVehicles[index].position = veh1Node.f8Pos
-                f8OtherAllVehicles[index].zRotation = veh1Node.f8Rot
+                f8OtherAllVehicles[index].zRotation = veh1Node.f8Rot + f8OtherAllVehicles[index].f8RotTweak.degrees() //Convert to radians
                 f8OtherAllVehicles[index].zPosition = veh1Node.f8zPos
             }
             
@@ -1812,7 +1952,7 @@ func redoCamera() {
 //    sTrackCamera.setScale(sTrackWidth/straightScene.width)
 ////        camera?.setScale(1/4)
 ////        f8TrackCamera.setScale(f8Scene.height/f8ImageHeight)
-}
+}           //end of redoCamera func
 
 //MARK: - Function flashes vehicle when display shows only that data
 func flashVehicle(thisVehicle: Vehicle) {           //Called every 500ms. 'thisVehicle' = sKL...
@@ -1852,4 +1992,4 @@ func flashVehicle(thisVehicle: Vehicle) {           //Called every 500ms. 'thisV
             f8OtherAllVehicles[vehNum].alpha = 1
         }
     }
-}
+}               //end of flashVehicle func
