@@ -73,6 +73,31 @@ class Vehicle: SKSpriteNode, ObservableObject {
     /// - Time range = minChangeTime to maxChangeTime (initially 1 to 180 seconds)
     /// - eg. randomValue(distribution: sKLVehicle[x].varTime, min: minChangeTime, max: maxChangeTime)
     @Published var holdTime: CGFloat = -1          //-1 to +1. Ref from sKL vehicles ONLY! OtherTrack speeds match!
+    
+    /// Stay 'mySetGap' secs behind vehicle in front or further
+    ///  -     Skew     |   Vehicle   |    Range
+    ///  -     -0.5     |    Cars     |   2.4-3.4
+    ///  -      0       |    Buses    |   2.8-4.2
+    ///  -     +0.25    |    Trucks   |   2.9-5.6
+    @Published var mySetGap: CGFloat = 3    //Gap in secs between vehicles individually set
+    /// Sets deceleration rate when >= mySetGap from vehicle in front in m/s2
+    ///  -     Skew     |   Vehicle   |   Range
+    ///  -     +1.0     |    Cars     |  2.5-4.0
+    ///  -      -0.2    |    Buses    |  1.4-3.8
+    ///  -     -1.0     |    Trucks   |  1.0-3.5
+    @Published var decelMin: CGFloat = 3    //m/s2
+    /// Sets deceleration rate when within 'myMinGap' of vehicle in front
+    ///  -     Skew     |   Vehicle   |   Range
+    ///  -     +0.5     |    Cars     |  8.0-10.0
+    ///  -      0       |    Buses    |  7.0-8.5
+    ///  -     -0.5     |    Trucks   |  6.5-8.0
+    @Published var decelMax: CGFloat = 9   //Deceleration rate when within 'myMinGap' of vehicle in front
+    /// Apply emergency deceleration within myMinGap of vehicle in front in secs
+    ///  -     Skew     |   Vehicle   |    Range
+    ///  -     -1.0     |    Cars     |   0.4-0.8
+    ///  -      0.0     |    Buses    |   0.6-0.9
+    ///  -     +1.0     |    Trucks   |   0.8-1.2
+    @Published var myMinGap: CGFloat = 0.9  //Apply emergency deceleration within myMinGap of vehicle in front
 
     //Create variables used in 'setVariables'
 //    @Published var strtSpd: CGFloat = 0             //Capture preferredSpeed @ start of action sequence
@@ -403,6 +428,9 @@ class Vehicle: SKSpriteNode, ObservableObject {
         if self.vehType == .bus { vTipe = "b" } else if self.vehType == .truck { vTipe = "t" } else { vTipe = "Car" }
         if vehNo == 1 { print("\nVeh\tkph\t ->\tkph\t\tadTim\tHold\tTotal\t Now\tlowR\t topR\tType") }
         print("\(vehNo)\t\(sS1)\t\t\(tS1)\t\t\(aT2)\t\(fT2)\t\(tote2)\t\(now)\t\(lR1)%\t \(tR1)%\t\(vTipe)")
+        if strtSpd == 0 {
+            print("\t  mySetGap-\(sKLAllVehicles[vehNo].mySetGap.dp2)_decelMin-\(sKLAllVehicles[vehNo].decelMin.dp1)_decelMax-\(sKLAllVehicles[vehNo].decelMax.dp1)_myMinGap-\(sKLAllVehicles[vehNo].myMinGap.dp2)")
+        }
 //        if vehNo == numVehicles { print("\n")}
         
         //Updates preferredSpeed with next calculated value over period 'adjustTime'

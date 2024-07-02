@@ -30,8 +30,6 @@ var kph = Metric ? "kph" : "mph"
 ///Returns "Left" or "Right"
 var Left = keepLeft ? "Left" : "Right"
 
-let gapVal: CGFloat = 3     //Time gap in seconds to vehicle in front
-
 ///Returns CGFloat of sin(45deg) as constant. Saves calculation time.
 let sin45Deg = sin(CGFloat(45).degrees())   //Replace calculation by constant
 
@@ -91,8 +89,9 @@ var FS:CGFloat = 0
 var GS:CGFloat = 0
 var TEST: Int = 0
 
-//This variable is defined in Settings and defines how many vehicles will be driving around track
-var numVehicles = 15 //28 - NOTE: NEVER set to 0! Illegal value.
+///This variable is configured in Settings and defines how many vehicles will be driving around each track
+/// - Legal values: 1 - 100
+var numVehicles = 32 //28 - NOTE: NEVER set to 0! Illegal value.
 let minGap: CGFloat = 2.5     //Sets minimum permissible gap between vehicles in metres. MUST be >=1 metre!
 
 enum Zone: CaseIterable {               //Define Zone with different speed limits, L/R Hand Drive etc

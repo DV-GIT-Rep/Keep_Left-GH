@@ -29,6 +29,17 @@ public extension CGFloat {
     }
 }
 
+//extension SKNode {
+//    func copi() -> SKNode {
+//        var copy = SKNode()
+//        copy = self
+//        return copy
+//    }
+//}
+
+var f8KLLabel = SKNode()    //Hierarchy: f8Background -> f8LabelParent -> f8KLLabel
+var f8OtherLabel = SKNode()    //Hierarchy: f8Background -> f8LabelParent -> f8OtherLabel
+
 //var toggleSpeed: Int = 1    //Temp for vehicle speed
 var firstThru = true        //Set to false after all vehicle speeds evaluated once
 
@@ -206,7 +217,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             self.camera = ((whichScene == .figure8) ? f8TrackCamera : sTrackCamera)
 
             //MARK: - Create sLabelParent Node
-            let sLabelParent = SKSpriteNode()                    //Labels are children of f8Background. Groups them together and puts the
+            let sLabelParent = SKSpriteNode()                    //Labels are children of sBackground. Groups them together and puts the
             sLabelParent.position = CGPoint(x: 0, y: (sTrackLength / 2))    //  base zPos = sBackground + 100
             sLabelParent.zPosition = 1000000000
             sBackground.addChild(sLabelParent)
@@ -218,16 +229,45 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             f8Background.addChild(f8LabelParent)
             
             //MARK: - Create f8KLLabel Node
-            let f8KLLabel = SKNode()                                //Hierarchy: f8Background -> f8LabelParent -> f8KLLabel
-            f8KLLabel.position = CGPoint(x: 0, y: f8CircleCentre)   //Set position inside top loop of figure 8 track
-            f8KLLabel.zPosition = 10
-            f8LabelParent.addChild(f8KLLabel)                       //Make child of f8LabelParent
+            let labelMask = SKShapeNode(circleOfRadius: 55) //Inside radius of blur
+            labelMask.fillColor = .black
+            labelMask.glowWidth = 6                         //Adds blur outside of ShapeNode
+            
+            let upperLabel = SKCropNode()
+            upperLabel.position = CGPoint(x: 0, y: f8CircleCentre)   //Set position inside top loop of figure 8 track
+            upperLabel.zPosition = 10
+            upperLabel.maskNode = labelMask
+            
+//            let f8KLLabel = SKNode()    //Hierarchy: f8Background -> f8LabelParent -> f8KLLabel
+
+            upperLabel.addChild(f8KLLabel)
+            f8LabelParent.addChild(upperLabel)
+
+
+
+//            let f8KLLabel = SKNode()                                //Hierarchy: f8Background -> f8LabelParent -> f8KLLabel
+//            f8KLLabel.position = CGPoint(x: 0, y: f8CircleCentre)   //Set position inside top loop of figure 8 track
+//            f8KLLabel.zPosition = 10
+//            f8LabelParent.addChild(f8KLLabel)                       //Make child of f8LabelParent
             
             //MARK: - Create f8OtherLabel Node
-            let f8OtherLabel = SKNode()                                //Hierarchy: f8Background -> f8LabelParent -> f8KLLabel
-            f8OtherLabel.position = CGPoint(x: 0, y: -1 * f8CircleCentre)   //Set position inside lower loop of figure 8 track
-            f8OtherLabel.zPosition = 1000000000000000000
-            f8LabelParent.addChild(f8OtherLabel)                       //Make child of f8LabelParent
+            let lowerLabel = SKCropNode()
+            lowerLabel.position = CGPoint(x: 0, y: -1 * f8CircleCentre)   //Set position inside top loop of figure 8 track
+            lowerLabel.zPosition = 10
+            lowerLabel.maskNode = labelMask
+            
+//            let f8OtherLabel = SKNode()    //Hierarchy: f8Background -> f8LabelParent -> f8KLLabel
+
+            lowerLabel.addChild(f8OtherLabel)
+            f8LabelParent.addChild(lowerLabel)
+
+
+
+
+//            let f8OtherLabel = SKNode()                                //Hierarchy: f8Background -> f8LabelParent -> f8KLLabel
+//            f8OtherLabel.position = CGPoint(x: 0, y: -1 * f8CircleCentre)   //Set position inside lower loop of figure 8 track
+//            f8OtherLabel.zPosition = 1000000000000000000
+//            f8LabelParent.addChild(f8OtherLabel)                       //Make child of f8LabelParent
             
             //MARK: - Create commonViewBackground Node
             commonLabelBackground.zPosition = 1
@@ -392,8 +432,23 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         }
         
         redoCamera()    //Don't call until metre1 calculated!!!
+        
+        var authorityLogo = SKSpriteNode(imageNamed: "logo-TfNSW")
+        let authoScale = 0.09
+        authorityLogo.setScale(authoScale)
+//        authorityLogo.xScale = authoScale
+    
+//        authorityLogo.yScale = authoScale
+        let logoXPos: CGFloat = 0.47 * (0.5 * self.size.width)
+        let logoYPos: CGFloat = 0.36 * (0.5 * self.size.height)
+        print("Width: \(self.size.width.dp2)\tHeight: \(self.size.height.dp2)\tName: \(String(describing: self.name))")
+        authorityLogo.position = CGPoint(x: logoXPos, y: logoYPos)
+        authorityLogo.zPosition = 500
+        f8Background.addChild(authorityLogo)
 
         let ms500Timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(every500ms), userInfo: nil, repeats: true)
+        
+        
         
         //setVehicleSpeeds
         
@@ -535,6 +590,11 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         nodeDataKL.indicator = veh1Node.indicator
                         nodeDataKL.startIndicator = veh1Node.startIndicator
                         
+                        nodeDataKL.mySetGap = veh1Node.mySetGap     //Always use value in KL!
+                        nodeDataKL.decelMin = veh1Node.decelMin     //THESE 4 VALUES NEVER CHANGE!
+                        nodeDataKL.decelMax = veh1Node.decelMax
+                        nodeDataKL.myMinGap = veh1Node.myMinGap     //Gap in seconds
+
                     }   //end index zero check
                     t1xVehicle.append(nodeDataKL)
                 }       //end For Loop
@@ -635,6 +695,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         //                                rtnT1Veh = cLResult1
                         //                            }
                         
+
                     }               //End 'for' loop
                     //All vehicles on Track 1 (Keep Left Track) checked
                     
@@ -700,6 +761,12 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         nodeDataO.indicator = veh2Node.indicator
                         nodeDataO.startIndicator = veh2Node.startIndicator
                         
+                        nodeDataO.mySetGap = sKLAllVehicles[index].mySetGap     //Always use value in KL!
+                        nodeDataO.decelMin = sKLAllVehicles[index].decelMin     //THESE 4 VALUES NEVER CHANGE!
+                        nodeDataO.decelMax = sKLAllVehicles[index].decelMax
+                        nodeDataO.myMinGap = sKLAllVehicles[index].myMinGap
+
+
 //                nodeDataO.equivF8Name = not needed here!
                     }       //end index zero check
                     t2xVehicle.append(nodeDataO)
@@ -1292,6 +1359,31 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
             //_________________________________________________________________ end
 
+            //_________________________________________________________________
+            //Following sets up parameters to alter set gap, min gap & decel min/max
+            //_________________________________________________________________ start gap
+            switch sKLVehicle.vehType {
+            //Gaps in seconds. Decels in m/s2. See Quick Help on each for details!
+            case .car:
+                sKLVehicle.mySetGap = randomValue(distribution: -0.5, min: 2.4, max: 3.4)   //gap in secs
+                sKLVehicle.decelMin = randomValue(distribution: +1.0, min: 2.5, max: 4.0)   //m/s2
+                sKLVehicle.decelMax = randomValue(distribution: +0.5, min: 8.0, max: 10.0)  //m/s2
+                sKLVehicle.myMinGap = randomValue(distribution: -1.0, min: 0.4, max: 0.8)   //gap in secs
+            case .truck:
+                sKLVehicle.mySetGap = randomValue(distribution: +0.25, min: 2.9, max: 5.6)
+                sKLVehicle.decelMin = randomValue(distribution: -1.0, min: 1.0, max: 3.5)
+                sKLVehicle.decelMax = randomValue(distribution: -0.5, min: 6.5, max: 8.0)
+                sKLVehicle.myMinGap = randomValue(distribution: +1.0, min: 0.8, max: 1.2)
+            case .bus:
+                sKLVehicle.mySetGap = randomValue(distribution: 0.0, min: 2.8, max: 4.2)
+                sKLVehicle.decelMin = randomValue(distribution: -0.2, min: 1.4, max: 3.8)
+                sKLVehicle.decelMax = randomValue(distribution: 0.0, min: 7.0, max: 8.5)
+                sKLVehicle.myMinGap = randomValue(distribution: 0.0, min: 0.6, max: 0.9)
+            }
+            
+
+            //_________________________________________________________________ end gap
+
             sKLVehicle = placeVehicle(sKLVehicle: sKLVehicle, sOtherVehicle: sOtherVehicle)
 
             //UNSURE OF RELEVANCE OF BELOW - MAY BE REDUNDANT & UNUSED!!!
@@ -1408,42 +1500,77 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
     //MARK: - Swipe left/right on figure 8 screen
     @objc func swipeLeft(sender: UISwipeGestureRecognizer) {
         
-        if whichScene == .figure8 {
-            if f8DisplayDat >= (numVehicles) {
-                f8DisplayDat = 0
-            } else {
-                f8DisplayDat += 1
-            }
-            let delay5 = SKAction.wait(forDuration: oneVehicleDisplayTime)
-            let backToAll = SKAction.run {
-                f8DisplayDat = 0
-            }
-            let backToAllSequence = SKAction.sequence([delay5, backToAll])
-            run(backToAllSequence, withKey: "backToAll")
-        } else {
-        }
+        let duration = 0.4      //If changed, change also 'swipeRight'!
 
-    }
-
-    @objc func swipeRight(sender: UISwipeGestureRecognizer) {
-        
         if whichScene == .figure8 {
-            if f8DisplayDat == 0 {
-                f8DisplayDat = numVehicles
-            } else {
-                f8DisplayDat -= 1
+            let halfSwipeDelay = SKAction.wait(forDuration: duration / 2)   //Change display data @ slide halfway point
+            let setNextVehicle = SKAction.run {
+                if f8DisplayDat >= (numVehicles) {
+                    f8DisplayDat = 0
+                } else {
+                    f8DisplayDat += 1
+                }
             }
             //The following will set display back to All Vehicles after a delay
             let delay5 = SKAction.wait(forDuration: oneVehicleDisplayTime)
             let backToAll = SKAction.run {
                 f8DisplayDat = 0
             }
-            let backToAllSequence = SKAction.sequence([delay5, backToAll])
+            let backToAllSequence = SKAction.sequence([halfSwipeDelay, setNextVehicle, delay5, backToAll])
+            run(backToAllSequence, withKey: "backToAll")
+        } else {    //Scene != .figure 8. Must be displaying Straight Track
+        }           //end whichScene test
+
+        let slideLeft = SKAction.customAction(withDuration: duration, actionBlock: {
+            (node, elapsedTime) in
+            if (elapsedTime / duration) < 0.5 {     //Slide labels off to left
+                f8KLLabel.position.x = 0 - (elapsedTime / duration) * 220
+                f8OtherLabel.position.x = 0 - (elapsedTime / duration) * 220
+            } else {                                //Move label off-screen to right & then slide in
+                f8KLLabel.position.x = 110 - ((elapsedTime / duration) - 0.5) * 220
+                f8OtherLabel.position.x = 110 - ((elapsedTime / duration) - 0.5) * 220
+            }
+        })
+        run(slideLeft)
+
+    }               //end Swipe Left/Right gesture
+
+    @objc func swipeRight(sender: UISwipeGestureRecognizer) {
+        
+        let duration = 0.4      //If changed, change also 'swipeLeft'!
+
+        if whichScene == .figure8 {
+            let halfSwipeDelay = SKAction.wait(forDuration: duration / 2)   //Change display data @ slide halfway point
+            let setNextVehicle = SKAction.run {
+                if f8DisplayDat == 0 {
+                    f8DisplayDat = numVehicles
+                } else {
+                    f8DisplayDat -= 1
+                }
+            }
+            //The following will set display back to All Vehicles after a delay
+            let delay5 = SKAction.wait(forDuration: oneVehicleDisplayTime)
+            let backToAll = SKAction.run {
+                f8DisplayDat = 0
+            }
+            let backToAllSequence = SKAction.sequence([halfSwipeDelay, setNextVehicle, delay5, backToAll])
             run(backToAllSequence, withKey: "backToAll")
         } else {
             //.straight code here
         }
         
+        let slideRight = SKAction.customAction(withDuration: duration, actionBlock: {
+            (node, elapsedTime) in
+            if (elapsedTime / duration) < 0.5 {     //Slide labels off to right
+                f8KLLabel.position.x = 0 + (elapsedTime / duration) * 220
+                f8OtherLabel.position.x = 0 + (elapsedTime / duration) * 220
+            } else {                                //Move label off-screen to left & then slide in
+                f8KLLabel.position.x = -110 + ((elapsedTime / duration) - 0.5) * 220
+                f8OtherLabel.position.x = -110 + ((elapsedTime / duration) - 0.5) * 220
+            }
+        })
+        run(slideRight)
+
     }
 
     //MARK: - the function below runs every 500ms
@@ -1543,6 +1670,14 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
     }   //End of 'for' loop
         
 //        firstThru = false       //NEVER = true again !!!
+        
+//        let snapShot = self.view?.texture(from: sKLAllVehicles[1], crop: CGRect(x: 0, y: 500, width: 25, height: 25))
+//        var zoomBit = SKSpriteNode(texture: snapShot, size: CGSize(width: 50, height: 50))
+//        zoomBit.setScale(1.5)
+//        zoomBit.zPosition = 1500
+//        zoomBit.zRotation = .pi/2
+//        print("self: \(self)\nsnapShot: \(String(describing: snapShot))\nzoomBit: \(zoomBit)")
+//        addChild(zoomBit)
         
 }       //end 500ms function
     

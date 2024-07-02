@@ -24,7 +24,7 @@ struct StraightTrackView: View {
 //    }
     let gameScene = GameScene()
 
-    @State private var angle: Angle = .degrees(0)
+    @State private var angle: Angle = .degrees(0)   //Changing value has no effect!
 //    @State var straitScene = StraightTrackScene()
 //    @State private static var straitScene = StraightTrackScene()  //try later !!! x2
 
@@ -64,7 +64,7 @@ struct StraightTrackView: View {
 //            }
 //            }
 
-        }
+        }   //end ZStack
         .statusBar(hidden: true)
         .onAppear {
             self.updateOrintation()

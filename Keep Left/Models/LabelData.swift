@@ -34,15 +34,19 @@ class LabelData: SKLabelNode, ObservableObject {
     
     @Published var f8KLLabelTitle = SKLabelNode(fontNamed: "Helvetica Neue Bold")
     @Published var f8KLLabelDescription = SKLabelNode(fontNamed: "Chalkduster")
+    
     @Published var avgSpdDesc = SKLabelNode(fontNamed: "Helvetica Neue Medium")
     @Published var maxSpdDesc = SKLabelNode(fontNamed: "Helvetica Neue Light")
     @Published var minSpdDesc = SKLabelNode(fontNamed: "Helvetica Neue Light")
+    
     @Published var avgDistanceDesc = SKLabelNode(fontNamed: "Helvetica Neue Medium")
     @Published var maxDistanceDesc = SKLabelNode(fontNamed: "Helvetica Neue Light")
     @Published var minDistanceDesc = SKLabelNode(fontNamed: "Helvetica Neue Light")
+    
     @Published var avgSpd = SKLabelNode(fontNamed: "Helvetica Neue Medium")
     @Published var maxSpd = SKLabelNode(fontNamed: "Helvetica Neue Light")
     @Published var minSpd = SKLabelNode(fontNamed: "Helvetica Neue Light")
+    
     @Published var avgDistance = SKLabelNode(fontNamed: "Helvetica Neue Medium")
     @Published var maxDistance = SKLabelNode(fontNamed: "Helvetica Neue Light")
     @Published var minDistance = SKLabelNode(fontNamed: "Helvetica Neue Light")
@@ -211,7 +215,7 @@ class LabelData: SKLabelNode, ObservableObject {
         f8KLLabelTitle.text = topLabel ? "\(kLTitle)" : "Std Track"
         
         //SubTitle
-        f8KLLabelDescription.text = f8DisplayDat == 0 ? "All Vehicles" : flashOffFlag ? "" : "Vehicle \(f8DisplayDat)"
+        f8KLLabelDescription.text = f8DisplayDat == 0 ? "All Vehicles" : flashOffFlag ? "Vehicle \(f8DisplayDat)" : ""
         f8KLLabelDescription.fontColor = f8DisplayDat == 0 ? subTitleColour : UIColor(displayP3Red: 0.98, green: 1, blue: 0.84, alpha: 1)
 //        UIColor(displayP3Red: 0.85, green: 0.9, blue: 0.7, alpha: 1)
         
