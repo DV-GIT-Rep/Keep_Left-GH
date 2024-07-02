@@ -91,7 +91,7 @@ var TEST: Int = 0
 
 ///This variable is configured in Settings and defines how many vehicles will be driving around each track
 /// - Legal values: 1 - 100
-var numVehicles = 32 //28 - NOTE: NEVER set to 0! Illegal value.
+var numVehicles = 12 //28 - NOTE: NEVER set to 0! Illegal value.
 let minGap: CGFloat = 2.5     //Sets minimum permissible gap between vehicles in metres. MUST be >=1 metre!
 
 enum Zone: CaseIterable {               //Define Zone with different speed limits, L/R Hand Drive etc

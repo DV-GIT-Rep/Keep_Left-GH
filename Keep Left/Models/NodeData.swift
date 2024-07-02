@@ -882,7 +882,7 @@ struct NodeData {
             oRearSub = (teeVeh[indx].oRearSpd - teeVeh[indx].currentSpeed)  //Used to calc speed difference
             
             if oRearSub < 0 {
-                oRearSub = 0                        //This vehicle faster than oRearSpd - allow min gap
+                oRearSub = 0                        //This vehicle faster than oRearSpd - SAFE allow min gap
             } else {
                 if oRearSub > maxORearSpdDiff {
                     oRearSub = maxORearSpdDiff      //This vehicle slower than (oRearSpd - ~15kph) - require max gap
@@ -900,18 +900,18 @@ struct NodeData {
             //****************  Test for permissible oRearGap /\   ****************
             //****************  Test for permissible oFrontGap \/  ****************
             //For now same constants used for front as for back. Name not changed as may later be changed.
-            oFrontSub = (teeVeh[indx].oFrontSpd - teeVeh[indx].currentSpeed)  //Used to calc speed difference
+            oFrontSub = (teeVeh[indx].currentSpeed - teeVeh[indx].oFrontSpd)  //Used to calc speed difference
             
             if oFrontSub < 0 {
-                oFrontSub = 0
+                oFrontSub = 0                       //This vehicle slower than oFrontSpd - SAFE allow min gap
             } else {
                 if oFrontSub > maxORearSpdDiff {
-                    oFrontSub = maxORearSpdDiff
+                    oFrontSub = maxORearSpdDiff     //This vehicle faster than (oFrontSpd + ~15kph) - require max gap
                 }
             }
             
             oFrontOKGap = oRearMinGap + (oRearGapRange / maxORearSpdDiff * oFrontSub) //returns min gap allowed = 0.5 - 3 secs
-            oFrontOKGap = (teeVeh[indx].oFrontSpd * oFrontOKGap) / 3.6                 //converts to metres
+            oFrontOKGap = (teeVeh[indx].currentSpeed * oFrontOKGap) / 3.6                 //converts to metres
             
             if oFrontOKGap <= minGap { oFrontOKGap = minGap }       //Limit minimum gap to 2.5m ( + 1m = 3.5m?) at low speeds
             
