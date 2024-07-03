@@ -70,7 +70,7 @@
 //        //oRearGap OK - Test other factors.
 //        //****************  Test for permissible oFrontGap /\  ****************
 //        
-//        bigGap = ((1.3 * teeVeh[indx].mySetGap) * teeVeh[indx].currentSpeed) / 3.6    //bigGap = 130% of 3 sec gap.
+//        bigGap = ((1.05 * teeVeh[indx].mySetGap) * teeVeh[indx].currentSpeed) / 3.6    //bigGap = 105% of 3 sec gap.
 //        
 //        if teeVeh[indx].lane == 0 {             //Preferred lane (Left)
 //            //****************  Test for permissible gap/otherGap from lane 0 \/  ****************

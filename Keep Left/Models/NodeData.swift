@@ -143,7 +143,7 @@ struct NodeData {
         var decel: CGFloat = 4          // m/sec2. Typical. Varies!
         
         //########################### RearGap calc loop #######################################
-        tVehicle.sort(by: keepLeft ? {$0.position.y > $1.position.y} : {$0.position.y <= $1.position.y}) //Sort into positional order for REAR detection, 999.999 - 000
+        tVehicle.sort(by: keepLeft ? {$0.position.y > $1.position.y} : {$0.position.y < $1.position.y}) //Sort into positional order for REAR detection, 999.999 - 000
         
         var unitNumb: Int
         var reerGap: CGFloat = 0.0      //Distance behind in this lane
@@ -165,8 +165,13 @@ struct NodeData {
             
             unitNumb = Int.extractNum(from: vehNode.name)! //NOTE: Use [unitNumb] for sKLAllVehicles. Use [index] OR [nextIndex] for tVehicles!
             
-            nextIndex = index
+            if index != 0 {     //Check for duplicates yPos = yPos. Ignore index = 0 as any equals will be found.
+                if vehNode.position.y == tVehicle[index-1].position.y {
+                    oReerGap = 0.1  //Equal found! Assume no gap to vehicle in other lane
+                }                   //Checked here as same pos may not be picked up in both directions!
+            }
             
+            nextIndex = index
             var tmpIndex = (index - 1)
             while reerGap == 0 || oReerGap == 0 {
                 
@@ -186,10 +191,10 @@ struct NodeData {
                 
                 //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
                 if sameLane.contains(tVehicle[nextIndex].lane) {
-                    //Both vehicles in same lane
+                    //Both vehicles in same lane (@ least partially)
                     if reerGap == 0 {
                         reerGap = (past1km == false) ? sameLap : lastLap
-                        if reerGap <= 0 { reerGap = 0.1 } //Should NEVER happen! (due to self braking)
+                        if reerGap < 0.1 { reerGap = 0.1 } //Should NEVER happen! (due to self braking)
                         //                    vehNode.spacing = gap
                         tVehicle[index].rearUnit = tVehicle[nextIndex].name      //Save identity of rear unit (NOT Required?)
                         tVehicle[index].rearPos = tVehicle[nextIndex].position   //Save position of rear unit (NOT Required?)
@@ -198,7 +203,7 @@ struct NodeData {
                         //If this vehicle is mid-lane, set oRearGap = rearGap
                         if oReerGap == 0 {
                             oReerGap = (past1km == false) ? sameLap : lastLap
-                            if oReerGap <= 0 { oReerGap = 0.1 } //Could prevent -ve values by using <= here
+                            if oReerGap < 0.1 { oReerGap = 0.1 } //Could prevent -ve values by using <= here
                             //                    vehNode.oRearGap = oReerGap
                             tVehicle[index].oRearSpd = tVehicle[nextIndex].currentSpeed   //Save speed of oRear unit
                         }
@@ -207,7 +212,9 @@ struct NodeData {
                     //The two vehicles are in different lanes
                     if oReerGap == 0 {
                         oReerGap = (past1km == false) ? sameLap : lastLap
-                        if oReerGap <= 0 { oReerGap = 0.1 } //Could prevent -ve values by using <= here
+                        if oReerGap < 0.1 {
+                            oReerGap = 0.1
+                        } //Could prevent -ve values by using <= here
                         //                    vehNode.oRearGap = oReerGap
                         tVehicle[index].oRearSpd = tVehicle[nextIndex].currentSpeed   //Save speed of oRear unit
                     }
@@ -238,8 +245,10 @@ struct NodeData {
         //findObstacles Flowchart Page 2 of 4     :Determine Front Gaps etc
         //*****************************
         //########################### Front Gap calc loop #######################################
-        tVehicle.sort(by: keepLeft ? {$0.position.y < $1.position.y} : {$0.position.y >= $1.position.y}) //Sort into positional order for FRONT detection, 000 - 999.999
-        
+        tVehicle.sort(by: keepLeft ? {$0.position.y < $1.position.y} : {$0.position.y > $1.position.y}) //Sort into positional order for FRONT detection, 000 - 999.999
+        //NOTE: <= complements > for rear KL AND > complements <= for rear Other
+//        tVehicle.sort(by: keepLeft ? {$0.position.y < $1.position.y} : {$0.position.y >= $1.position.y}) //Sort into positional order for FRONT detection, 000 - 999.999
+
         var gapp: CGFloat = 0.0      //Distance ahead in THIS lane
         var othergapp: CGFloat = 0.0     //Distance ahead in OTHER lane
         //    nextIndex = 0               //Not required - value loaded below!
@@ -254,8 +263,13 @@ struct NodeData {
             
             unitNumb = Int.extractNum(from: vehNode.name)! //NOTE: Use [unitNumb] for sKLAllVehicles. Use [index] OR [nextIndex] for tVehicles!
             
-            nextIndex = index
+            if index != 0 {     //Check for duplicates yPos = yPos. Ignore index = 0 as any equals will be found.
+                if vehNode.position.y == tVehicle[index-1].position.y {
+                    othergapp = 0.1     //Equal found! Assume no gap to vehicle in other lane
+                }                       //Checked here as same pos may not be picked up in both directions!
+            }
             
+            nextIndex = index
             var tmpIndex = (index - 1)
             while gapp == 0 || othergapp == 0 {       //Find both gap & otherGap
                 
@@ -278,7 +292,7 @@ struct NodeData {
                     //Both vehicles in same lane +/- 0.8 (laneMax)
                     if gapp == 0 {
                         gapp = (past1km == false) ? sameLap : lastLap
-                        if gapp <= 0 { gapp = 0.1 } //Should NEVER happen! (due to self braking)
+                        if gapp < 0.1 { gapp = 0.1 } //Should NEVER happen! (due to self braking)
                         //                    vehNode.spacing = gap
                         tVehicle[index].frontUnit = tVehicle[nextIndex].name      //Save identity of front unit
                         tVehicle[index].frontPos = tVehicle[nextIndex].position   //Save position of front unit
@@ -288,7 +302,7 @@ struct NodeData {
                         //If this vehicle is mid-lane, set otherGap = gap
                         if othergapp == 0 {
                             othergapp = (past1km == false) ? sameLap : lastLap
-                            if othergapp <= 0 { othergapp = 0.1 } //Could prevent -ve values by using <= here
+                            if othergapp < 0.1 { othergapp = 0.1 } //Could prevent -ve values by using <= here
                             //                    vehNode.othergap = othergapp
                             tVehicle[index].oFrontSpd = tVehicle[nextIndex].currentSpeed   //Save speed of oFront unit
                         }
@@ -297,7 +311,9 @@ struct NodeData {
                     //The two vehicles are in different lanes ie.> 0.8 lanes away from this lane!
                     if othergapp == 0 {
                         othergapp = (past1km == false) ? sameLap : lastLap
-                        if othergapp <= 0 { othergapp = 0.1 } //Could prevent -ve values by using <= here
+                        if othergapp < 0.1 {
+                            othergapp = 0.1
+                        } //Could prevent -ve values by using <= here
                         //                    vehNode.otherGap = othergapp
                         tVehicle[index].oFrontSpd = tVehicle[nextIndex].currentSpeed   //Save speed of oFront unit
                     }
@@ -343,8 +359,8 @@ struct NodeData {
             gapTime = (gapp * 3.6) / vehNode.currentSpeed   //Time in secs to catch vehicle in front @ current speed
             if gapTime > 9.9 { gapTime = 9.9 }    //Avoid infinite result!
             
-            if gapp <= minGap {
-                golSpeed = 0    //Force speed to 0 if gap is less than minimum allowed! (= 2.5m)
+            if gapp <= (0.7 * minGap) {
+                golSpeed = 0    //Force speed to 0 if gap is less than min allowed! (0.7*3.5=2.45m)
             } else {
                 
                 //MARK: - Create variable value of decel when gap 1 - 3 secs from vehicle in front
@@ -840,9 +856,9 @@ struct NodeData {
         
         //teeVeh[index].mySetGap ~3 secs = min gap to vehicle in front
         //These values used to test distance between this vehicle & the one behind in the other lane.
-        let oRearDecel: CGFloat = 5                     //m/s2 used to calc diff eg. (3 x 5) = 15 kph
-        var oRearMaxGap: CGFloat    //~ 3 secs
-        var oRearMinGap: CGFloat    //(3 secs / 6) = 0.5 secs = min gap for overtaking
+        let oRearDecel: CGFloat = 3.5   //m/s2 used to calc spd diff (2.4-5.6secs x 3.5m/s2) = 8.4-19.6 kph
+        var oRearMaxGap: CGFloat    //(2.4-5.6) secs
+        var oRearMinGap: CGFloat    //(3 secs / 6) = 0.5 secs = min gap for overtaking XXX
         var oRearGapRange: CGFloat
         var maxORearSpdDiff: CGFloat   //eg. (3 x 5) = 15 kph
         
@@ -853,9 +869,38 @@ struct NodeData {
         var oFrontOKGap: CGFloat             //Used to store min allowable oRearGap
         
         var bigGap: CGFloat = 0             //bigGap = 110% of 3 sec gap. Calc'd for each vehicle during loop.
-        let minChangeLaneSpdL: CGFloat = 16 //Minimum speed where lane change permitted!
-        let minChangeLaneSpdR: CGFloat = 28 //Minimum speed where lane change permitted!
+        
+        /// Setup multiplier to work out minimum speed for change into left lane
+        ///- Result = (100-numVehicles)[result capped @ 80] * 11/80 + 5
+        ///-     min spd = 16kph if <= 20 Vehicles
+        ///-     min spd = 5kph  if 100 Vehicles
+        var minChangeLaneSpdL: CGFloat //Minimum speed where lane change permitted!
+        /// Setup multiplier to work out minimum speed for change into right lane
+        ///- Result = (100-numVehicles)[result capped @ 80] * 23/80 + 5
+        ///-     min spd = 28kph if <= 20 Vehicles
+        ///-     min spd = 5kph  if 100 Vehicles
+        var minChangeLaneSpdR: CGFloat //Minimum speed where lane change permitted!
         //NOTE: May have to reduce the above when 'numVehicles' becomes large!!!
+        var tmp = CGFloat(numVehicles)
+        if tmp < 20 { tmp = 20 }
+        tmp = 100 - tmp
+        var tmp2: CGFloat = 23 / 80             //= 0.2875 = kph diff
+        //23 = 28kph - 5kph
+        minChangeLaneSpdR = tmp * tmp2 + 5.0
+        
+        tmp2 = 11 / 80             //= 0.1375 = kph diff
+        //11 = 16kph - 5kph
+        minChangeLaneSpdL = tmp * tmp2 + 5.0
+        
+        //Tests indicated vehicle speeds for various numVehicles limited as follows:
+        //  20 Vehicles 32kph       ;Formulas above prevent lane changes @ low speeds
+        //  30 Vehicles 24kph       ;subject to no. of vehicles.
+        //  40 Vehicles 22kph       ;
+        //  50 Vehicles 19kph       ;   -> Left Lane    5kph 100 vehicles
+        //  60 Vehicles 15kph       ;                   28kph 20 vehicles
+        //  70 Vehicles 11kph       ;
+        //  80 Vehicles 8kph        ;   -> Right Lane   5kph 100 vehicles
+        //  110 Vehicles 6kph       ;                   16kph 20 vehicles
 
         //Start loop
         for indx in teeVeh.indices {
@@ -873,16 +918,19 @@ struct NodeData {
             }
             //^^^^^^^^^^ Force Lane to 0 or 1 ^^^^^^^^^^
 
-            oRearMaxGap = teeVeh[indx].mySetGap    //~ 3 secs
-            oRearMinGap = (oRearMaxGap / 6)    //(~3 secs / 6) = ~0.5 secs (0.4-0.933s) = min gap for overtaking
+            oRearMaxGap = teeVeh[indx].mySetGap    //~ 3 secs (2.4-5.6 secs)
+//            oRearMinGap = (oRearMaxGap / 6)    //(~3 secs / 6) = ~0.5 secs (0.4-0.933s) = min gap for overtaking
+            oRearMinGap = (teeVeh[indx].myMinGap * 2)    //(0.4-1.2secs * 2) = (0.8-2.4secs) = min gap for overtaking
             oRearGapRange = (oRearMaxGap - oRearMinGap)
-            maxORearSpdDiff = (oRearMaxGap * oRearDecel)   //eg. (~3 x 5) = 15 kph
+            maxORearSpdDiff = (oRearMaxGap * oRearDecel) //(2.4-5.6secs @ 5m/s2) = 12-28kph ~15 kph
 
             //****************  Test for permissible oRearGap \/   ****************
             oRearSub = (teeVeh[indx].oRearSpd - teeVeh[indx].currentSpeed)  //Used to calc speed difference
             
             if oRearSub < 0 {
-                oRearSub = 0                        //This vehicle faster than oRearSpd - SAFE allow min gap
+                oRearSub = 0                        //This vehicle faster than oRearSpd - SAFE to allow min gap
+                //NOTE: the minimum gap = 'myMinGap' (0.4-1.2secs) or 'minGap' (3.5m), whichever is greater.
+                //      'myMinGap' calc'd on oRearSpd for rear or currentSpeed for front!
             } else {
                 if oRearSub > maxORearSpdDiff {
                     oRearSub = maxORearSpdDiff      //This vehicle slower than (oRearSpd - ~15kph) - require max gap
@@ -892,7 +940,7 @@ struct NodeData {
             oRearOKGap = oRearMinGap + ((oRearGapRange / maxORearSpdDiff) * oRearSub) //returns min gap allowed = 0.5 - 3 secs
             oRearOKGap = (teeVeh[indx].oRearSpd * oRearOKGap) / 3.6 // = permissible gap in metres
             
-            if oRearOKGap < minGap { oRearOKGap = minGap }       //Limit minimum gap to 2.5m at low speeds
+            if oRearOKGap < minGap { oRearOKGap = minGap }       //Limit minimum gap to 3.5m at low speeds
             
             if teeVeh[indx].oRearGap <= oRearOKGap { continue } //oRearGap insufficient to change lanes. End.
             //oRearGap OK - Test other factors.
@@ -903,70 +951,70 @@ struct NodeData {
             oFrontSub = (teeVeh[indx].currentSpeed - teeVeh[indx].oFrontSpd)  //Used to calc speed difference
             
             if oFrontSub < 0 {
-                oFrontSub = 0                       //This vehicle slower than oFrontSpd - SAFE allow min gap
+                oFrontSub = 0                       //This vehicle slower than oFrontSpd - SAFE to allow min gap
+                //NOTE: the minimum gap = 'myMinGap' (0.4-1.2secs) or 'minGap' (3.5m), whichever is greater.
+                //      'myMinGap' calc'd on oRearSpd for rear or currentSpeed for front!
             } else {
                 if oFrontSub > maxORearSpdDiff {
                     oFrontSub = maxORearSpdDiff     //This vehicle faster than (oFrontSpd + ~15kph) - require max gap
                 }
             }
             
-            oFrontOKGap = oRearMinGap + (oRearGapRange / maxORearSpdDiff * oFrontSub) //returns min gap allowed = 0.5 - 3 secs
-            oFrontOKGap = (teeVeh[indx].currentSpeed * oFrontOKGap) / 3.6                 //converts to metres
+            oFrontOKGap = oRearMinGap + (oRearGapRange / maxORearSpdDiff * oFrontSub) //returns min gap allowed = ~0.5 - ~3 secs
+            oFrontOKGap = (teeVeh[indx].currentSpeed * oFrontOKGap) / 3.6 // = permissible gap in metres
             
-            if oFrontOKGap <= minGap { oFrontOKGap = minGap }       //Limit minimum gap to 2.5m ( + 1m = 3.5m?) at low speeds
+            if oFrontOKGap <= minGap { oFrontOKGap = minGap }       //Limit minimum gap to 3.5m at low speeds
             
             if teeVeh[indx].otherGap <= oFrontOKGap { continue } //oFrontGap insufficient to change lanes. End.
             //oRearGap OK - Test other factors.
             
             //****************  Test for permissible oFrontGap /\  ****************
             //*********  Test for minimum speed to permit lane change \/  ****************
-//            if teeVeh[indx].currentSpeed < minChangeLaneSpdR { continue }     //Don't permit lane change when vehicle speed < 2.5? kph.
+//            if teeVeh[indx].currentSpeed < minChangeLaneSpdR { continue }     //Don't permit lane change when vehicle speed < 5-28 kph.
             
             //*********  Test for minimum speed to permit lane change /\  ****************
             
-            bigGap = ((1.3 * teeVeh[indx].mySetGap) * teeVeh[indx].currentSpeed) / 3.6    //bigGap = 130% of 3 sec gap.
-            
+            bigGap = ((1.05 * teeVeh[indx].mySetGap) * teeVeh[indx].currentSpeed) / 3.6 //bigGap = 105% of 3 sec gap.
+            //Bigger so lane change starts b4 vehicle slows down.
+            //Can't be too big ????? TBC ?????
             if teeVeh[indx].lane == 0 {             //Preferred lane (Left)
                 //****************  Test for permissible gap/otherGap from lane 0 \/  ****************
-                if teeVeh[indx].currentSpeed < minChangeLaneSpdR { continue }     //Don't permit lane change when vehicle speed < 2.5? kph.
+                if teeVeh[indx].currentSpeed < minChangeLaneSpdR { continue }     //Don't permit lane change when vehicle speed < 5-28 kph (subject to numVehicles).
                 if teeVeh[indx].frontSpd >= teeVeh[indx].currentSpeed {
                     continue        //Stay in left lane
                 } else {            //Going faster than vehicle in front
-                    if teeVeh[indx].gap > bigGap {
-                        continue    //gap > 110% 3 sec gap. Stay in left lane.
-                    } else {
-                        if teeVeh[indx].gap >= teeVeh[indx].otherGap {
-                            continue    //LHS gap > otherGap. Stay in this lane.
-                        } else {
-                            if teeVeh[indx].otherGap <= minGap { continue }      //Limit minimum gap to 2.5m ( + 1m = 2m) at low speeds
-                            //                            print("to 1\t\(indx)\t\(teeVeh[indx].lane)")
-                            //                            teeVeh[indx].lane = 1       //Overtake (done elsewhere in SKAction)
+                    if teeVeh[indx].gap > bigGap { continue } //gap > 105% 3 sec gap. Stay in left lane.
+                    if teeVeh[indx].gap >= teeVeh[indx].otherGap { continue } //LHS gap > otherGap. Stay in this lane.
+// if teeVeh[indx].otherGap <= minGap { continue } //Limit minimum gap to 3.5m at low speeds. ALREADY DONE!
+// print("to 1\t\(indx)\t\(teeVeh[indx].lane)")
+// teeVeh[indx].lane = 1       //Overtake (done elsewhere in SKAction)
                             teeVeh[indx].indicator = .overtake              //Move to right (overtaking) lane
-                            //                            sKLAllVehicles[indx].indicator = .overtake      //Move to right (overtaking) lane
+// sKLAllVehicles[indx].indicator = .overtake      //Move to right (overtaking) lane
                             teeVeh[indx].startIndicator = true  //Flag used to start lane change
-                            //                            print("to 1\t\(indx)\t\(teeVeh[indx].lane)")
+// print("to 1\t\(indx)\t\(teeVeh[indx].lane)")
                             continue
-                        }
-                    }
                 }
-                //May later compare frontSpd to oFrontSpd too!
+//May later compare frontSpd to oFrontSpd too!
                 
                 //****************  Test for permissible gap/otherGap from lane 0 /\  ****************
             }               //End in lane 0 checks
             
             if teeVeh[indx].lane == 1 {             //Overtaking lane (Right)
                 //****************  Test for permissible gap/otherGap from lane 1 \/  ****************
-                if teeVeh[indx].currentSpeed < minChangeLaneSpdL { continue }     //Don't permit lane change when vehicle speed < 2.5? kph.
+                if teeVeh[indx].currentSpeed < minChangeLaneSpdL { continue }     //Don't permit lane change when vehicle speed < 5-16 kph (subject to numVehicles).
+//                if teeVeh[indx].otherGap > teeVeh[indx].mySetGap {
                 if teeVeh[indx].otherGap > bigGap {
+                    if teeVeh[indx].otherTrack == true { continue } //Stay in lane if otherTrack
                     //                    teeVeh[indx].lane = 0       //Return to left lane
                     teeVeh[indx].indicator = .endOvertake               //Return to left lane
                     //                    sKLAllVehicles[indx].indicator = .endOvertake       //Return to left lane
                     teeVeh[indx].startIndicator = true      //Flag used to start lane change
                     //                    print("ta\t\(indx)\t\(teeVeh[indx].lane)\tenablSpd: \(enableMinSpeed)")
                     continue                    //End this vehicle
-                } else {
-                    if teeVeh[indx].otherGap >= teeVeh[indx].gap {
-                        if teeVeh[indx].otherGap <= minGap { continue }      //Limit minimum gap to 2.5m ( + 1m = 2m) at low speeds
+                } else {    //otherGap <= mySetGap
+//                    if teeVeh[indx].otherGap >= teeVeh[indx].gap {
+                    if true == true {   //Temporarily REPLACES INSTRUCTION ABOVE - FOR TESTING ONLY!!!
+//if teeVeh[indx].otherGap <= minGap { continue }      //Limit minimum gap to 3.5m at low speeds ALREADY DONE!
                         //                        teeVeh[indx].lane = 0       //Return to left lane
                         teeVeh[indx].indicator = .endOvertake              //Return to left lane
                         //                        sKLAllVehicles[indx].indicator = .endOvertake       //Return to left lane
