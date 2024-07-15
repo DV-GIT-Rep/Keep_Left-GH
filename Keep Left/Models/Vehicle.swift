@@ -78,7 +78,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
     ///  -     Skew     |   Vehicle   |    Range
     ///  -     -0.5     |    Cars     |   2.4-3.4
     ///  -      0       |    Buses    |   2.8-4.2
-    ///  -     +0.25    |    Trucks   |   2.9-5.6
+    ///  -     +0.25    |    Trucks   |   2.9-5.8
     @Published var mySetGap: CGFloat = 3    //Gap in secs between vehicles individually set
     /// Sets deceleration rate when >= mySetGap from vehicle in front in m/s2
     ///  -     Skew     |   Vehicle   |   Range
@@ -98,6 +98,14 @@ class Vehicle: SKSpriteNode, ObservableObject {
     ///  -      0.0     |    Buses    |   0.6-0.9
     ///  -     +1.0     |    Trucks   |   0.8-1.2
     @Published var myMinGap: CGFloat = 0.9  //Apply emergency deceleration within myMinGap of vehicle in front
+
+    /// Probability of this vehicle setting .laneMode to hi or low value: 0-100
+    /// - Value -1 to +1. Fixed when vehicle created.
+    /// - Used as 'distribution' when redefining .laneMode.
+    @Published var laneProb: CGFloat = 0.0
+    /// Random value 0-100 set during SKAction with distribution = .laneProb
+    /// - see .laneProb
+    @Published var laneMode: CGFloat = 50.0
 
     //Create variables used in 'setVariables'
 //    @Published var strtSpd: CGFloat = 0             //Capture preferredSpeed @ start of action sequence
@@ -487,9 +495,24 @@ class Vehicle: SKSpriteNode, ObservableObject {
         let reRun = SKAction.run { self.setVehicleSpeed() }    //Recursion here! Call func again @ end of current call
         let spdSequence = SKAction.sequence([setSpeed, delay, reRun]) //Alter preferredSpeed slowly followed by 'delay'
 
-        run(spdSequence, withKey: "spdAct\(vehNo)")
+        run(spdSequence, withKey: "spdAct\(vehNo)") //Overrides & cancels existing SKAction
         
     }           //end of setVehicleSpeed function
+    
+    func setLaneMode() {
+        let vehNo = Int.extractNum(from: self.name ?? "999")! //vehicle = sKLAllVehicles[vehNo]
+        let runTime = randomValue(distribution: 0, min: 5*60, max: 30*60) //Value 5 mins - 30 mins
+        
+        let setMode = SKAction.run {
+            sOtherAllVehicles[vehNo].laneMode = randomValue(distribution: sKLAllVehicles[vehNo].laneProb, min: 0, max: 100) //Only used for otherTrack tho laneProb stored in sKL.
+        }
+        let delay = SKAction.wait(forDuration: runTime) //Hold new setMode for the next 5-30 mins (randomly selected)
+        let reRun = SKAction.run { self.setLaneMode() } //Recursion here! Call func again @ end of current call
+        let laneSequence = SKAction.sequence([setMode, delay, reRun])
+        
+        run(laneSequence, withKey: "laneAct\(vehNo)") //Overrides & cancels existing SKAction
+        
+    }           //end of setLaneMode function
 
     
 }           //End of Vehicle class

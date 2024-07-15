@@ -91,7 +91,7 @@ var TEST: Int = 0
 
 ///This variable is configured in Settings and defines how many vehicles will be driving around each track
 /// - Legal values: 1 - 100
-var numVehicles = 148        //28 - NOTE: NEVER set to 0! Illegal value.
+var numVehicles = 28        //28 - NOTE: NEVER set to 0! Illegal value.
 let minGap: CGFloat = 3.5   //Sets minimum permissible gap to change lanes between vehicles in metres.
                             // -see 'myMinGap' for min gap between vehicles in same lane in seconds!
 

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct StatsView: View {
     var body: some View {
-        Text("Statistics View")
+        Text("Statistics View\nAdd graphical representation of performance differences between tracks over time")
     }
 }
 

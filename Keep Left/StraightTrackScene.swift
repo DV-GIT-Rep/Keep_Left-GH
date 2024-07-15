@@ -595,6 +595,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         nodeDataKL.decelMax = veh1Node.decelMax
                         nodeDataKL.myMinGap = veh1Node.myMinGap     //Gap in seconds
 
+//                        nodeDataKL.laneProb = veh1Node.laneProb     //Always use value in KL! Never changes.
+                        nodeDataKL.laneMode = -1                    //KL Track = -1. OtherTrack = 0-100
+
                     }   //end index zero check
                     t1xVehicle.append(nodeDataKL)
                 }       //end For Loop
@@ -765,6 +768,9 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         nodeDataO.decelMin = sKLAllVehicles[index].decelMin     //THESE 4 VALUES NEVER CHANGE!
                         nodeDataO.decelMax = sKLAllVehicles[index].decelMax
                         nodeDataO.myMinGap = sKLAllVehicles[index].myMinGap
+
+//                        nodeDataO.laneProb = sKLAllVehicles[index].laneProb     //Always use KL value! Never changes.
+                        nodeDataO.laneMode = sOtherAllVehicles[index].laneMode     //Always use value in KL!
 
 
 //                nodeDataO.equivF8Name = not needed here!
@@ -1334,7 +1340,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             
             //_________________________________________________________________
             //Following sets up parameters to alter vehicle preferred speed etc
-            //_________________________________________________________________ start
+            //_________________________________________________________________ start speed
             //Higher spdPref prefers > speed probability within range for next speed calculation
             // tempDist = 1.0 for Cars, 0.45 for Trucks & 0 for Buses
             sKLVehicle.spdPref = randomValue(distribution: tempDist, min: -1, max: +1)
@@ -1356,11 +1362,11 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
             //varTime sets distribution for randomly changing time between speed variances. Skewed low
             sKLVehicle.holdTime = randomValue(distribution: -sKLVehicle.spdPref, min: -1, max: +1)
-
-            //_________________________________________________________________ end
+            //_________________________________________________________________ end speed
 
             //_________________________________________________________________
             //Following sets up parameters to alter set gap, min gap & decel min/max
+            //Each vehicle retains these values for remainder of lifecycle
             //_________________________________________________________________ start gap
             switch sKLVehicle.vehType {
             //Gaps in seconds. Decels in m/s2. See Quick Help on each for details!
@@ -1369,20 +1375,31 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                 sKLVehicle.decelMin = randomValue(distribution: +1.0, min: 2.5, max: 4.0)   //m/s2
                 sKLVehicle.decelMax = randomValue(distribution: +0.5, min: 8.0, max: 10.0)  //m/s2
                 sKLVehicle.myMinGap = randomValue(distribution: -1.0, min: 0.4, max: 0.8)   //gap in secs
-            case .truck:
-                sKLVehicle.mySetGap = randomValue(distribution: +0.25, min: 2.9, max: 5.6)
-                sKLVehicle.decelMin = randomValue(distribution: -1.0, min: 1.0, max: 3.5)
-                sKLVehicle.decelMax = randomValue(distribution: -0.5, min: 6.5, max: 8.0)
-                sKLVehicle.myMinGap = randomValue(distribution: +1.0, min: 0.8, max: 1.2)
             case .bus:
                 sKLVehicle.mySetGap = randomValue(distribution: 0.0, min: 2.8, max: 4.2)
                 sKLVehicle.decelMin = randomValue(distribution: -0.2, min: 1.4, max: 3.8)
                 sKLVehicle.decelMax = randomValue(distribution: 0.0, min: 7.0, max: 8.5)
                 sKLVehicle.myMinGap = randomValue(distribution: 0.0, min: 0.6, max: 0.9)
+            case .truck:
+                sKLVehicle.mySetGap = randomValue(distribution: +0.25, min: 2.9, max: 5.8)
+                sKLVehicle.decelMin = randomValue(distribution: -1.0, min: 1.0, max: 3.5)
+                sKLVehicle.decelMax = randomValue(distribution: -0.5, min: 6.5, max: 8.0)
+                sKLVehicle.myMinGap = randomValue(distribution: +1.0, min: 0.8, max: 1.2)
             }
-            
-
             //_________________________________________________________________ end gap
+
+            //_________________________________________________________________
+            //Following sets up probabilities to alter how vehicles on the otherTrack
+            // change lanes. No affect on vehicles on Keep left Track.
+            //Each vehicle retains these values for remainder of lifecycle
+            //_________________________________________________________________ start lane
+                sKLVehicle.laneProb = randomValue(distribution: 0, min: -1, max: 1)   //Define distribution for ongoing variations
+
+            //_________________________________________________________________ end lane
+
+//1st line below runs randomValue & prints value. 2nd line runs randomValue 10,000 times to test distribution.
+// print("Result: \(randomValue(distribution: -1, min: 0, max: 100).dp0)%")  //Prints 'numVehicles' times
+// testRun(distribution: -1) //Test distribution from 10,000 attempts (* numVehicles)
 
             sKLVehicle = placeVehicle(sKLVehicle: sKLVehicle, sOtherVehicle: sOtherVehicle)
 
@@ -1655,6 +1672,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             //          setVehicleSpeed recursive. Called within 1/2s of Start/Stop
             if newRun == true {             //Call setVehicleSpeed after Start/Stop
                 sKLNode.setVehicleSpeed()   //Randomly calculate & load preferredSpeed for each vehicle
+                sKLNode.setLaneMode()       //Randomly calculate & load laneMode 0-100 for each vehicle
             }
 
 

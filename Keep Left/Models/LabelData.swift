@@ -237,7 +237,9 @@ class LabelData: SKLabelNode, ObservableObject {
         maxDistanceDesc.text = f8DisplayDat == 0 ? "Max \(Km)" : "Total \(Km)"
         maxDistanceDesc.fontColor = f8DisplayDat == 0 ? spdSubTitleColour : UIColor(displayP3Red: 0.85, green: 0.9, blue: 0.7, alpha: 1)
         maxDistanceDesc.fontName = f8DisplayDat == 0 ? "Helvetica Neue Light" : "Helvetica Neue Medium"
-        minDistanceDesc.text = f8DisplayDat == 0 ? "Min \(Km)" : topLabel ? "Honda" : ""
+//        minDistanceDesc.text = f8DisplayDat == 0 ? "Min \(Km)" : topLabel ? "Honda" : ""
+        //Temp - move down 1 line & center later!
+        minDistanceDesc.text = f8DisplayDat == 0 ? "Min \(Km)" : topLabel ? "\(sKLAllVehicles[f8DisplayDat].vehType)" : ""
         minDistanceDesc.fontColor = spdSubTitleColour
         minDistanceDesc.fontName = f8DisplayDat == 0 ? "Helvetica Neue Light" : "Helvetica Neue Medium"
 
@@ -261,7 +263,9 @@ class LabelData: SKLabelNode, ObservableObject {
         maxDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distanceMax).varDP)" : "\(abs(vehicel.distance).varDP)"
         maxDistance.fontColor = f8DisplayDat == 0 ? spdSubTitleColour : UIColor(displayP3Red: 0.6, green: 1, blue: 0.67, alpha: 1)
         maxDistance.fontName = f8DisplayDat == 0 ? "Helvetica Neue Light" : "Helvetica Neue Medium"
-        minDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distanceMin).varDP)" : topLabel ? "S2000" : ""
+//        minDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distanceMin).varDP)" : topLabel ? "S2000" : ""
+        //Temp - move down 1 line & center later!
+        minDistance.text = f8DisplayDat == 0 ? "\(abs(vehicel.distanceMin).varDP)" : topLabel ? "" : ""
         minDistance.fontName = f8DisplayDat == 0 ? "Helvetica Neue Light" : "Helvetica Neue Medium"
         
         //May require the following to refresh between 'All Vehicles' and single vehicle display!!!
