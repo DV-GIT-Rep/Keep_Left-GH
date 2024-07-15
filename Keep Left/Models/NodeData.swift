@@ -860,15 +860,15 @@ struct NodeData {
         //Constants below dictate lane change of otherTrack vehicles. laneMode = 0-100
         // ...for KL Track laneMode = -1
         //bigGap IGNORED FOR NOW!!!
-        let goRightOnly = 0..<7.5   //Force vehicle into the Right Lane (need to use ~= to compare)
-        let do3 = 7.5..<15          //3. goLeft if Left Lane gap >= Right Lane gap
-        let do2 = 15..<22.5         //2. goLeft if Left Lane gap >= bigGap
-        let do1 = 22.5..<30.0       //1. goLeft if Speed <= (Left Lane)frontSpd
-        let doAll = 30..<70.0       //do 1, 2 & 3
-        let do2_3 = 70..<77.5       //do 2 & 3
-        let do1_3 = 77.5..<85.0     //do 1 & 3
-        let do1_2 = 85..<92.5       //do 1 & 2
-        let goLeftOnly = 92.5...100 //Force vehicle into the Left Lane (need to use ~= to compare)
+        let goRightOnly = 0..<10.0  //Force vehicle into the Right Lane (need to use ~= to compare)
+        let do3 = 10..<20.0         //3. goLeft if Left Lane gap >= Right Lane gap
+        let do2 = 20..<30.0         //2. goLeft if Left Lane gap >= bigGap
+        let do1 = 30..<40.0         //1. goLeft if Speed <= (Left Lane)frontSpd
+        let doAll = 40..<60.0       //do 1, 2 & 3
+        let do2_3 = 60..<70.0       //do 2 & 3
+        let do1_3 = 70..<80.0       //do 1 & 3
+        let do1_2 = 80..<90.0       //do 1 & 2
+        let goLeftOnly = 90.0...100 //Force vehicle into the Left Lane (need to use ~= to compare)
 
         //teeVeh[index].mySetGap ~3 secs = min gap to vehicle in front
         //These values used to test distance between this vehicle & the one behind in the other lane.
@@ -923,7 +923,8 @@ struct NodeData {
             //        for (indx, vehc) in teeVeh.enumerated() {
             if indx == 0 { continue }       //Skip loop for element[0] = All Vehicles
             
-            let frontNum = Int.extractNum(from: teeVeh[indx].frontUnit)! //UnitNum of vehicle in front. Same lane.
+            var frontNum = Int.extractNum(from: teeVeh[indx].frontUnit) ?? nil //UnitNum of vehicle in front. Same lane.
+            //Returns nil if there's no other vehicles in THIS lane!
             
             //vvvvvvvvvv Force Lane to 0 or 1 vvvvvvvvvv
             if teeVeh[indx].indicator != .off { continue }  //Lane change already in progress
@@ -1003,7 +1004,9 @@ struct NodeData {
                 //Only permit lane change above 5-28kph
                 if teeVeh[indx].currentSpeed < minChangeLaneSpdR { continue }     //Don't permit lane change when vehicle speed < 5-28 kph (subject to numVehicles).
                 
-                if teeVeh[frontNum].indicator == .overtake { continue } //Don't overtake if vehicle in front is
+                if frontNum != nil {    //nil if no other vehicles in this lane
+                    if teeVeh[frontNum!].indicator == .overtake { continue } //No overtake if vehicle in front is too
+                }
                 
                 //Force into Right Lane?
                 if teeVeh[indx].otherTrack == true {            //OtherTrack
@@ -1063,7 +1066,9 @@ struct NodeData {
                 //Only permit lane change above 5-16kph
                 if teeVeh[indx].currentSpeed < minChangeLaneSpdL { continue }     //Don't permit lane change when vehicle speed < 5-16 kph (subject to numVehicles).
                 
-                if teeVeh[frontNum].indicator == .endOvertake { continue } //Don't move left if vehicle in front is
+                if frontNum != nil {    //nil if no other vehicles in this lane
+                    if teeVeh[frontNum!].indicator == .endOvertake { continue } //Don't move left if vehicle in front is too
+                }
                 
                 //Force into Left Lane?
                 if teeVeh[indx].otherTrack == true {            //OtherTrack
@@ -1075,7 +1080,7 @@ struct NodeData {
                 }       //end KL Track test
                 
                 //Condition 1. Slower than Left Lane FrontSpd?
-                if teeVeh[indx].currentSpeed <= teeVeh[indx].oFrontSpd {    //Safe in Left Lane?
+                if teeVeh[indx].currentSpeed < teeVeh[indx].oFrontSpd {    //Safe in Left Lane?
 //                    if teeVeh[indx].otherTrack == false || do1 ~= teeVeh[indx].laneMode || do1_3 ~= teeVeh[indx].laneMode || do1_2 ~= teeVeh[indx].laneMode || doAll ~= teeVeh[indx].laneMode {
 // To reinstate condition 2 for otherTrack uncomment above & comment below!
                     if teeVeh[indx].otherTrack == false {
@@ -1086,7 +1091,7 @@ struct NodeData {
                 }       //Left Lane FrontSpd test ended - do next test
 
                 //Condition 2. bigGap vs Left Lane Gap Test
-                if teeVeh[indx].otherGap >= bigGap {    //Safe in Left Lane?
+                if teeVeh[indx].otherGap > bigGap {    //Safe in Left Lane?
                     if teeVeh[indx].otherTrack == false || do2 ~= teeVeh[indx].laneMode || do2_3 ~= teeVeh[indx].laneMode || do1_2 ~= teeVeh[indx].laneMode || doAll ~= teeVeh[indx].laneMode {
                         teeVeh[indx].indicator = .endOvertake   //Move to Left Lane
                         teeVeh[indx].startIndicator = true      //Flag used to start lane change
@@ -1095,7 +1100,7 @@ struct NodeData {
                 }       //Left Lane bigGap test ended - do next test
 
                 //Condition 3. This (Right) Gap vs Left Lane Gap Test
-                if teeVeh[indx].otherGap >= teeVeh[indx].gap {
+                if teeVeh[indx].otherGap > teeVeh[indx].gap {
                     if teeVeh[indx].otherTrack == false || do3 ~= teeVeh[indx].laneMode || do2_3 ~= teeVeh[indx].laneMode || do1_3 ~= teeVeh[indx].laneMode || doAll ~= teeVeh[indx].laneMode {
                         teeVeh[indx].indicator = .endOvertake   //Move to Left Lane
                         teeVeh[indx].startIndicator = true      //Flag used to start lane change
