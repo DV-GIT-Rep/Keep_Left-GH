@@ -91,7 +91,7 @@ var TEST: Int = 0
 
 ///This variable is configured in Settings and defines how many vehicles will be driving around each track
 /// - Legal values: 1 - 100
-var numVehicles = 100        //28 - NOTE: NEVER set to 0! Illegal value.
+var numVehicles = 60        //28 - NOTE: NEVER set to 0! Illegal value.
 let minGap: CGFloat = 4.0   //Sets minimum permissible gap to change lanes between vehicles in metres.
                             // -see 'myMinGap' for min gap between vehicles in same lane in seconds!
 
@@ -252,6 +252,7 @@ var f8SceneWidth: CGFloat = 0.0     //Figure 8 Track Scene Width in Points
 var f8SceneHeight: CGFloat = 0.0    //Figure 8 Track Scene Height in Points
 var f8ScreenHeight: CGFloat = 400.0    //Figure 8 track screen height (longest axis) in metres
 let f8ScreenWidth: CGFloat = 200.0      //Figure 8 track screen width (shortest axis) in metres
+///Radius of either end of Figure 8 Track along centre strip of green divider
 var F8Radius: CGFloat = sTrackLength / (4 + piBy3)       //Radius of centre of figure 8 curves
 //var F8Radius: CGFloat = 75.0       //Radius of centre of figure 8 curves (see above: ~ 74.489m)
 let f8CentreStrip: CGFloat = 9.5    //Width of centre strip in metres

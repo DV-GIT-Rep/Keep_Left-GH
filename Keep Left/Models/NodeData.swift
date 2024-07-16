@@ -859,16 +859,26 @@ struct NodeData {
         
         //Constants below dictate lane change of otherTrack vehicles. laneMode = 0-100
         // ...for KL Track laneMode = -1
-        //bigGap IGNORED FOR NOW!!!
-        let goRightOnly = 0..<10.0  //Force vehicle into the Right Lane (need to use ~= to compare)
-        let do3 = 10..<20.0         //3. goLeft if Left Lane gap >= Right Lane gap
-        let do2 = 20..<30.0         //2. goLeft if Left Lane gap >= bigGap
-        let do1 = 30..<40.0         //1. goLeft if Speed <= (Left Lane)frontSpd
-        let doAll = 40..<60.0       //do 1, 2 & 3
-        let do2_3 = 60..<70.0       //do 2 & 3
-        let do1_3 = 70..<80.0       //do 1 & 3
-        let do1_2 = 80..<90.0       //do 1 & 2
-        let goLeftOnly = 90.0...100 //Force vehicle into the Left Lane (need to use ~= to compare)
+        //bigGap (2 & B) IGNORED FOR NOW ON OtherTrack!!!
+        let goRightOnly = 0..<12.0  //Force vehicle into the Right Lane (need to use ~= to compare)
+        let doA_B_C = 00..<00.0     //do A, B & C   X
+        let doA_B = 00..<00.0       //do A & B      X
+        let doA_C = 12..<23.0       //do A & C
+        let doB_C = 00..<00.0       //do B & C      X
+        let doA = 23..<34.0         //A = goRight if Speed < (Right Lane)frontSpd
+        let doB = 00..<00.0         //B = goRight if Right Lane gap > bigGap (DISABLED) X
+        let doC = 34..<45.0         //C = goRight if Right Lane gap > Left Lane gap
+        
+        let doNothing = 45..<55.0   //Stay in current lane
+
+        let do3 = 55..<66.0         //3 = goLeft if Left Lane gap > Right Lane gap
+        let do2 = 00..<00.0         //2 = goLeft if Left Lane gap > bigGap (DISABLED)   X
+        let do1 = 66..<77.0         //1 = goLeft if Speed < (Left Lane)frontSpd
+        let do2_3 = 00..<00.0       //do 2 & 3      X
+        let do1_3 = 77..<88.0       //do 1 & 3
+        let do1_2 = 00..<00.0       //do 1 & 2      X
+        let do1_2_3 = 00..<00.0     //do 1, 2 & 3 (same as Keep Left Track)             X
+        let goLeftOnly = 88.0...100 //Force vehicle into the Left Lane (need to use ~= to compare)
 
         //teeVeh[index].mySetGap ~3 secs = min gap to vehicle in front
         //These values used to test distance between this vehicle & the one behind in the other lane.
@@ -923,7 +933,7 @@ struct NodeData {
             //        for (indx, vehc) in teeVeh.enumerated() {
             if indx == 0 { continue }       //Skip loop for element[0] = All Vehicles
             
-            var frontNum = Int.extractNum(from: teeVeh[indx].frontUnit) ?? nil //UnitNum of vehicle in front. Same lane.
+            var frontNum = Int.extractNum(from: teeVeh[indx].frontUnit) ?? nil //UnitNum of vehicle ahead in same lane.
             //Returns nil if there's no other vehicles in THIS lane!
             
             //vvvvvvvvvv Force Lane to 0 or 1 vvvvvvvvvv
@@ -998,8 +1008,8 @@ struct NodeData {
             //Bigger so lane change starts b4 vehicle slows down.
             //Can't be too big ????? TBC ?????
 
+            var switchLanes: Bool = false
             if teeVeh[indx].lane == 0 {             //In Preferred Lane (Left)
-                var switchLanes: Bool = false
                 //****************  Test for permissible gap/otherGap from lane 0 (Left Lane) \/  ****************
                 //Only permit lane change above 5-28kph
                 if teeVeh[indx].currentSpeed < minChangeLaneSpdR { continue }     //Don't permit lane change when vehicle speed < 5-28 kph (subject to numVehicles).
@@ -1017,10 +1027,41 @@ struct NodeData {
                     } else {                    //Normal - don't force right lane
                         switchLanes = false     //Already false. Normal - don't force right lane
                     }   //end force lane check
-                }       //end KL Track test
+                    
+                //OtherTrack ONLY! Test doA-doC here
+                //  do1-3 NEVER occurs at same time as doA-C!
+                    //Condition A. Slower than Right Lane FrontSpd?
+                    if teeVeh[indx].currentSpeed < teeVeh[indx].oFrontSpd {    //Safe in Right Lane?
+                        if doA ~= teeVeh[indx].laneMode || doA_C ~= teeVeh[indx].laneMode || doA_B ~= teeVeh[indx].laneMode || doA_B_C ~= teeVeh[indx].laneMode {
+                            teeVeh[indx].indicator = .overtake  //Move to right (overtaking) lane
+                            teeVeh[indx].startIndicator = true      //Flag used to start lane change
+                            continue                                //Lane change initiated - end
+                        }   //end - condition to change lanes not met!
+                    }       //Right Lane FrontSpd test ended - do next test
+
+                    //Condition B. bigGap vs Right Lane Gap Test - DISABLED!
+                    // To reinstate condition B for otherTrack uncomment the code below!
+//                    if teeVeh[indx].otherGap > bigGap {    //Safe in Right Lane?
+//                        if doB ~= teeVeh[indx].laneMode || doB_C ~= teeVeh[indx].laneMode || doA_B ~= teeVeh[indx].laneMode || doA_B_C ~= teeVeh[indx].laneMode {
+//                            teeVeh[indx].indicator = .overtake  //Move to right (overtaking) lane
+//                            teeVeh[indx].startIndicator = true      //Flag used to start lane change
+//                            continue                                //Lane change initiated - end
+//                        }   //end - condition to change lanes not met!
+//                    }       //Right Lane bigGap test ended - do next test
+
+                    //Condition C. This (Left) Gap vs Right Lane Gap Test
+                    if teeVeh[indx].otherGap > teeVeh[indx].gap {
+                        if doC ~= teeVeh[indx].laneMode || doB_C ~= teeVeh[indx].laneMode || doA_C ~= teeVeh[indx].laneMode || doA_B_C ~= teeVeh[indx].laneMode {
+                            teeVeh[indx].indicator = .overtake  //Move to right (overtaking) lane
+                            teeVeh[indx].startIndicator = true      //Flag used to start lane change
+                            continue                                //Lane change initiated - end
+                        }   //end - condition to change lanes not met!
+                    }       //Right Lane otherGap test ended.
+                    
+                }       //end KL Track test. Can be KLTrack or otherTrack after this closure!
                 
-                //Condition 1. Lane Change Test
-                if teeVeh[indx].otherTrack == false || do1 ~= teeVeh[indx].laneMode || do1_3 ~= teeVeh[indx].laneMode || do1_2 ~= teeVeh[indx].laneMode || doAll ~= teeVeh[indx].laneMode {
+                //Condition 1. Slower than Left Lane FrontSpd?
+                if teeVeh[indx].otherTrack == false || do1 ~= teeVeh[indx].laneMode || do1_3 ~= teeVeh[indx].laneMode || do1_2 ~= teeVeh[indx].laneMode || do1_2_3 ~= teeVeh[indx].laneMode {
                     if teeVeh[indx].currentSpeed <= teeVeh[indx].frontSpd { //Stay in left lane
                         continue                //Condition 1 to change lanes not met - end
                     } else {                    //Speed > frontSpd
@@ -1028,11 +1069,11 @@ struct NodeData {
                     }   //end speed check
                 }       //FrontSpd test ended - do next test
                 
-                //Condition 2. bigGap Test
-//                if teeVeh[indx].otherTrack == false || do2 ~= teeVeh[indx].laneMode || do2_3 ~= teeVeh[indx].laneMode || do1_2 ~= teeVeh[indx].laneMode || doAll ~= teeVeh[indx].laneMode {
-// To reinstate condition 2 for otherTrack uncomment above & comment below!
-                if teeVeh[indx].otherTrack == false {
-                    if teeVeh[indx].gap >= bigGap { //Stay in left lane
+                //Condition 2. bigGap Test - DISABLED!
+//                if teeVeh[indx].otherTrack == false || do2 ~= teeVeh[indx].laneMode || do2_3 ~= teeVeh[indx].laneMode || do1_2 ~= teeVeh[indx].laneMode || do1_2_3 ~= teeVeh[indx].laneMode {
+// To reinstate condition 2 for otherTrack uncomment above & comment below! (BOTH TRACKS!)
+                if teeVeh[indx].otherTrack == false {   //Keep Left Track ONLY! 2 disabled.
+                    if teeVeh[indx].gap >= bigGap {     //Stay in left lane
                         continue                //Condition 2 to change lanes not met - end
                     } else {                    //gap < bigGap
                         switchLanes = true      //Condition 2 to change lanes met - Continue tests
@@ -1040,7 +1081,7 @@ struct NodeData {
                 }       //bigGap test ended - do next test
                 
                 //Condition 3. oGap Test
-                if teeVeh[indx].otherTrack == false || do3 ~= teeVeh[indx].laneMode || do2_3 ~= teeVeh[indx].laneMode || do1_3 ~= teeVeh[indx].laneMode || doAll ~= teeVeh[indx].laneMode {
+                if teeVeh[indx].otherTrack == false || do3 ~= teeVeh[indx].laneMode || do2_3 ~= teeVeh[indx].laneMode || do1_3 ~= teeVeh[indx].laneMode || do1_2_3 ~= teeVeh[indx].laneMode {
                     if teeVeh[indx].gap >= teeVeh[indx].otherGap { //Stay in left lane
                         continue                //Condition 3 to change lanes not met - end
                     } else {                    //LHS gap < otherGap.
@@ -1081,18 +1122,18 @@ struct NodeData {
                 
                 //Condition 1. Slower than Left Lane FrontSpd?
                 if teeVeh[indx].currentSpeed < teeVeh[indx].oFrontSpd {    //Safe in Left Lane?
-//                    if teeVeh[indx].otherTrack == false || do1 ~= teeVeh[indx].laneMode || do1_3 ~= teeVeh[indx].laneMode || do1_2 ~= teeVeh[indx].laneMode || doAll ~= teeVeh[indx].laneMode {
-// To reinstate condition 2 for otherTrack uncomment above & comment below!
-                    if teeVeh[indx].otherTrack == false {
+                    if teeVeh[indx].otherTrack == false || do1 ~= teeVeh[indx].laneMode || do1_3 ~= teeVeh[indx].laneMode || do1_2 ~= teeVeh[indx].laneMode || do1_2_3 ~= teeVeh[indx].laneMode {
                         teeVeh[indx].indicator = .endOvertake   //Move to Left Lane
                         teeVeh[indx].startIndicator = true      //Flag used to start lane change
                         continue                                //Lane change initiated - end
                     }   //end - condition to change lanes not met!
                 }       //Left Lane FrontSpd test ended - do next test
 
-                //Condition 2. bigGap vs Left Lane Gap Test
+                //Condition 2. bigGap vs Left Lane Gap Test - DISABLED!
                 if teeVeh[indx].otherGap > bigGap {    //Safe in Left Lane?
-                    if teeVeh[indx].otherTrack == false || do2 ~= teeVeh[indx].laneMode || do2_3 ~= teeVeh[indx].laneMode || do1_2 ~= teeVeh[indx].laneMode || doAll ~= teeVeh[indx].laneMode {
+//                    if teeVeh[indx].otherTrack == false || do2 ~= teeVeh[indx].laneMode || do2_3 ~= teeVeh[indx].laneMode || do1_2 ~= teeVeh[indx].laneMode || do1_2_3 ~= teeVeh[indx].laneMode {
+// To reinstate condition 2 for otherTrack uncomment above & comment below! (BOTH TRACKS!)
+                    if teeVeh[indx].otherTrack == false {       //Keep Left Track ONLY! 2 disabled.
                         teeVeh[indx].indicator = .endOvertake   //Move to Left Lane
                         teeVeh[indx].startIndicator = true      //Flag used to start lane change
                         continue                                //Lane change initiated - end
@@ -1101,12 +1142,55 @@ struct NodeData {
 
                 //Condition 3. This (Right) Gap vs Left Lane Gap Test
                 if teeVeh[indx].otherGap > teeVeh[indx].gap {
-                    if teeVeh[indx].otherTrack == false || do3 ~= teeVeh[indx].laneMode || do2_3 ~= teeVeh[indx].laneMode || do1_3 ~= teeVeh[indx].laneMode || doAll ~= teeVeh[indx].laneMode {
+                    if teeVeh[indx].otherTrack == false || do3 ~= teeVeh[indx].laneMode || do2_3 ~= teeVeh[indx].laneMode || do1_3 ~= teeVeh[indx].laneMode || do1_2_3 ~= teeVeh[indx].laneMode {
                         teeVeh[indx].indicator = .endOvertake   //Move to Left Lane
                         teeVeh[indx].startIndicator = true      //Flag used to start lane change
                         continue                                //Lane change initiated - end
                     }   //end - condition to change lanes not met!
-                }       //Left Lane bigGap test ended - do next test
+                }       //Left Lane otherGap test ended.
+                
+                //OtherTrack ONLY! Test doA-doC here
+                //  do1-3 NEVER occurs at same time as doA-C!
+                if teeVeh[indx].otherTrack == false { continue }    //Tests below are for otherTrack ONLY!
+                switchLanes = false     //Already false? Make Sure
+
+                //Condition A. Slower than Right Lane FrontSpd?
+                if doA ~= teeVeh[indx].laneMode || doA_C ~= teeVeh[indx].laneMode || doA_B ~= teeVeh[indx].laneMode || doA_B_C ~= teeVeh[indx].laneMode {
+                    if teeVeh[indx].currentSpeed <= teeVeh[indx].frontSpd { //Stay in Right lane
+                        continue                //Condition A to change lanes not met - end
+                    } else {                    //Speed > frontSpd
+                        switchLanes = true      //Condition A to change lanes met - Continue tests
+                    }   //end speed check
+                }       //FrontSpd test ended - do next test
+                
+                //Condition B. bigGap Test - DISABLED!
+                // To reinstate condition B for otherTrack uncomment the code below
+                if doB ~= teeVeh[indx].laneMode || doB_C ~= teeVeh[indx].laneMode || doA_B ~= teeVeh[indx].laneMode || doA_B_C ~= teeVeh[indx].laneMode {
+                    if teeVeh[indx].gap >= bigGap {     //Stay in Right lane
+                        continue                //Condition B to change lanes not met - end
+                    } else {                    //gap < bigGap
+                        switchLanes = true      //Condition B to change lanes met - Continue tests
+                    }   //end bigGap check
+                }       //bigGap test ended - do next test
+                
+                //Condition C. oGap Test
+                if doC ~= teeVeh[indx].laneMode || doB_C ~= teeVeh[indx].laneMode || doA_C ~= teeVeh[indx].laneMode || doA_B_C ~= teeVeh[indx].laneMode {
+                    if teeVeh[indx].gap >= teeVeh[indx].otherGap { //Stay in Right lane
+                        continue                //Condition C to change lanes not met - end
+                    } else {                    //RHS gap < otherGap.
+                        switchLanes = true      //Condition C to change lanes met - Continue tests
+                    }   //end oGap check
+                }       //oGap (Left Lane gap) test ended - do next test
+                
+                if switchLanes == false {
+                    continue
+                }
+                
+                //Move into Left Lane (0)\
+                teeVeh[indx].indicator = .endOvertake   //Move to Left Lane
+                teeVeh[indx].startIndicator = true  //Flag used to start lane change
+                continue
+                
                 //****************  Test for permissible gap/otherGap from lane 1 /\  ****************
             }               //End in lane 1 checks
 
