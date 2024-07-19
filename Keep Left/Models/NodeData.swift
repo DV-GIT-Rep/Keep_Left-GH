@@ -189,16 +189,16 @@ struct NodeData {
                 
                 let sameLane = (vehNode.lane - laneMax)...(vehNode.lane + laneMax)   //Scan for vehicles within 0.8 lanes either side
                 //                let sameLane = (vehNode.lane - 0.5) < 0 ? 0...(vehNode.lane + 0.5) : (vehNode.lane + 0.5) <= 1 ? (vehNode.lane - 0.5)...(vehNode.lane + 0.5) : (vehNode.lane - 0.5)...1   //Scan for vehicles within 0.5 lanes either side
-                let sameLap = (vehNode.position.y - (vehNode.size.height / 2)) - (tVehicle[nextIndex].position.y + (tVehicle[nextIndex].size.height / 2)) //Vehicle in front on same side of 1km boundary
-                let lastLap = ((vehNode.position.y + sTrackLength) - (vehNode.size.height / 2)) - (tVehicle[nextIndex].position.y + (tVehicle[nextIndex].size.height / 2))    //Vehicle in front is over the 1km boundary!
+                let sameLap = (vehNode.position.y - (vehNode.size.height / 2)) - (tVehicle[nextIndex].position.y + (tVehicle[nextIndex].size.height / 2)) - minGap //Vehicle in front on same side of 1km boundary
+                let lastLap = ((vehNode.position.y + sTrackLength) - (vehNode.size.height / 2)) - (tVehicle[nextIndex].position.y + (tVehicle[nextIndex].size.height / 2)) - minGap    //Vehicle in front is over the 1km boundary!
                 
                 //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
                 if sameLane.contains(tVehicle[nextIndex].lane) {
                     //Both vehicles in same lane (@ least partially)
                     if reerGap == 0 {
                         reerGap = (past1km == false) ? sameLap : lastLap
-                        if reerGap < 0.1 { reerGap = 0.1 } //Should NEVER happen! (due to self braking)
-                        //                    vehNode.spacing = gap
+                        if reerGap < 0.1 { reerGap = 0.1 } //0 = minGap between vehicles. -ve indicates less spacing!
+                        //                    vehNode.spacing = rearGap = (gap + minGap)
                         tVehicle[index].rearUnit = tVehicle[nextIndex].name      //Save identity of rear unit (NOT Required?)
                         tVehicle[index].rearPos = tVehicle[nextIndex].position   //Save position of rear unit (NOT Required?)
                     }
@@ -206,8 +206,8 @@ struct NodeData {
                         //If this vehicle is mid-lane, set oRearGap = rearGap
                         if oReerGap == 0 {
                             oReerGap = (past1km == false) ? sameLap : lastLap
-                            if oReerGap < 0.1 { oReerGap = 0.1 } //Could prevent -ve values by using <= here
-                            //                    vehNode.oRearGap = oReerGap
+                            if oReerGap < 0.1 { oReerGap = 0.1 } //0 = minGap between vehicles. -ve indicates less spacing!
+                            //                    vehNode.oRearGap = oReerGap = (gap + minGap)
                             tVehicle[index].oRearSpd = tVehicle[nextIndex].currentSpeed   //Save speed of oRear unit
                         }
                     }
@@ -287,16 +287,16 @@ struct NodeData {
                 
                 let sameLane = (vehNode.lane - laneMax)...(vehNode.lane + laneMax)   //Scan for vehicles within 0.8 lanes either side
                 //                let sameLane = (vehNode.lane - 0.5) < 0 ? 0...(vehNode.lane + 0.5) : (vehNode.lane + 0.5) <= 1 ? (vehNode.lane - 0.5)...(vehNode.lane + 0.5) : (vehNode.lane - 0.5)...1   //Scan for vehicles within 0.5 lanes either side
-                let sameLap = (tVehicle[nextIndex].position.y - (tVehicle[nextIndex].size.height / 2)) - (vehNode.position.y + (vehNode.size.height / 2))                             //Vehicle in front on same side of 1km boundary
-                let lastLap = ((tVehicle[nextIndex].position.y + sTrackLength) - (tVehicle[nextIndex].size.height / 2)) - (vehNode.position.y + (vehNode.size.height / 2))      //Vehicle in front is over the 1km boundary!
+                let sameLap = (tVehicle[nextIndex].position.y - (tVehicle[nextIndex].size.height / 2)) - (vehNode.position.y + (vehNode.size.height / 2)) - minGap                             //Vehicle in front on same side of 1km boundary
+                let lastLap = ((tVehicle[nextIndex].position.y + sTrackLength) - (tVehicle[nextIndex].size.height / 2)) - (vehNode.position.y + (vehNode.size.height / 2)) - minGap      //Vehicle in front is over the 1km boundary!
                 
                 //NOTE: 0.5 lanewidth used for now due to in & out. May extend to 0.7 or so later!!!
                 if sameLane.contains(tVehicle[nextIndex].lane) {
                     //Both vehicles in same lane +/- 0.8 (laneMax)
                     if gapp == 0 {
                         gapp = (past1km == false) ? sameLap : lastLap
-                        if gapp < 0.1 { gapp = 0.1 } //Should NEVER happen! (due to self braking)
-                        //                    vehNode.spacing = gap
+                        if gapp < 0.1 { gapp = 0.1 } //0 = minGap between vehicles. -ve indicates less spacing!
+                        //                    vehNode.spacing = gap = (gap + minGap)
                         tVehicle[index].frontUnit = tVehicle[nextIndex].name      //Save identity of front unit
                         tVehicle[index].frontPos = tVehicle[nextIndex].position   //Save position of front unit
                         tVehicle[index].frontSpd = tVehicle[nextIndex].currentSpeed   //Save speed of front unit
@@ -305,8 +305,8 @@ struct NodeData {
                         //If this vehicle is mid-lane, set otherGap = gap
                         if othergapp == 0 {
                             othergapp = (past1km == false) ? sameLap : lastLap
-                            if othergapp < 0.1 { othergapp = 0.1 } //Could prevent -ve values by using <= here
-                            //                    vehNode.othergap = othergapp
+                            if othergapp < 0.1 { othergapp = 0.1 } //0 = minGap between vehicles. -ve indicates less spacing!
+                            //                    vehNode.othergap = othergapp = (gap + minGap)
                             tVehicle[index].oFrontSpd = tVehicle[nextIndex].currentSpeed   //Save speed of oFront unit
                         }
                     }
@@ -362,7 +362,8 @@ struct NodeData {
             gapTime = (gapp * 3.6) / vehNode.currentSpeed   //Time in secs to catch vehicle in front @ current speed
             if gapTime > 9.9 { gapTime = 9.9 }    //Avoid infinite result!
             
-            if gapp <= (0.7 * minGap) {
+//            if gapp <= (0.7 * minGap) {   //Changed 19/7/24 after restricting gapp to (minGap to gapp)
+            if gapp <= (0.1) {
                 golSpeed = 0    //Force speed to 0 if gap is less than min allowed! (0.7*3.5=2.45m)
             } else {
                 
@@ -860,25 +861,45 @@ struct NodeData {
         //Constants below dictate lane change of otherTrack vehicles. laneMode = 0-100
         // ...for KL Track laneMode = -1
         //bigGap (2 & B) IGNORED FOR NOW ON OtherTrack!!!
-        let goRightOnly = 0..<12.0  //Force vehicle into the Right Lane (need to use ~= to compare)
-        let doA_B_C = 00..<00.0     //do A, B & C   X
-        let doA_B = 00..<00.0       //do A & B      X
-        let doA_C = 12..<23.0       //do A & C
-        let doB_C = 00..<00.0       //do B & C      X
-        let doA = 23..<34.0         //A = goRight if Speed < (Right Lane)frontSpd
-        let doB = 00..<00.0         //B = goRight if Right Lane gap > bigGap (DISABLED) X
-        let doC = 34..<45.0         //C = goRight if Right Lane gap > Left Lane gap
+//        let goRightOnly = 0..<12.0  //Force vehicle into the Right Lane (need to use ~= to compare)
+//        let doA_B_C = 200..<200.0     //do A, B & C   X
+//        let doA_B = 200..<200.0       //do A & B      X
+//        let doA_C = 12..<23.0       //do A & C
+//        let doB_C = 200..<200.0       //do B & C      X
+//        let doA = 23..<34.0         //A = goRight if Speed < (Right Lane)frontSpd
+//        let doB = 200..<200.0         //B = goRight if Right Lane gap > bigGap (DISABLED) X
+//        let doC = 34..<45.0         //C = goRight if Right Lane gap > Left Lane gap
+//        
+//        let doNothing = 45..<55.0   //Stay in current lane
+//
+//        let do3 = 55..<66.0         //3 = goLeft if Left Lane gap > Right Lane gap
+//        let do2 = 200..<200.0         //2 = goLeft if Left Lane gap > bigGap (DISABLED)   X
+//        let do1 = 66..<77.0         //1 = goLeft if Speed < (Left Lane)frontSpd
+//        let do2_3 = 200..<200.0       //do 2 & 3      X
+//        let do1_3 = 77..<88.0       //do 1 & 3
+//        let do1_2 = 200..<200.0       //do 1 & 2      X
+//        let do1_2_3 = 200..<200.0     //do 1, 2 & 3 (same as Keep Left Track)             X
+//        let goLeftOnly = 88.0...100 //Force vehicle into the Left Lane (need to use ~= to compare)
+
+        let goRightOnly = 0..<30.0  //Force vehicle into the Right Lane (need to use ~= to compare)
+        let doA_B_C = 230..<245.0     //do A, B & C   X
+        let doA_B = 200..<200.0       //do A & B      X
+        let doA_C = 30..<45.0       //do A & C
+        let doB_C = 200..<200.0       //do B & C      X
+        let doA = 223..<234.0         //A = goRight if Speed < (Right Lane)frontSpd
+        let doB = 200..<200.0         //B = goRight if Right Lane gap > bigGap (DISABLED) X
+        let doC = 234..<245.0         //C = goRight if Right Lane gap > Left Lane gap
         
         let doNothing = 45..<55.0   //Stay in current lane
 
-        let do3 = 55..<66.0         //3 = goLeft if Left Lane gap > Right Lane gap
-        let do2 = 00..<00.0         //2 = goLeft if Left Lane gap > bigGap (DISABLED)   X
-        let do1 = 66..<77.0         //1 = goLeft if Speed < (Left Lane)frontSpd
-        let do2_3 = 00..<00.0       //do 2 & 3      X
-        let do1_3 = 77..<88.0       //do 1 & 3
-        let do1_2 = 00..<00.0       //do 1 & 2      X
-        let do1_2_3 = 00..<00.0     //do 1, 2 & 3 (same as Keep Left Track)             X
-        let goLeftOnly = 88.0...100 //Force vehicle into the Left Lane (need to use ~= to compare)
+        let do3 = 255..<266.0         //3 = goLeft if Left Lane gap > Right Lane gap
+        let do2 = 200..<200.0         //2 = goLeft if Left Lane gap > bigGap (DISABLED)   X
+        let do1 = 266..<277.0         //1 = goLeft if Speed < (Left Lane)frontSpd
+        let do2_3 = 200..<200.0       //do 2 & 3      X
+        let do1_3 = 55..<70.0       //do 1 & 3
+        let do1_2 = 200..<200.0       //do 1 & 2      X
+        let do1_2_3 = 255..<270.0     //do 1, 2 & 3 (same as Keep Left Track)             X
+        let goLeftOnly = 70.0...100 //Force vehicle into the Left Lane (need to use ~= to compare)
 
         //teeVeh[index].mySetGap ~3 secs = min gap to vehicle in front
         //These values used to test distance between this vehicle & the one behind in the other lane.
@@ -969,8 +990,9 @@ struct NodeData {
             oRearOKGap = oRearMinGap + ((oRearGapRange / maxORearSpdDiff) * oRearSub) //returns min gap allowed = 0.5 - 3 secs
             oRearOKGap = (teeVeh[indx].oRearSpd * oRearOKGap) / 3.6 // = permissible gap in metres
             
-            if oRearOKGap < minGap { oRearOKGap = minGap }       //Limit minimum gap to 3.5m at low speeds
-            
+//            if oRearOKGap < minGap { oRearOKGap = minGap }       //Limit minimum gap to 3.5m at low speeds
+            if oRearOKGap < 0.1 { oRearOKGap = 0.1 }       //Zero gap already includes minGap! 19/7/24
+
             if teeVeh[indx].oRearGap <= oRearOKGap { continue } //oRearGap insufficient to change lanes. End.
             //oRearGap OK - Test other factors.
             
@@ -992,8 +1014,9 @@ struct NodeData {
             oFrontOKGap = oRearMinGap + (oRearGapRange / maxORearSpdDiff * oFrontSub) //returns min gap allowed = ~0.5 - ~3 secs
             oFrontOKGap = (teeVeh[indx].currentSpeed * oFrontOKGap) / 3.6 // = permissible gap in metres
             
-            if oFrontOKGap <= minGap { oFrontOKGap = minGap }       //Limit minimum gap to 3.5m at low speeds
-            
+//            if oFrontOKGap <= minGap { oFrontOKGap = minGap }       //Limit minimum gap to 3.5m at low speeds
+            if oFrontOKGap <= 0.1 { oFrontOKGap = 0.1 }       //Zero gap already includes minGap! 19/7/24
+
             if teeVeh[indx].otherGap <= oFrontOKGap { continue } //oFrontGap insufficient to change lanes. End.
             //oRearGap OK - Test other factors.
             
@@ -1041,13 +1064,13 @@ struct NodeData {
 
                     //Condition B. bigGap vs Right Lane Gap Test - DISABLED!
                     // To reinstate condition B for otherTrack uncomment the code below!
-//                    if teeVeh[indx].otherGap > bigGap {    //Safe in Right Lane?
-//                        if doB ~= teeVeh[indx].laneMode || doB_C ~= teeVeh[indx].laneMode || doA_B ~= teeVeh[indx].laneMode || doA_B_C ~= teeVeh[indx].laneMode {
-//                            teeVeh[indx].indicator = .overtake  //Move to right (overtaking) lane
-//                            teeVeh[indx].startIndicator = true      //Flag used to start lane change
-//                            continue                                //Lane change initiated - end
-//                        }   //end - condition to change lanes not met!
-//                    }       //Right Lane bigGap test ended - do next test
+                    if teeVeh[indx].otherGap > bigGap {    //Safe in Right Lane?
+                        if doB ~= teeVeh[indx].laneMode || doB_C ~= teeVeh[indx].laneMode || doA_B ~= teeVeh[indx].laneMode || doA_B_C ~= teeVeh[indx].laneMode {
+                            teeVeh[indx].indicator = .overtake  //Move to right (overtaking) lane
+                            teeVeh[indx].startIndicator = true      //Flag used to start lane change
+                            continue                                //Lane change initiated - end
+                        }   //end - condition to change lanes not met!
+                    }       //Right Lane bigGap test ended - do next test
 
                     //Condition C. This (Left) Gap vs Right Lane Gap Test
                     if teeVeh[indx].otherGap > teeVeh[indx].gap {
@@ -1070,9 +1093,9 @@ struct NodeData {
                 }       //FrontSpd test ended - do next test
                 
                 //Condition 2. bigGap Test - DISABLED!
-//                if teeVeh[indx].otherTrack == false || do2 ~= teeVeh[indx].laneMode || do2_3 ~= teeVeh[indx].laneMode || do1_2 ~= teeVeh[indx].laneMode || do1_2_3 ~= teeVeh[indx].laneMode {
+                if teeVeh[indx].otherTrack == false || do2 ~= teeVeh[indx].laneMode || do2_3 ~= teeVeh[indx].laneMode || do1_2 ~= teeVeh[indx].laneMode || do1_2_3 ~= teeVeh[indx].laneMode {
 // To reinstate condition 2 for otherTrack uncomment above & comment below! (BOTH TRACKS!)
-                if teeVeh[indx].otherTrack == false {   //Keep Left Track ONLY! 2 disabled.
+//                if teeVeh[indx].otherTrack == false {   //Keep Left Track ONLY! 2 disabled.
                     if teeVeh[indx].gap >= bigGap {     //Stay in left lane
                         continue                //Condition 2 to change lanes not met - end
                     } else {                    //gap < bigGap
@@ -1131,9 +1154,9 @@ struct NodeData {
 
                 //Condition 2. bigGap vs Left Lane Gap Test - DISABLED!
                 if teeVeh[indx].otherGap > bigGap {    //Safe in Left Lane?
-//                    if teeVeh[indx].otherTrack == false || do2 ~= teeVeh[indx].laneMode || do2_3 ~= teeVeh[indx].laneMode || do1_2 ~= teeVeh[indx].laneMode || do1_2_3 ~= teeVeh[indx].laneMode {
+                    if teeVeh[indx].otherTrack == false || do2 ~= teeVeh[indx].laneMode || do2_3 ~= teeVeh[indx].laneMode || do1_2 ~= teeVeh[indx].laneMode || do1_2_3 ~= teeVeh[indx].laneMode {
 // To reinstate condition 2 for otherTrack uncomment above & comment below! (BOTH TRACKS!)
-                    if teeVeh[indx].otherTrack == false {       //Keep Left Track ONLY! 2 disabled.
+//                    if teeVeh[indx].otherTrack == false {       //Keep Left Track ONLY! 2 disabled.
                         teeVeh[indx].indicator = .endOvertake   //Move to Left Lane
                         teeVeh[indx].startIndicator = true      //Flag used to start lane change
                         continue                                //Lane change initiated - end
