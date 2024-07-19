@@ -502,16 +502,20 @@ class Vehicle: SKSpriteNode, ObservableObject {
     func setLaneMode() {
         let vehNo = Int.extractNum(from: self.name ?? "999")! //vehicle = sKLAllVehicles[vehNo]
         let runTime = randomValue(distribution: 0, min: 5*60, max: 30*60) //Value 5 mins - 30 mins
+        let fixedLaneLevel: CGFloat = 10 //% @ zero & 100 ends where vehicle only wants to be in left or right lane
         
-        let setMode = SKAction.run {
-            sOtherAllVehicles[vehNo].laneMode = randomValue(distribution: sKLAllVehicles[vehNo].laneProb, min: 0, max: 100) //Only used for otherTrack tho laneProb stored in sKL.
-        }
-        let delay = SKAction.wait(forDuration: runTime) //Hold new setMode for the next 5-30 mins (randomly selected)
-        let reRun = SKAction.run { self.setLaneMode() } //Recursion here! Call func again @ end of current call
-        let laneSequence = SKAction.sequence([setMode, delay, reRun])
-        
-        run(laneSequence, withKey: "laneAct\(vehNo)") //Overrides & cancels existing SKAction
-        
+        if sOtherAllVehicles[vehNo].laneMode > fixedLaneLevel && sOtherAllVehicles[vehNo].laneMode < (100 - fixedLaneLevel) {   //If condition NOT met then leave laneMode value as is!
+            //Able to adjust .laneMode value.
+            let setMode = SKAction.run {
+                sOtherAllVehicles[vehNo].laneMode = randomValue(distribution: sKLAllVehicles[vehNo].laneProb, min: fixedLaneLevel, max: (100 - fixedLaneLevel)) //Only used for otherTrack tho laneProb stored in sKL.
+            }   //end SKAction.run
+            let delay = SKAction.wait(forDuration: runTime) //Hold new setMode for the next 5-30 mins (randomly selected)
+            let reRun = SKAction.run { self.setLaneMode() } //Recursion here! Call func again @ end of current call
+            let laneSequence = SKAction.sequence([setMode, delay, reRun])
+            
+            run(laneSequence, withKey: "laneAct\(vehNo)") //Overrides & cancels existing SKAction
+            
+        }       //end laneMode value check
     }           //end of setLaneMode function
 
     

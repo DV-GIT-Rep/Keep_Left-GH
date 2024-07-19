@@ -861,6 +861,7 @@ struct NodeData {
         //Constants below dictate lane change of otherTrack vehicles. laneMode = 0-100
         // ...for KL Track laneMode = -1
         //bigGap (2 & B) IGNORED FOR NOW ON OtherTrack!!!
+//        let fixedLaneLevel: CGFloat = 10 //ACTUAL value set during 'setLaneMode' function!
 //        let goRightOnly = 0..<12.0  //Force vehicle into the Right Lane (need to use ~= to compare)
 //        let doA_B_C = 200..<200.0     //do A, B & C   X
 //        let doA_B = 200..<200.0       //do A & B      X
@@ -882,6 +883,7 @@ struct NodeData {
 //        let goLeftOnly = 88.0...100 //Force vehicle into the Left Lane (need to use ~= to compare)
 
         let goRightOnly = 0..<30.0  //Force vehicle into the Right Lane (need to use ~= to compare)
+        //NOTE: Any value below 'fixedLaneLevel' (10?) ALWAYS goes Right!
         let doA_B_C = 230..<245.0     //do A, B & C   X
         let doA_B = 200..<200.0       //do A & B      X
         let doA_C = 30..<45.0       //do A & C
@@ -900,6 +902,7 @@ struct NodeData {
         let do1_2 = 200..<200.0       //do 1 & 2      X
         let do1_2_3 = 255..<270.0     //do 1, 2 & 3 (same as Keep Left Track)             X
         let goLeftOnly = 70.0...100 //Force vehicle into the Left Lane (need to use ~= to compare)
+        //NOTE: Any value above (100 - 'fixedLaneLevel') (90?) ALWAYS goes Left!
 
         //teeVeh[index].mySetGap ~3 secs = min gap to vehicle in front
         //These values used to test distance between this vehicle & the one behind in the other lane.
