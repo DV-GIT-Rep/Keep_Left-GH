@@ -389,7 +389,7 @@ class Vehicle: SKSpriteNode, ObservableObject {
 //
     
 
-    /// Creates a new value of preferredSpeed, sets it over a random period, holds it over a new random period, and then repeats with new random values indefinitely
+    /// Creates a new value of preferredSpeed, sets it over a random period (1-180s), holds it over a new random period (1-180s), and then repeats with new random values indefinitely
     /// - Parameters:
     ///   - vehicle: To be setup - Straight Keep Left Track ONLY! Others are copied
     ///   - vehNo: Number of this vehicle

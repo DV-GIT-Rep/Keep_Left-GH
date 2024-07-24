@@ -18,7 +18,7 @@ import SwiftUI
 ///   - distribution: Value between -1 & +1. -1 has distribution skewed to low end, +1 skews distribution to high end & 0 gives flat distribution, default = 0
 ///   - min: Low end of Random range, default = 0
 ///   - max: High end of Random range, default = 1
-/// - Returns: Random Number between 'min' & 'max'
+/// - Returns: Random value between 'min' & 'max'
 /// - to test distribution, use 'testRun(distribution: _, min: _, max: _)'
 func randomValue(distribution d: CGFloat = 0, min: CGFloat = 0, max: CGFloat = 1) -> CGFloat {
     assert((-1.2...1.2).contains(d), "\n\nERROR: distribution in 'randomValue' MUST be in range -1.2 to +1.2!")         //Error if d not in range

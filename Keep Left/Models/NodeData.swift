@@ -862,6 +862,7 @@ struct NodeData {
         // ...for KL Track laneMode = -1
         //bigGap (2 & B) IGNORED FOR NOW ON OtherTrack!!!
 //        let fixedLaneLevel: CGFloat = 10 //ACTUAL value set during 'setLaneMode' function!
+        //NOTE: Any value below 'fixedLaneLevel' (10?) ALWAYS goes Right!
 //        let goRightOnly = 0..<12.0  //Force vehicle into the Right Lane (need to use ~= to compare)
 //        let doA_B_C = 200..<200.0     //do A, B & C   X
 //        let doA_B = 200..<200.0       //do A & B      X
@@ -881,8 +882,10 @@ struct NodeData {
 //        let do1_2 = 200..<200.0       //do 1 & 2      X
 //        let do1_2_3 = 200..<200.0     //do 1, 2 & 3 (same as Keep Left Track)             X
 //        let goLeftOnly = 88.0...100 //Force vehicle into the Left Lane (need to use ~= to compare)
+        //NOTE: Any value above (100 - 'fixedLaneLevel') (90?) ALWAYS goes Left!
 
         let goRightOnly = 0..<30.0  //Force vehicle into the Right Lane (need to use ~= to compare)
+        // let fixedLaneLevel: CGFloat = 10 //ACTUAL value set during 'setLaneMode' function!
         //NOTE: Any value below 'fixedLaneLevel' (10?) ALWAYS goes Right!
         let doA_B_C = 230..<245.0     //do A, B & C   X
         let doA_B = 200..<200.0       //do A & B      X
@@ -1041,12 +1044,13 @@ struct NodeData {
                 if teeVeh[indx].currentSpeed < minChangeLaneSpdR { continue }     //Don't permit lane change when vehicle speed < 5-28 kph (subject to numVehicles).
                 
                 if frontNum != nil {    //nil if no other vehicles in this lane
-                    if teeVeh[frontNum!].indicator == .overtake { continue } //No overtake if vehicle in front is too
+                    if teeVeh[frontNum!].indicator == .overtake { continue } //Stay in lane if vehicle in front overtaking
                 }
                 
                 //Force into Right Lane?
                 if teeVeh[indx].otherTrack == true {            //OtherTrack
                     if goRightOnly ~= teeVeh[indx].laneMode {   //Go To Right Lane - No Reason
+                        if teeVeh[indx].otherGap < (teeVeh[indx].mySetGap * 0.7) { continue }
                         teeVeh[indx].indicator = .overtake      //Move to right (overtaking) lane
                         teeVeh[indx].startIndicator = true      //Flag used to start lane change
                         continue                                //Lane change initiated - end
@@ -1088,7 +1092,7 @@ struct NodeData {
                 
                 //Condition 1. Slower than Left Lane FrontSpd?
                 if teeVeh[indx].otherTrack == false || do1 ~= teeVeh[indx].laneMode || do1_3 ~= teeVeh[indx].laneMode || do1_2 ~= teeVeh[indx].laneMode || do1_2_3 ~= teeVeh[indx].laneMode {
-                    if teeVeh[indx].currentSpeed <= teeVeh[indx].frontSpd { //Stay in left lane
+                    if teeVeh[indx].currentSpeed < teeVeh[indx].frontSpd { //Stay in left lane
                         continue                //Condition 1 to change lanes not met - end
                     } else {                    //Speed > frontSpd
                         switchLanes = true      //Condition 1 to change lanes met - Continue tests
@@ -1140,6 +1144,7 @@ struct NodeData {
                 //Force into Left Lane?
                 if teeVeh[indx].otherTrack == true {            //OtherTrack
                     if goLeftOnly ~= teeVeh[indx].laneMode {    //Go To Left Lane - No Reason
+                        if teeVeh[indx].otherGap < (teeVeh[indx].mySetGap * 0.7) { continue }
                         teeVeh[indx].indicator = .endOvertake   //Move to Left Lane
                         teeVeh[indx].startIndicator = true      //Flag used to start lane change
                         continue                                //Lane change initiated - end

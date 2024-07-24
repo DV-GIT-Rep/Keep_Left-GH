@@ -1393,7 +1393,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             // change lanes. No affect on vehicles on Keep left Track.
             //Each vehicle retains these values for remainder of lifecycle
             //_________________________________________________________________ start lane
-                sKLVehicle.laneProb = randomValue(distribution: 0, min: -1, max: 1)   //Define distribution for ongoing variations
+            sKLVehicle.laneProb = randomValue(distribution: 0, min: -1, max: 1)   //Define distribution for ongoing variations
             sOtherVehicle.laneMode = randomValue(distribution: 0, min: 0, max: 100) //Only here to load values within 'fixedLaneLevel' of 0 or 100 which will NEVER change.
 
             //_________________________________________________________________ end lane
