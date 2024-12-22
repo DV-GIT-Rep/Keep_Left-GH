@@ -91,9 +91,10 @@ var TEST: Int = 0
 
 ///This variable is configured in Settings and defines how many vehicles will be driving around each track
 /// - Legal values: 1 - 100
-var numVehicles = 60        //28 - NOTE: NEVER set to 0! Illegal value.
+var numVehicles = 32        //28 - NOTE: NEVER set to 0! Illegal value.
 let minGap: CGFloat = 3.0   //minGap + 0.1secs = min permissible gap to change lanes between vehicles in metres.
                             // -see 'myMinGap' for min gap between vehicles in same lane in seconds!
+var tmpTst: CGFloat = 1
 
 enum Zone: CaseIterable {               //Define Zone with different speed limits, L/R Hand Drive etc
     case NSW, Vic, Qld, SA, Tas, WA, NT //May make a subset of AUS

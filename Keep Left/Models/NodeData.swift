@@ -77,6 +77,14 @@ struct NodeData {
 //    var laneProb: CGFloat = 0.0
     var laneMode: CGFloat = 50.0
 
+    /// Timer increments when vehicle going slow & hasn't changed lanes
+    /// - Increments every 10 secs if Speed < (preferredSpeed - 2)
+    /// - Cleared every 10 secs if Speed > (preferredSpeed - 1)
+    /// - From left lane considered 'stuck' if timer > 'stuckLLow' to 'stuckLHi'
+    /// - From right lane considered 'stuck' if timer > 'stuckRLow' to 'stuckRHi'
+    /// - Actual time within these ranges determined as (vehNo/numVehicles*(stuckXLow-stuckXHi)+stuckXLow)
+    var stuckTimer: CGFloat = 0
+
     init() {
         name = " "
         position = CGPoint(x: 0, y: 0)
@@ -906,6 +914,19 @@ struct NodeData {
         let do1_2_3 = 255..<270.0     //do 1, 2 & 3 (same as Keep Left Track)             X
         let goLeftOnly = 70.0...100 //Force vehicle into the Left Lane (need to use ~= to compare)
         //NOTE: Any value above (100 - 'fixedLaneLevel') (90?) ALWAYS goes Left!
+        
+        //tests time vehicle stuck in left lane on KL Track 31.07.2024
+        let stuckLLo = 4.0        //Units of 10secs. 40secs / 10 = 4
+        let stuckLHi = 60.0 //Units of 10secs. 10mins * 6 = 60
+        //tests time vehicle stuck in right lane on KL Track 31.07.2024
+        let stuckRLo = 24.0  //Units of 10secs. 4mins * 6 = 24
+        let stuckRHi = 96.0 //Units of 10secs. 16mins * 6 = 96
+//        //tests time vehicle stuck in left lane on KL Track 31.07.2024
+//        let stuckLLo: CGFloat = (40 / 10.0)        //Units of 10secs. 40secs / 10 = 4
+//        let stuckLHi: CGFloat = (10 * (60 / 10.0)) //Units of 10secs. 10mins * 6 = 60
+//        //tests time vehicle stuck in right lane on KL Track 31.07.2024
+//        let stuckRLo: CGFloat = (4 * (60 / 10.0))  //Units of 10secs. 4mins * 6 = 24
+//        let stuckRHi: CGFloat = (16 * (60 / 10.0)) //Units of 10secs. 16mins * 6 = 96
 
         //teeVeh[index].mySetGap ~3 secs = min gap to vehicle in front
         //These values used to test distance between this vehicle & the one behind in the other lane.
@@ -964,7 +985,13 @@ struct NodeData {
             //Returns nil if there's no other vehicles in THIS lane!
             
             //vvvvvvvvvv Force Lane to 0 or 1 vvvvvvvvvv
-            if teeVeh[indx].indicator != .off { continue }  //Lane change already in progress
+            if teeVeh[indx].indicator != .off {     //Lane change already in progress
+                if indx == Int(tmpTst) {  //Print 1st 4 vehicles ONLY
+                    print("\(indx) stuckTmr Cleared due to Lane Change")
+                }   //end Print
+                teeVeh[indx].stuckTimer = 0         //0 -> stuckTimer when lane changes! (KL ONLY used)
+                continue                            //Lane change already in progress - end
+            }
             //NOTE: If inst's below omitted then each veh will O/T or return ONLY once!
             //  (value of indicator changed by 0.002! - laneChange not EXACTLY 1.0 lanes)
             if teeVeh[indx].lane > 0.5 {    //Ensure lane only = 1 or 0 when here!
@@ -1112,18 +1139,47 @@ struct NodeData {
                 
                 //Condition 3. oGap Test
                 if teeVeh[indx].otherTrack == false || do3 ~= teeVeh[indx].laneMode || do2_3 ~= teeVeh[indx].laneMode || do1_3 ~= teeVeh[indx].laneMode || do1_2_3 ~= teeVeh[indx].laneMode {
+                    
+                    //New Code tests if vehicle stuck in lane on KL Track 31.07.2024
+//                    if teeVeh[indx].otherTrack == false && (teeVeh[indx].stuckTimer > (CGFloat(indx / numVehicles) * (stuckLHi - stuckLLo) + stuckLLo)) {    //where indx = vehicle number
+                    if teeVeh[indx].otherTrack == false && (teeVeh[indx].stuckTimer > (CGFloat(indx / numVehicles) * (60 - 4) + 4)) {    //where indx = vehicle number
+                        if teeVeh[indx].otherGap > (teeVeh[indx].mySetGap / 2) {
+                            //Stuck in lane too long & oGap OK - Switch Lanes
+                            //Move into Right Lane (1)
+                            print("\(indx) stuck!    Move into Right Lane")
+                            teeVeh[indx].stuckTimer = 0         //0 -> stuckTimer when lane changes! (KL ONLY used)
+                           teeVeh[indx].indicator = .overtake  //Move to right (overtaking) lane
+                            teeVeh[indx].startIndicator = true  //Flag used to start lane change
+                            continue
+                        }   //end compare oGap to (mySetGap/2)
+                    }       //end 'stuck' check on KL Track
+                    
+                    
                     if teeVeh[indx].gap >= teeVeh[indx].otherGap { //Stay in left lane
                         continue                //Condition 3 to change lanes not met - end
                     } else {                    //LHS gap < otherGap.
                         switchLanes = true      //Condition 3 to change lanes met - Continue tests
                     }   //end oGap check
                 }       //oGap test ended - do next test
-                
+
                 if switchLanes == false {
-                    continue
-                }
+                    continue        //exit if switchLanes NOT true
+                }                   //end 'switchLanes' check
+
+//                //Condition 3. oGap Test
+//                if teeVeh[indx].otherTrack == false || do3 ~= teeVeh[indx].laneMode || do2_3 ~= teeVeh[indx].laneMode || do1_3 ~= teeVeh[indx].laneMode || do1_2_3 ~= teeVeh[indx].laneMode {
+//                    if teeVeh[indx].gap >= teeVeh[indx].otherGap { //Stay in left lane
+//                        continue                //Condition 3 to change lanes not met - end
+//                    } else {                    //LHS gap < otherGap.
+//                        switchLanes = true      //Condition 3 to change lanes met - Continue tests
+//                    }   //end oGap check
+//                }       //oGap test ended - do next test
+//                
+//                if switchLanes == false {
+//                    continue
+//                }
                 
-                //Move into Right Lane (1)\
+                //Move into Right Lane (1)
                 teeVeh[indx].indicator = .overtake  //Move to right (overtaking) lane
                 teeVeh[indx].startIndicator = true  //Flag used to start lane change
                 continue

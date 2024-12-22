@@ -106,6 +106,14 @@ class Vehicle: SKSpriteNode, ObservableObject {
     /// Random value 0-100 set during SKAction with distribution = .laneProb
     /// - see .laneProb
     @Published var laneMode: CGFloat = 50.0
+    
+    /// Timer increments when vehicle going slow & hasn't changed lanes
+    /// - Increments every 10 secs if Speed < (preferredSpeed - 2)
+    /// - Cleared every 10 secs if Speed > (preferredSpeed - 1)
+    /// - From left lane considered 'stuck' if timer > 'stuckLLow' to 'stuckLHi'
+    /// - From right lane considered 'stuck' if timer > 'stuckRLow' to 'stuckRHi'
+    /// - Actual time within these ranges determined as (vehNo/numVehicles*(stuckXLow-stuckXHi)+stuckXLow)
+    @Published var stuckTimer: CGFloat = 0
 
     //Create variables used in 'setVariables'
 //    @Published var strtSpd: CGFloat = 0             //Capture preferredSpeed @ start of action sequence
@@ -517,6 +525,32 @@ class Vehicle: SKSpriteNode, ObservableObject {
             
         }       //end laneMode value check
     }           //end of setLaneMode function
+    
+    func getUnStuck() {
+        let vehNo = Int.extractNum(from: self.name ?? "999")! //vehicle = sOtherAllVehicles[vehNo]
+        let adjStuckTmr = SKAction.run {
+            if self.currentSpeed < (self.preferredSpeed - 2) {
+                self.stuckTimer += 1
+                sKLAllVehicles[vehNo].stuckTimer = self.stuckTimer
+                if vehNo == Int(tmpTst) {  //Print 1st 4 vehicles ONLY
+                    print("\(vehNo) Spd: \(self.currentSpeed.dp1)\tPrefS: \(self.preferredSpeed.dp1)\tstuckTmr: \(self.stuckTimer.dp1)")
+                }   //end Print
+            } else {
+                if self.currentSpeed > (self.preferredSpeed - 1) {
+                    if vehNo == Int(tmpTst) {  //Print 1st 4 vehicles ONLY
+                        print("\(vehNo) stuckTmr Cleared in 'getUnStuck'")
+                    }   //end Print
+                    self.stuckTimer = 0
+                }   //end if spd > (prefSpd - 1)
+            }       //end if spd < (prefSpd - 2)
+        }           //end SKAction.run
+        let delay = SKAction.wait(forDuration: 10) //Runs every 10 seconds
+        let reRun = SKAction.run { sKLAllVehicles[vehNo].getUnStuck() } //Recursion here! Call func again @ end of current call
+        let laneSequence = SKAction.sequence([adjStuckTmr, delay, reRun])
+        
+        run(laneSequence, withKey: "unStick\(vehNo)") //Overrides & cancels existing SKAction
+        
+    }               //end getUnStuck func
 
     
 }           //End of Vehicle class

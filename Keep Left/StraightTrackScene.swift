@@ -579,7 +579,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         nodeDataKL.lane = veh1Node.lane
                         nodeDataKL.laps = veh1Node.laps
                         nodeDataKL.preferredSpeed = veh1Node.preferredSpeed
-                        nodeDataKL.currentSpeed = abs(veh1Node.physicsBody!.velocity.dy * 3.6)      //  ????? x 3.6 for kph?
+                        veh1Node.currentSpeed = abs(veh1Node.physicsBody!.velocity.dy * 3.6) //𝑥 x 3.6 for kph
+                        nodeDataKL.currentSpeed = veh1Node.currentSpeed      //  ????? x 3.6 for kph?
                         nodeDataKL.otherTrack = veh1Node.otherTrack
                         nodeDataKL.startPos = veh1Node.startPos
                         nodeDataKL.preDistance = veh1Node.preDistance
@@ -594,6 +595,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         nodeDataKL.decelMin = veh1Node.decelMin     //THESE 4 VALUES NEVER CHANGE!
                         nodeDataKL.decelMax = veh1Node.decelMax
                         nodeDataKL.myMinGap = veh1Node.myMinGap     //Gap in seconds
+                        
+                        nodeDataKL.stuckTimer = veh1Node.stuckTimer //Only KL Track
 
 //                        nodeDataKL.laneProb = veh1Node.laneProb     //Always use value in KL! Never changes.
                         nodeDataKL.laneMode = -1                    //KL Track = -1. OtherTrack = 0-100
@@ -683,6 +686,10 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         sKLAllVehicles[i].spdClk = rtnT1Veh[i].spdClk
                         sKLAllVehicles[i].upToSpd = rtnT1Veh[i].upToSpd
                         
+//                        if rtnT1Veh[i].stuckTimer == 0 {
+//                            sKLAllVehicles[i].stuckTimer = 0    //Restore value in case cleared during goLeft
+//                        }
+                        
                         if rtnT1Veh[i].upToSpd == false { allAtSpeed1 = false } //Flag cleared if ANY vehicle NOT up to speed
                         
                         //If vehicle crosses 1km boundary then subtract tracklength from the y position.
@@ -753,7 +760,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         nodeDataO.lane = veh2Node.lane
                         nodeDataO.laps = veh2Node.laps
                         nodeDataO.preferredSpeed = veh2Node.preferredSpeed
-                        nodeDataO.currentSpeed = abs(veh2Node.physicsBody!.velocity.dy * 3.6)      //  ????? x 3.6 for kph?
+                        veh2Node.currentSpeed = abs(veh2Node.physicsBody!.velocity.dy * 3.6) //𝑥 x 3.6 for kph
+                        nodeDataO.currentSpeed = veh2Node.currentSpeed
                         nodeDataO.otherTrack = veh2Node.otherTrack
                         nodeDataO.startPos = veh2Node.startPos
                         nodeDataO.preDistance = veh2Node.preDistance
@@ -1674,6 +1682,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
             if newRun == true {             //Call setVehicleSpeed after Start/Stop
                 sKLNode.setVehicleSpeed()   //Randomly calculate & load preferredSpeed for each vehicle
                 sKLNode.setLaneMode()       //Randomly calculate & load laneMode 0-100 for each vehicle
+                sKLNode.getUnStuck()        //Increment/Clear stuckTimer once per 10 secs (KL ONLY)
             }
 
 
@@ -1945,7 +1954,7 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
                         sOtherAllVehicles[index].zRotation = ((elapsedTime / laneChangeTime) * rotAngle.degrees()) + CGFloat(180).degrees() //Convert to radians
 //                        if index == 1 {print("\(index)\tmaxAngle: \(maxVehicleAngle.dp2)\tAngle: \(rotAngle.dp2)\tOtherTrack Overtake")}
                         //-------------
-                    })               //End goToLane0 action
+                    })               //End goToLane1 action
                     
                     let laneChange = SKAction.group([goToLane1, flash])
                     
