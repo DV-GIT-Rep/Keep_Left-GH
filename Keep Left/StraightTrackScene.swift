@@ -446,8 +446,12 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
         authorityLogo.zPosition = 500
         f8Background.addChild(authorityLogo)
 
-        let ms500Timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(every500ms), userInfo: nil, repeats: true)
-        
+        //MARK: - the function below runs every 500ms (see ms500Timer)
+        //    Changed from objC function to SKAction 22/12/24
+//        let ms500Timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(every500ms), userInfo: nil, repeats: true)
+        let ms500Group = SKAction.group([waitHalfSec, ms500Code])   //Group 500ms delay with 500ms code
+        let ms500Timer = SKAction.repeatForever(ms500Group)         //Set repeating group
+        run(ms500Timer)     //Set code to repeat every 500msecs!
         
         
         //setVehicleSpeeds
@@ -1599,9 +1603,12 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 
     }
 
-    //MARK: - the function below runs every 500ms
-    @objc func every500ms() {
-        
+    //MARK: - code below runs every 500ms (see ms500Timer)
+//    Changed from objC function to SKAction 22/12/24
+    //    @objc func every500ms() {
+    let waitHalfSec = SKAction.wait(forDuration: 0.5)   //Run every 0.5 seconds
+    let ms500Code = SKAction.run {  //Code block follows! Grouped & run afterwards!
+        //Run every 500msecs!
         var newRun: Bool
         if runSwitched == .switched {   //Indicates run/stop state just changed
             newRun = true
@@ -1707,7 +1714,8 @@ class StraightTrackScene: SKScene, SKPhysicsContactDelegate, ObservableObject {
 //        print("self: \(self)\nsnapShot: \(String(describing: snapShot))\nzoomBit: \(zoomBit)")
 //        addChild(zoomBit)
         
-}       //end 500ms function
+}       //end 'ms500Code' code block!
+    //See also ms500Group & ms500Timer where code is run from!!!
     
     
     //'updateSpeeds' replaced by 'updateKLVehicles' & 'updateOtherVehicles'
